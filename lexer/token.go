@@ -1,10 +1,20 @@
 package lexer
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+)
 
-type Token interface {
+type TokenDesc interface {
 	Literal() string // token的字面量, 比如123, 456, <, >
 	Type() TokenType
+	SymbolicName() string
+	String() string
+}
+
+type Token interface {
+	TokenDesc
+	Position() (line, col int)
 }
 
 type TokenType = int
@@ -32,56 +42,84 @@ const (
 	tokenCount
 )
 
-var constTokens []Token
+func TokenDescs() []TokenDesc {
+	onceToken.Do(initTokens)
+	return tokens
+}
+
+func NewToken(tokenType TokenType, literal string, line, col int) Token {
+	return &token{
+		TokenDesc: tokens[tokenType],
+		line:      line, col: col,
+	}
+}
+
+var (
+	tokens             []TokenDesc
+	tokenSymbolicNames []string
+)
 
 var onceToken sync.Once
 
-func ConstTokens() []Token {
-	onceToken.Do(initTokens)
-	return constTokens
-}
-
 func initTokens() {
-	constTokens = make([]Token, tokenCount)
+	tokens = make([]TokenDesc, tokenCount)
+	tokenSymbolicNames = make([]string, tokenCount)
 	// 关键字
-	constTokens[TokenINT32] = newToken(TokenINT32, "i32")
-	constTokens[TokenLET] = newToken(TokenLET, "let")
-	constTokens[TokenIF] = newToken(TokenIF, "if")
-	constTokens[TokenELSE] = newToken(TokenELSE, "else")
-	constTokens[TokenRETURN] = newToken(TokenRETURN, "return")
-	constTokens[TokenMUT] = newToken(TokenMUT, "mut")
-	constTokens[TokenFN] = newToken(TokenFN, "fn")
-	constTokens[TokenFOR] = newToken(TokenFOR, "for")
-	constTokens[TokenIN] = newToken(TokenIN, "in")
-	constTokens[TokenLOOP] = newToken(TokenLOOP, "loop")
-	constTokens[TokenBREAK] = newToken(TokenBREAK, "break")
-	constTokens[TokenCONTINUE] = newToken(TokenCONTINUE, "continue")
+	newTokenDesc(TokenINT32, "i32", "INT32")
+	newTokenDesc(TokenLET, "let", "LET")
+	newTokenDesc(TokenIF, "if", "IF")
+	newTokenDesc(TokenELSE, "else", "ELSE")
+	newTokenDesc(TokenRETURN, "return", "RETURN")
+	newTokenDesc(TokenWhile, "while", "WHILE")
+	newTokenDesc(TokenMUT, "mut", "MUT")
+	newTokenDesc(TokenFN, "fn", "FN")
+	newTokenDesc(TokenFOR, "for", "FOR")
+	newTokenDesc(TokenIN, "in", "INT")
+	newTokenDesc(TokenLOOP, "loop", "LOOP")
+	newTokenDesc(TokenBREAK, "break", "BREAK")
+	newTokenDesc(TokenCONTINUE, "continue", "CONTINUE")
 	// 标识符（无固定字符串）
-	constTokens[TokenID] = newToken(TokenID, "") // 或占位符如 "ID"
+	newTokenDesc(TokenID, "", "ID") // 或占位符如 "ID"
 }
 
 type token struct {
-	tkType TokenType
-	text   string // token字面量
+	TokenDesc
+	line, col int
 }
 
 var _ Token = (*token)(nil)
 
-func (tk *token) Literal() string {
+func (tk *token) Position() (int, int) {
+	return tk.line, tk.col
+}
+
+type tokenDesc struct {
+	tkType TokenType
+	text   string // token字面量
+}
+
+var _ TokenDesc = (*tokenDesc)(nil)
+
+func (tk *tokenDesc) Literal() string {
 	return tk.text
 }
 
-func (tk *token) Type() TokenType {
+func (tk *tokenDesc) Type() TokenType {
 	return tk.tkType
 }
 
-func NewToken(tkType TokenType, text string) Token {
-	return newToken(tkType, text)
+func (tk *tokenDesc) SymbolicName() string {
+	return tokenSymbolicNames[tk.tkType]
 }
 
-func newToken(tkType TokenType, text string) *token {
-	return &token{
+func (tk *tokenDesc) String() string {
+	return fmt.Sprintf("token(%s):%s", tk.SymbolicName(), tk.Literal())
+}
+
+func newTokenDesc(tkType TokenType, text, symbol string) {
+	tokens[tkType] = &tokenDesc{
 		tkType: tkType,
 		text:   text,
 	}
+	tokenSymbolicNames[tkType] = symbol
 }

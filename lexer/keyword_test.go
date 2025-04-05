@@ -5,6 +5,13 @@ import (
 )
 
 func TestKwTable(t *testing.T) {
+	for pos, e := range TokenDescs() {
+		if e == nil {
+			t.Errorf("find nil at <%d>", pos)
+		}
+		t.Log(e)
+	}
+
 	kw := GetKWTable()
 
 	cases := []struct {
@@ -29,12 +36,13 @@ func TestKwTable(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		exist := kw.Exist(c.token) != nil
-		if exist != c.exist {
-			t.Errorf("(token[%s] in keyword) should be %v, but %v",
+		tk := kw.Exist(c.token)
+		exists := tk != nil
+		if exists != c.exist {
+			t.Errorf("([%s] in keyword) should be %v, but %v",
 				c.token,
 				c.exist,
-				exist)
+				exists)
 		} else {
 			t.Logf("token[%s] --> %v", c.token, c.exist)
 		}

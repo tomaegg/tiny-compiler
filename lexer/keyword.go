@@ -3,17 +3,17 @@ package lexer
 import "sync"
 
 type KeywordTable interface {
-	Exist(string) Token
+	Exist(string) TokenDesc
 }
 
 type keywordTable struct {
-	table  map[string]Token
-	tokens []Token
+	table  map[string]TokenDesc
+	tokens []TokenDesc
 }
 
 var kwTable keywordTable = keywordTable{
-	table:  make(map[string]Token),
-	tokens: ConstTokens(),
+	table:  make(map[string]TokenDesc),
+	tokens: TokenDescs(),
 }
 
 var onceKTable sync.Once
@@ -44,6 +44,6 @@ func (kw *keywordTable) put(tkType TokenType) {
 	kwTable.table[tk.Literal()] = tk
 }
 
-func (kw *keywordTable) Exist(text string) Token {
+func (kw *keywordTable) Exist(text string) TokenDesc {
 	return kw.table[text]
 }
