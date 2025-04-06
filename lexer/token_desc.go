@@ -17,6 +17,14 @@ type TokenType = int
 const (
 	TokenEOF = iota
 	TokenUNKNONW
+
+	// comments
+	TokenSCOMMENT // 单行注释
+	TokenMCOMMENT // 多行注释
+
+	// space
+	TokenWS
+
 	// keyword
 	TokenINT32
 	TokenLET
@@ -80,7 +88,15 @@ func TokenDescs() []TokenDesc {
 func initTokens() {
 	tokens = make([]TokenDesc, tokenCount)
 	tokenSymbolicNames = make([]string, tokenCount)
+	// space
+	newTokenDesc(TokenWS, "", "WS")
+	// comment
+	newTokenDesc(TokenSCOMMENT, "//...", "SCOMMENT")
+	newTokenDesc(TokenMCOMMENT, "/*...*/", "MCOMMENT")
+
+	// EOF
 	newTokenDesc(TokenEOF, "", "EOF")
+	// UNKNOWN
 	newTokenDesc(TokenUNKNONW, "", "UNKNOWN")
 	// 关键字
 	newTokenDesc(TokenINT32, "i32", "INT32")
