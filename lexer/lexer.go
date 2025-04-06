@@ -3,6 +3,7 @@ package lexer
 import (
 	"bytes"
 	"io"
+	"log"
 	"math"
 	"strings"
 	"unicode"
@@ -10,15 +11,15 @@ import (
 
 type Lexer interface {
 	Reset(offset int)
-	Advance() (EOF bool)
+	Advance()
 	NextToken() Token
 }
 
 type RustLikeLexer struct {
-	reader    bytes.Reader // reader
-	peek_     byte         // 当前的字符
-	lastPeek  byte         // 上一个字符
-	line, col int          // 当前的行与列
+	reader    *bytes.Reader // reader
+	peek_     byte          // 当前的字符
+	lastPeek  byte          // 上一个字符
+	line, col int           // 当前的行与列
 
 	longestValidPrefixType   TokenType // token type
 	longestValidPrefixOffset int       // 上一次匹配的位置的下一个字符的位置
@@ -27,9 +28,12 @@ type RustLikeLexer struct {
 
 var _ Lexer = (*RustLikeLexer)(nil)
 
-const invalidChar = math.MaxUint8
+const (
+	invalidChar = math.MaxUint8
+	peekEOF     = 0
+)
 
-func NewRustLikeLexer(reader bytes.Reader) *RustLikeLexer {
+func NewRustLikeLexer(reader *bytes.Reader) *RustLikeLexer {
 	ret := &RustLikeLexer{
 		reader:   reader,
 		peek_:    invalidChar,
@@ -48,13 +52,17 @@ func (rl *RustLikeLexer) Reset(offset int) {
 	}
 }
 
-func (rl *RustLikeLexer) Advance() (EOF bool) {
+func (rl *RustLikeLexer) Advance() {
 	var err error
 	rl.lastPeek = rl.peek_
 	rl.peek_, err = rl.reader.ReadByte()
 	if err == io.EOF {
-		return true
+		rl.peek_ = peekEOF
+		// msg := fmt.Sprintf("unexpected EOF at %d:%d", rl.line, rl.col)
+		// panic(msg)
+		return
 	}
+
 	// NOTE:这里不需要考虑\r的情况,因为在预处理环节,就可以把\r\n替换为\n
 	if rl.lastPeek == '\n' {
 		// 如果上一个是换行, 那么当前的就是另起一行
@@ -63,14 +71,12 @@ func (rl *RustLikeLexer) Advance() (EOF bool) {
 	} else {
 		rl.col++
 	}
-
-	return false
 }
 
 func (rl *RustLikeLexer) NextToken() Token {
 	if rl.reader.Len() == 0 {
 		// 已经读取结束, 那么返回EOF
-		return NewToken(TokenEOF, "", rl.line, rl.col)
+		return NewToken(TokenEOF, rl.line, rl.col)
 	}
 
 	// 开启状态机的转移
@@ -85,6 +91,8 @@ func (rl *RustLikeLexer) NextToken() Token {
 		ret = rl.tokenCOMMENT()
 	}
 
+	log.Printf("current peek: %c(%d)", rl.peek(), rl.peek())
+
 	return ret
 }
 
@@ -97,13 +105,13 @@ func (rl *RustLikeLexer) peek() rune {
 }
 
 func (rl *RustLikeLexer) tokenWS() Token {
-	var literal strings.Builder
+	var text strings.Builder
 	sline, scol := rl.line, rl.col
 	for unicode.IsSpace(rl.peek()) {
-		literal.WriteByte(byte(rl.peek()))
+		text.WriteByte(byte(rl.peek()))
 		rl.Advance()
 	}
-	return NewToken(TokenWS, literal.String(), sline, scol)
+	return NewTokenWithText(TokenWS, text.String(), sline, scol)
 }
 
 func (rl *RustLikeLexer) tokenCOMMENT() Token {
@@ -113,20 +121,29 @@ func (rl *RustLikeLexer) tokenCOMMENT() Token {
 		q1
 		q2
 		q3
-		q4 // 多行注释的接受态
-		q5 // 单行注释的接受态
+		q4    // 多行注释的接受态
+		q5    // 单行注释的接受态
+		qDead // unknown token
 	)
 
 	sline, scol := rl.line, rl.col
 	// 把当前的/消耗掉
-	var literal strings.Builder
-	literal.WriteByte(byte(rl.peek()))
+	var text strings.Builder
+	text.WriteByte(byte(rl.peek()))
 	rl.Advance()
 	state := q0
 
 	for {
 		r := rl.peek()
-		literal.WriteByte(byte(r))
+
+		if r != peekEOF {
+			switch state {
+			case q4, q5, qDead:
+			// pass此时属于终态，不写入
+			default:
+				text.WriteByte(byte(r))
+			}
+		}
 
 		switch state {
 		case q0:
@@ -138,24 +155,30 @@ func (rl *RustLikeLexer) tokenCOMMENT() Token {
 				state = q2
 				rl.Advance()
 			default: // unknown token
+				state = qDead
 				rl.Advance()
-				return NewToken(TokenUNKNONW, literal.String(), sline, scol)
 			}
 
 		case q1:
-			if r == '\n' {
+			switch r {
+			case '\n':
 				state = q5
 				rl.Advance()
-			} else {
+			case peekEOF:
+				state = qDead
+			default:
 				// 保持当前
 				rl.Advance()
 			}
 
 		case q2:
-			if r == '*' {
+			switch r {
+			case '*':
 				state = q3
 				rl.Advance()
-			} else {
+			case peekEOF:
+				state = qDead
+			default:
 				rl.Advance()
 			}
 
@@ -164,15 +187,20 @@ func (rl *RustLikeLexer) tokenCOMMENT() Token {
 				state = q4
 				rl.Advance()
 			} else {
-				return NewToken(TokenUNKNONW, literal.String(), sline, scol)
+				state = qDead
+				rl.Advance()
 			}
 
 		case q4:
 			// 此时已经到达多行注释的接受态
-			return NewToken(TokenMCOMMENT, literal.String(), sline, scol)
+			return NewTokenWithText(TokenMCOMMENT, text.String(), sline, scol)
 		case q5:
 			// 此时已经到达单行注释的接受态
-			return NewToken(TokenSCOMMENT, literal.String(), sline, scol)
+			return NewTokenWithText(TokenSCOMMENT, text.String(), sline, scol)
+
+		case qDead:
+			return NewTokenWithText(TokenUNKNONW, text.String(), sline, scol)
+
 		}
 	}
 }
