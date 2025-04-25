@@ -92,6 +92,12 @@ func (rl *RustLikeLexer) NextToken() Token {
 	// 处理关键词或标识符
 	case unicode.IsLetter(r) || r == '_':
 		ret = rl.tokenKeywordorID()
+	// 处理数字
+	case unicode.IsDigit(r):
+		ret = rl.tokenNumber()
+	// 处理赋值号
+	case r == '=':
+		ret = rl.tokenAssignOrEQ()
 	}
 
 	log.Printf("current peek: %c(%d)", rl.peek(), rl.peek())
@@ -240,4 +246,40 @@ func (rl *RustLikeLexer) tokenKeywordorID() Token {
 
 	// 空内容
 	return NewTokenWithText(TokenUNKNONW, literal, sline, scol)
+}
+
+func (rl *RustLikeLexer) tokenNumber() Token {
+	var text strings.Builder
+	sline, scol := rl.line, rl.col
+
+	// 收集数字字符
+	for {
+		r := rl.peek()
+		if unicode.IsDigit(r) {
+			text.WriteRune(r)
+			rl.Advance()
+		} else {
+			break
+		}
+	}
+
+	literal := text.String()
+	if text.Len() > 0 {
+		return NewTokenWithText(TokenNUMBER, literal, sline, scol)
+	}
+
+	return NewTokenWithText(TokenUNKNONW, literal, sline, scol)
+}
+
+func (rl *RustLikeLexer) tokenAssignOrEQ() Token {
+	sline, scol := rl.line, rl.col
+	// 处理赋值号
+	rl.Advance()
+	if rl.peek() == '=' {
+		rl.Advance()
+		return NewTokenWithText(TokenEQ, "==", sline, scol)
+	}
+
+	// 处理赋值号
+	return NewTokenWithText(TokenASSIGN, "=", sline, scol)
 }

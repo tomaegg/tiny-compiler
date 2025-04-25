@@ -12,6 +12,10 @@ func TestNextToken(t *testing.T) {
 
 	t.Run("KEYWORD", testNextTokenKeywordorID)
 
+	t.Run("NUMBER", testNextTokenNumber)
+
+	t.Run("ASSIGNorEQ", testNextTokenAssignOrEQ)
+
 }
 
 func testNextTokenWS(t *testing.T) {
@@ -74,6 +78,79 @@ func testNextTokenKeywordorID(t *testing.T) {
 	}
 
 	// Ensure the next token is EOF
+	tk := lexer.NextToken()
+	if tk.Type() == TokenWS {
+		tk = lexer.NextToken() // Skip whitespace tokens
+	}
+	if tk.Type() != TokenEOF {
+		t.Errorf("expected EOF, got %d", tk.Type())
+	}
+}
+
+func testNextTokenNumber(t *testing.T) {
+	b := []byte(
+		`123 456 1 3 5 123456789`,
+	)
+	reader := bytes.NewReader(b)
+	lexer := NewRustLikeLexer(reader)
+
+	expectedTokens := []struct {
+		tokenType TokenType
+		literal   string
+	}{
+		{TokenNUMBER, "123"}, {TokenNUMBER, "456"}, {TokenNUMBER, "1"}, {TokenNUMBER, "3"}, {TokenNUMBER, "5"},
+		{TokenNUMBER, "123456789"},
+	}
+
+	for _, expected := range expectedTokens {
+		tk := lexer.NextToken()
+		if tk.Type() == TokenWS {
+			tk = lexer.NextToken() // 跳过空格
+		}
+		if tk.Type() != expected.tokenType {
+			t.Errorf("expected token type %d with literal '%s', got type %d with literal '%s'",
+				expected.tokenType, expected.literal, tk.Type(), tk.Literal())
+		} else {
+			t.Logf("token: %s", tk)
+		}
+	}
+
+	tk := lexer.NextToken()
+	if tk.Type() == TokenWS {
+		tk = lexer.NextToken() // Skip whitespace tokens
+	}
+	if tk.Type() != TokenEOF {
+		t.Errorf("expected EOF, got %d", tk.Type())
+	}
+}
+
+func testNextTokenAssignOrEQ(t *testing.T) {
+	b := []byte(
+		`= ==`,
+	)
+	reader := bytes.NewReader(b)
+	lexer := NewRustLikeLexer(reader)
+
+	expectedTokens := []struct {
+		tokenType TokenType
+		literal   string
+	}{
+		{TokenASSIGN, "="}, {TokenEQ, "=="},
+	}
+
+	for _, expected := range expectedTokens {
+		tk := lexer.NextToken()
+		if tk.Type() == TokenWS {
+			tk = lexer.NextToken() // 跳过空格
+		}
+		if tk.Type() != expected.tokenType {
+			t.Errorf("expected token type %d with literal '%s', got type %d with literal '%s'",
+				expected.tokenType, expected.literal, tk.Type(), tk.Literal())
+		} else {
+			t.Logf("token: %s", tk)
+		}
+	}
+
 	tk := lexer.NextToken()
 	if tk.Type() == TokenWS {
 		tk = lexer.NextToken() // Skip whitespace tokens
