@@ -86,9 +86,12 @@ func (rl *RustLikeLexer) NextToken() Token {
 	// 处理空白
 	case unicode.IsSpace(r):
 		ret = rl.tokenWS()
-		// 处理注释
+	// 处理注释
 	case r == '/':
 		ret = rl.tokenCOMMENT()
+	// 处理关键词或标识符
+	case unicode.IsLetter(r) || r == '_':
+		ret = rl.tokenKeywordorID()
 	}
 
 	log.Printf("current peek: %c(%d)", rl.peek(), rl.peek())
@@ -203,4 +206,38 @@ func (rl *RustLikeLexer) tokenCOMMENT() Token {
 
 		}
 	}
+}
+
+func (rl *RustLikeLexer) tokenKeywordorID() Token {
+	var text strings.Builder
+	sline, scol := rl.line, rl.col
+
+	// 收集标识符字符（字母、数字、下划线）
+	for {
+		r := rl.peek()
+		if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' {
+			text.WriteRune(r)
+			rl.Advance()
+		} else {
+			break
+		}
+	}
+
+	log.Print(text.String())
+	literal := text.String()
+
+	// 判断是否为关键字（优先于标识符）
+	tokenDesc := GetKWTable().Exist(literal)
+	if tokenDesc != nil {
+		// 是关键字
+		return NewTokenWithText(tokenDesc.Type(), literal, sline, scol)
+	}
+
+	// 非关键字则视为标识符
+	if text.Len() > 0 {
+		return NewTokenWithText(TokenID, literal, sline, scol)
+	}
+
+	// 空内容
+	return NewTokenWithText(TokenUNKNONW, literal, sline, scol)
 }
