@@ -74,7 +74,7 @@ func (rl *RustLikeLexer) Advance() {
 }
 
 func (rl *RustLikeLexer) NextToken() Token {
-	if rl.reader.Len() == 0 {
+	if rl.peek_ == peekEOF {
 		// 已经读取结束, 那么返回EOF
 		return NewToken(TokenEOF, rl.line, rl.col)
 	}
@@ -82,6 +82,7 @@ func (rl *RustLikeLexer) NextToken() Token {
 	// 开启状态机的转移
 	var ret Token
 	r := rl.peek()
+
 	switch {
 	// 处理空白
 	case unicode.IsSpace(r):
@@ -98,6 +99,56 @@ func (rl *RustLikeLexer) NextToken() Token {
 	// 处理赋值号
 	case r == '=':
 		ret = rl.tokenAssignOrEQ()
+	// 处理界符
+	case r == '(':
+		ret = NewToken(TokenLPAREN, rl.line, rl.col)
+		rl.Advance()
+	case r == ')':
+		ret = NewToken(TokenRPAREN, rl.line, rl.col)
+		rl.Advance()
+	case r == '{':
+		ret = NewToken(TokenLBRACE, rl.line, rl.col)
+		rl.Advance()
+	case r == '}':
+		ret = NewToken(TokenRBRACE, rl.line, rl.col)
+		rl.Advance()
+	case r == '[':
+		ret = NewToken(TokenLBRAC, rl.line, rl.col)
+		rl.Advance()
+	case r == ']':
+		ret = NewToken(TokenRBRAC, rl.line, rl.col)
+		rl.Advance()
+	// 处理分割符
+	case r == ';':
+		ret = NewToken(TokenSEMI, rl.line, rl.col)
+		rl.Advance()
+	case r == ':':
+		ret = NewToken(TokenCOLON, rl.line, rl.col)
+		rl.Advance()
+	case r == ',':
+		ret = NewToken(TokenCOMMA, rl.line, rl.col)
+		rl.Advance()
+	// 处理特殊符号
+	case r == '.':
+		ret = rl.tokenDOT()
+	case r == '-':
+		ret = rl.tokenARROWorMINUS()
+	// 处理运算符
+	case r == '+':
+		ret = NewToken(TokenPLUS, rl.line, rl.col)
+		rl.Advance()
+	case r == '*':
+		ret = NewToken(TokenMULTI, rl.line, rl.col)
+		rl.Advance()
+	case r == '/':
+		ret = NewToken(TokenDIV, rl.line, rl.col)
+		rl.Advance()
+	case r == '<':
+		ret = rl.tokenLTorLE()
+	case r == '>':
+		ret = rl.tokenGTorGE()
+	case r == '!':
+		ret = rl.TokenNE()
 	}
 
 	log.Printf("current peek: %c(%d)", rl.peek(), rl.peek())
@@ -148,7 +199,7 @@ func (rl *RustLikeLexer) tokenCOMMENT() Token {
 		if r != peekEOF {
 			switch state {
 			case q4, q5, qDead:
-			// pass此时属于终态，不写入
+				// pass此时属于终态，不写入
 			default:
 				text.WriteByte(byte(r))
 			}
@@ -163,9 +214,9 @@ func (rl *RustLikeLexer) tokenCOMMENT() Token {
 			case '*':
 				state = q2
 				rl.Advance()
-			default: // unknown token
-				state = qDead
-				rl.Advance()
+			default:
+				// 如果既不是单行注释也不是多行注释，则返回除号
+				return NewTokenWithText(TokenDIV, "/", sline, scol)
 			}
 
 		case q1:
@@ -174,7 +225,7 @@ func (rl *RustLikeLexer) tokenCOMMENT() Token {
 				state = q5
 				rl.Advance()
 			case peekEOF:
-				state = qDead
+				state = q5
 			default:
 				// 保持当前
 				rl.Advance()
@@ -196,7 +247,7 @@ func (rl *RustLikeLexer) tokenCOMMENT() Token {
 				state = q4
 				rl.Advance()
 			} else {
-				state = qDead
+				state = q2
 				rl.Advance()
 			}
 
@@ -229,7 +280,6 @@ func (rl *RustLikeLexer) tokenKeywordorID() Token {
 		}
 	}
 
-	log.Print(text.String())
 	literal := text.String()
 
 	// 判断是否为关键字（优先于标识符）
@@ -282,4 +332,54 @@ func (rl *RustLikeLexer) tokenAssignOrEQ() Token {
 
 	// 处理赋值号
 	return NewTokenWithText(TokenASSIGN, "=", sline, scol)
+}
+
+func (rl *RustLikeLexer) tokenDOT() Token {
+	sline, scol := rl.line, rl.col
+	rl.Advance()
+	if rl.peek() == '.' {
+		rl.Advance()
+		return NewTokenWithText(Token2DOT, "..", sline, scol)
+	}
+	return NewTokenWithText(TokenDOT, ".", sline, scol)
+}
+
+func (rl *RustLikeLexer) tokenARROWorMINUS() Token {
+	sline, scol := rl.line, rl.col
+	rl.Advance()
+	if rl.peek() == '>' {
+		rl.Advance()
+		return NewTokenWithText(TokenARROW, "->", sline, scol)
+	}
+	return NewTokenWithText(TokenMINUS, "-", sline, scol)
+}
+
+func (rl *RustLikeLexer) tokenLTorLE() Token {
+	sline, scol := rl.line, rl.col
+	rl.Advance()
+	if rl.peek() == '=' {
+		rl.Advance()
+		return NewTokenWithText(TokenLE, "<=", sline, scol)
+	}
+	return NewTokenWithText(TokenLT, "<", sline, scol)
+}
+
+func (rl *RustLikeLexer) tokenGTorGE() Token {
+	sline, scol := rl.line, rl.col
+	rl.Advance()
+	if rl.peek() == '=' {
+		rl.Advance()
+		return NewTokenWithText(TokenGE, ">=", sline, scol)
+	}
+	return NewTokenWithText(TokenGT, ">", sline, scol)
+}
+
+func (rl *RustLikeLexer) TokenNE() Token {
+	sline, scol := rl.line, rl.col
+	rl.Advance()
+	if rl.peek() == '=' {
+		rl.Advance()
+		return NewTokenWithText(TokenNE, "!=", sline, scol)
+	}
+	return NewTokenWithText(TokenUNKNONW, "!", sline, scol)
 }

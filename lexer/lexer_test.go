@@ -16,6 +16,16 @@ func TestNextToken(t *testing.T) {
 
 	t.Run("ASSIGNorEQ", testNextTokenAssignOrEQ)
 
+	t.Run("BOUND", testNextTokenBound)
+
+	t.Run("DIVIDE", testDivide)
+
+	t.Run("SPECIAL", testSpecial)
+
+	t.Run("CALC", testCalc)
+
+	t.Run("COMPREHENSIVE", TestComprehensiveTokenParsing)
+
 }
 
 func testNextTokenWS(t *testing.T) {
@@ -70,8 +80,8 @@ func testNextTokenKeywordorID(t *testing.T) {
 			tk = lexer.NextToken() // 跳过空格
 		}
 		if tk.Type() != expected.tokenType {
-			t.Errorf("expected token type %d with literal '%s', got type %d with literal '%s'",
-				expected.tokenType, expected.literal, tk.Type(), tk.Literal())
+			t.Errorf("expected token type %s with literal '%s', got type %s with literal '%s'",
+				tokenSymbolicNames[expected.tokenType], expected.literal, tokenSymbolicNames[tk.Type()], tk.Literal())
 		} else {
 			t.Logf("token: %s", tk)
 		}
@@ -108,8 +118,8 @@ func testNextTokenNumber(t *testing.T) {
 			tk = lexer.NextToken() // 跳过空格
 		}
 		if tk.Type() != expected.tokenType {
-			t.Errorf("expected token type %d with literal '%s', got type %d with literal '%s'",
-				expected.tokenType, expected.literal, tk.Type(), tk.Literal())
+			t.Errorf("expected token type %s with literal '%s', got type %s with literal '%s'",
+				tokenSymbolicNames[expected.tokenType], expected.literal, tokenSymbolicNames[tk.Type()], tk.Literal())
 		} else {
 			t.Logf("token: %s", tk)
 		}
@@ -144,13 +154,224 @@ func testNextTokenAssignOrEQ(t *testing.T) {
 			tk = lexer.NextToken() // 跳过空格
 		}
 		if tk.Type() != expected.tokenType {
-			t.Errorf("expected token type %d with literal '%s', got type %d with literal '%s'",
-				expected.tokenType, expected.literal, tk.Type(), tk.Literal())
+			t.Errorf("expected token type %s with literal '%s', got type %s with literal '%s'",
+				tokenSymbolicNames[expected.tokenType], expected.literal, tokenSymbolicNames[tk.Type()], tk.Literal())
 		} else {
 			t.Logf("token: %s", tk)
 		}
 	}
 
+	tk := lexer.NextToken()
+	if tk.Type() == TokenWS {
+		tk = lexer.NextToken() // Skip whitespace tokens
+	}
+	if tk.Type() != TokenEOF {
+		t.Errorf("expected EOF, got %d", tk.Type())
+	}
+}
+
+func testNextTokenBound(t *testing.T) {
+	b := []byte(
+		`( )   { }    [ ]`,
+	)
+	reader := bytes.NewReader(b)
+	lexer := NewRustLikeLexer(reader)
+
+	expectedTokens := []struct {
+		tokenType TokenType
+		literal   string
+	}{
+		{TokenLPAREN, "("}, {TokenRPAREN, ")"}, {TokenLBRACE, "{"}, {TokenRBRACE, "}"},
+		{TokenLBRAC, "["}, {TokenRBRAC, "]"},
+	}
+
+	for _, expected := range expectedTokens {
+		tk := lexer.NextToken()
+		if tk.Type() == TokenWS {
+			tk = lexer.NextToken()
+		}
+		if tk.Type() != expected.tokenType {
+			t.Errorf("expected token type %s with literal '%s', got type %s with literal '%s'",
+				tokenSymbolicNames[expected.tokenType], expected.literal, tokenSymbolicNames[tk.Type()], tk.Literal())
+		} else {
+			t.Logf("token: %s", tk)
+		}
+	}
+
+	tk := lexer.NextToken()
+	if tk.Type() == TokenWS {
+		tk = lexer.NextToken()
+	}
+	if tk.Type() != TokenEOF {
+		t.Errorf("expected EOF, got %d", tk.Type())
+	}
+}
+
+func testDivide(t *testing.T) {
+	b := []byte(
+		`; : ,`,
+	)
+	reader := bytes.NewReader(b)
+	lexer := NewRustLikeLexer(reader)
+
+	expectedTokens := []struct {
+		tokenType TokenType
+		literal   string
+	}{
+		{TokenSEMI, ";"}, {TokenCOLON, ":"}, {TokenCOMMA, ","},
+	}
+
+	for _, expected := range expectedTokens {
+		tk := lexer.NextToken()
+		if tk.Type() == TokenWS {
+			tk = lexer.NextToken() // Skip whitespace tokens
+		}
+		if tk.Type() != expected.tokenType {
+			t.Errorf("expected token type %s with literal '%s', got type %s with literal '%s'",
+				tokenSymbolicNames[expected.tokenType], expected.literal, tokenSymbolicNames[tk.Type()], tk.Literal())
+		} else {
+			t.Logf("token: %s", tk)
+		}
+	}
+
+	tk := lexer.NextToken()
+	if tk.Type() == TokenWS {
+		tk = lexer.NextToken() // Skip whitespace tokens
+	}
+	if tk.Type() != TokenEOF {
+		t.Errorf("expected EOF, got %d", tk.Type())
+	}
+}
+
+func testSpecial(t *testing.T) {
+	b := []byte(
+		`-> .. .`,
+	)
+	reader := bytes.NewReader(b)
+	lexer := NewRustLikeLexer(reader)
+
+	expectedTokens := []struct {
+		tokenType TokenType
+		literal   string
+	}{
+		{TokenARROW, "->"}, {Token2DOT, ".."}, {TokenDOT, "."},
+	}
+
+	for _, expected := range expectedTokens {
+		tk := lexer.NextToken()
+		if tk.Type() == TokenWS {
+			tk = lexer.NextToken() // Skip whitespace tokens
+		}
+		if tk.Type() != expected.tokenType {
+			t.Errorf("expected token type %s with literal '%s', got type %s with literal '%s'",
+				tokenSymbolicNames[expected.tokenType], expected.literal, tokenSymbolicNames[tk.Type()], tk.Literal())
+		} else {
+			t.Logf("token: %s", tk)
+		}
+	}
+
+	tk := lexer.NextToken()
+	if tk.Type() == TokenWS {
+		tk = lexer.NextToken() // Skip whitespace tokens
+	}
+	if tk.Type() != TokenEOF {
+		t.Errorf("expected EOF, got %d", tk.Type())
+	}
+}
+
+func testCalc(t *testing.T) {
+	b := []byte(
+		`+ - * / == != < <= > >=`,
+	)
+	reader := bytes.NewReader(b)
+	lexer := NewRustLikeLexer(reader)
+
+	expectedTokens := []struct {
+		tokenType TokenType
+		literal   string
+	}{
+		{TokenPLUS, "+"}, {TokenMINUS, "-"}, {TokenMULTI, "*"}, {TokenDIV, "/"},
+		{TokenEQ, "=="}, {TokenNE, "!="}, {TokenLT, "<"}, {TokenLE, "<="},
+		{TokenGT, ">"}, {TokenGE, ">="},
+	}
+
+	for _, expected := range expectedTokens {
+		tk := lexer.NextToken()
+		if tk.Type() == TokenWS {
+			tk = lexer.NextToken() // Skip whitespace tokens
+		}
+		if tk.Type() != expected.tokenType {
+			t.Errorf("expected token type %s with literal '%s', got type %s with literal '%s'",
+				tokenSymbolicNames[expected.tokenType], expected.literal, tokenSymbolicNames[tk.Type()], tk.Literal())
+		} else {
+			t.Logf("token: %s", tk)
+		}
+	}
+
+	tk := lexer.NextToken()
+	if tk.Type() == TokenWS {
+		tk = lexer.NextToken() // Skip whitespace tokens
+	}
+	if tk.Type() != TokenEOF {
+		t.Errorf("expected EOF, got %d", tk.Type())
+	}
+}
+func TestComprehensiveTokenParsing(t *testing.T) {
+	b := []byte(
+		`let x = 123; if x >= 100 {
+			// Check if x is large
+			return x + 1;
+		} else {
+			/* Handle smaller values */
+			let y = x - 1;
+			y
+		}
+		-> .. . == != <= >= ( ) { } [ ] + - * / , :`,
+	)
+	reader := bytes.NewReader(b)
+	lexer := NewRustLikeLexer(reader)
+
+	expectedTokens := []struct {
+		tokenType TokenType
+		literal   string
+	}{
+		// Keywords and identifiers
+		{TokenLET, "let"}, {TokenID, "x"}, {TokenASSIGN, "="}, {TokenNUMBER, "123"}, {TokenSEMI, ";"},
+		{TokenIF, "if"}, {TokenID, "x"}, {TokenGE, ">="}, {TokenNUMBER, "100"}, {TokenLBRACE, "{"},
+
+		// Single-line comment
+		{TokenSCOMMENT, "// Check if x is large"},
+
+		{TokenRETURN, "return"}, {TokenID, "x"}, {TokenPLUS, "+"}, {TokenNUMBER, "1"}, {TokenSEMI, ";"},
+		{TokenRBRACE, "}"}, {TokenELSE, "else"}, {TokenLBRACE, "{"},
+
+		// Multi-line comment
+		{TokenMCOMMENT, "/* Handle smaller values */"},
+
+		{TokenLET, "let"}, {TokenID, "y"}, {TokenASSIGN, "="}, {TokenID, "x"}, {TokenMINUS, "-"},
+		{TokenNUMBER, "1"}, {TokenSEMI, ";"}, {TokenID, "y"}, {TokenRBRACE, "}"},
+
+		// Special symbols and operators
+		{TokenARROW, "->"}, {Token2DOT, ".."}, {TokenDOT, "."}, {TokenEQ, "=="}, {TokenNE, "!="},
+		{TokenLE, "<="}, {TokenGE, ">="}, {TokenLPAREN, "("}, {TokenRPAREN, ")"}, {TokenLBRACE, "{"},
+		{TokenRBRACE, "}"}, {TokenLBRAC, "["}, {TokenRBRAC, "]"}, {TokenPLUS, "+"}, {TokenMINUS, "-"},
+		{TokenMULTI, "*"}, {TokenDIV, "/"}, {TokenCOMMA, ","}, {TokenCOLON, ":"},
+	}
+
+	for _, expected := range expectedTokens {
+		tk := lexer.NextToken()
+		if tk.Type() == TokenWS {
+			tk = lexer.NextToken() // Skip whitespace tokens
+		}
+		if tk.Type() != expected.tokenType {
+			t.Errorf("expected token type %s with literal '%s', got type %s with literal '%s'",
+				tokenSymbolicNames[expected.tokenType], expected.literal, tokenSymbolicNames[tk.Type()], tk.Literal())
+		} else {
+			t.Logf("token: %s", tk)
+		}
+	}
+
+	// Ensure the next token is EOF
 	tk := lexer.NextToken()
 	if tk.Type() == TokenWS {
 		tk = lexer.NextToken() // Skip whitespace tokens
