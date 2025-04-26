@@ -76,6 +76,11 @@ const (
 	TokenLBRACE // {
 	TokenRBRACE // }
 
+	// 特殊符号
+	TokenARROW // ->
+	TokenDOT   // .
+	Token2DOT  // ..
+
 	// for count
 	tokenCount
 )
@@ -141,6 +146,10 @@ func initTokens() {
 	newTokenDesc(TokenRBRAC, "]", "RBRAC")
 	newTokenDesc(TokenLBRACE, "{", "LBRACE")
 	newTokenDesc(TokenRBRACE, "}", "RBRACE")
+	// 特殊符号
+	newTokenDesc(TokenARROW, "->", "ARROW")
+	newTokenDesc(TokenDOT, ".", "DOT")
+	newTokenDesc(Token2DOT, "..", "2DOT")
 }
 
 type tokenDesc struct {
