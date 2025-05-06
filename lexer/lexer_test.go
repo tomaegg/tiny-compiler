@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"bytes"
+	"math/rand/v2"
 	"testing"
 )
 
@@ -25,7 +26,62 @@ func TestNextToken(t *testing.T) {
 	t.Run("CALC", testCalc)
 
 	t.Run("COMPREHENSIVE", TestComprehensiveTokenParsing)
+}
 
+// TODO: 根据数组:	tokens []TokenDesc
+// 生成随机token进行测试, 其中id/numbe/comments是需要自己生成的
+// number的生成是显然的, id的生成已经给你写好了
+// 只需要随机取tokens即可, 利用token.Literal()方法得到token
+// 再次测试一下token的生成是否正确
+// 注意写入[]byte时可以用fmt.Appendf方法
+func TestNextTokenRand(t *testing.T) {
+}
+
+func genTokenID() []byte {
+	genDigit := func() byte {
+		return byte(rand.IntN(10) + '0')
+	}
+	genLetter := func() byte {
+		if rand.IntN(2) != 0 {
+			return byte(rand.IntN(26) + 'a')
+		}
+		return byte(rand.IntN(26) + 'A')
+	}
+	genOthers := func() byte {
+		switch rand.IntN(3) {
+		case 2:
+			return genLetter()
+		case 1:
+			return '_'
+		default:
+			return genDigit()
+		}
+	}
+	genFirst := func() byte {
+		switch rand.IntN(2) {
+		case 0:
+			return genLetter()
+		default:
+			return '_'
+		}
+	}
+
+	// default gen lenth <= 8
+	const maxIDLen = 8
+
+	l := rand.IntN(maxIDLen) + 1
+	var buffer bytes.Buffer
+	buffer.WriteByte(genFirst())
+	for range l - 1 {
+		buffer.WriteByte(genOthers())
+	}
+
+	kwTable := GetKWTable()
+	if kwTable.Exist(buffer.String()) != nil {
+		return genTokenID()
+	}
+
+	return buffer.Bytes()
 }
 
 func testNextTokenWS(t *testing.T) {
@@ -68,10 +124,20 @@ func testNextTokenKeywordorID(t *testing.T) {
 		tokenType TokenType
 		literal   string
 	}{
-		{TokenLET, "let"}, {TokenINT32, "i32"}, {TokenIF, "if"}, {TokenELSE, "else"},
-		{TokenRETURN, "return"}, {TokenMUT, "mut"}, {TokenFN, "fn"}, {TokenLOOP, "loop"},
-		{TokenFOR, "for"}, {TokenIN, "in"}, {TokenBREAK, "break"}, {TokenCONTINUE, "continue"},
-		{TokenID, "identifier123"}, {TokenID, "_anotherID"},
+		{TokenLET, "let"},
+		{TokenINT32, "i32"},
+		{TokenIF, "if"},
+		{TokenELSE, "else"},
+		{TokenRETURN, "return"},
+		{TokenMUT, "mut"},
+		{TokenFN, "fn"},
+		{TokenLOOP, "loop"},
+		{TokenFOR, "for"},
+		{TokenIN, "in"},
+		{TokenBREAK, "break"},
+		{TokenCONTINUE, "continue"},
+		{TokenID, "identifier123"},
+		{TokenID, "_anotherID"},
 	}
 
 	for _, expected := range expectedTokens {
@@ -108,7 +174,11 @@ func testNextTokenNumber(t *testing.T) {
 		tokenType TokenType
 		literal   string
 	}{
-		{TokenNUMBER, "123"}, {TokenNUMBER, "456"}, {TokenNUMBER, "1"}, {TokenNUMBER, "3"}, {TokenNUMBER, "5"},
+		{TokenNUMBER, "123"},
+		{TokenNUMBER, "456"},
+		{TokenNUMBER, "1"},
+		{TokenNUMBER, "3"},
+		{TokenNUMBER, "5"},
 		{TokenNUMBER, "123456789"},
 	}
 
@@ -181,8 +251,12 @@ func testNextTokenBound(t *testing.T) {
 		tokenType TokenType
 		literal   string
 	}{
-		{TokenLPAREN, "("}, {TokenRPAREN, ")"}, {TokenLBRACE, "{"}, {TokenRBRACE, "}"},
-		{TokenLBRAC, "["}, {TokenRBRAC, "]"},
+		{TokenLPAREN, "("},
+		{TokenRPAREN, ")"},
+		{TokenLBRACE, "{"},
+		{TokenRBRACE, "}"},
+		{TokenLBRAC, "["},
+		{TokenRBRAC, "]"},
 	}
 
 	for _, expected := range expectedTokens {
@@ -290,9 +364,16 @@ func testCalc(t *testing.T) {
 		tokenType TokenType
 		literal   string
 	}{
-		{TokenPLUS, "+"}, {TokenMINUS, "-"}, {TokenMULTI, "*"}, {TokenDIV, "/"},
-		{TokenEQ, "=="}, {TokenNE, "!="}, {TokenLT, "<"}, {TokenLE, "<="},
-		{TokenGT, ">"}, {TokenGE, ">="},
+		{TokenPLUS, "+"},
+		{TokenMINUS, "-"},
+		{TokenMULTI, "*"},
+		{TokenDIV, "/"},
+		{TokenEQ, "=="},
+		{TokenNE, "!="},
+		{TokenLT, "<"},
+		{TokenLE, "<="},
+		{TokenGT, ">"},
+		{TokenGE, ">="},
 	}
 
 	for _, expected := range expectedTokens {
@@ -316,6 +397,7 @@ func testCalc(t *testing.T) {
 		t.Errorf("expected EOF, got %d", tk.Type())
 	}
 }
+
 func TestComprehensiveTokenParsing(t *testing.T) {
 	b := []byte(
 		`let x = 123; if x >= 100 {
@@ -336,26 +418,62 @@ func TestComprehensiveTokenParsing(t *testing.T) {
 		literal   string
 	}{
 		// Keywords and identifiers
-		{TokenLET, "let"}, {TokenID, "x"}, {TokenASSIGN, "="}, {TokenNUMBER, "123"}, {TokenSEMI, ";"},
-		{TokenIF, "if"}, {TokenID, "x"}, {TokenGE, ">="}, {TokenNUMBER, "100"}, {TokenLBRACE, "{"},
+		{TokenLET, "let"},
+		{TokenID, "x"},
+		{TokenASSIGN, "="},
+		{TokenNUMBER, "123"},
+		{TokenSEMI, ";"},
+		{TokenIF, "if"},
+		{TokenID, "x"},
+		{TokenGE, ">="},
+		{TokenNUMBER, "100"},
+		{TokenLBRACE, "{"},
 
 		// Single-line comment
 		{TokenSCOMMENT, "// Check if x is large"},
 
-		{TokenRETURN, "return"}, {TokenID, "x"}, {TokenPLUS, "+"}, {TokenNUMBER, "1"}, {TokenSEMI, ";"},
-		{TokenRBRACE, "}"}, {TokenELSE, "else"}, {TokenLBRACE, "{"},
+		{TokenRETURN, "return"},
+		{TokenID, "x"},
+		{TokenPLUS, "+"},
+		{TokenNUMBER, "1"},
+		{TokenSEMI, ";"},
+		{TokenRBRACE, "}"},
+		{TokenELSE, "else"},
+		{TokenLBRACE, "{"},
 
 		// Multi-line comment
 		{TokenMCOMMENT, "/* Handle smaller values */"},
 
-		{TokenLET, "let"}, {TokenID, "y"}, {TokenASSIGN, "="}, {TokenID, "x"}, {TokenMINUS, "-"},
-		{TokenNUMBER, "1"}, {TokenSEMI, ";"}, {TokenID, "y"}, {TokenRBRACE, "}"},
+		{TokenLET, "let"},
+		{TokenID, "y"},
+		{TokenASSIGN, "="},
+		{TokenID, "x"},
+		{TokenMINUS, "-"},
+		{TokenNUMBER, "1"},
+		{TokenSEMI, ";"},
+		{TokenID, "y"},
+		{TokenRBRACE, "}"},
 
 		// Special symbols and operators
-		{TokenARROW, "->"}, {Token2DOT, ".."}, {TokenDOT, "."}, {TokenEQ, "=="}, {TokenNE, "!="},
-		{TokenLE, "<="}, {TokenGE, ">="}, {TokenLPAREN, "("}, {TokenRPAREN, ")"}, {TokenLBRACE, "{"},
-		{TokenRBRACE, "}"}, {TokenLBRAC, "["}, {TokenRBRAC, "]"}, {TokenPLUS, "+"}, {TokenMINUS, "-"},
-		{TokenMULTI, "*"}, {TokenDIV, "/"}, {TokenCOMMA, ","}, {TokenCOLON, ":"},
+		{TokenARROW, "->"},
+		{Token2DOT, ".."},
+		{TokenDOT, "."},
+		{TokenEQ, "=="},
+		{TokenNE, "!="},
+		{TokenLE, "<="},
+		{TokenGE, ">="},
+		{TokenLPAREN, "("},
+		{TokenRPAREN, ")"},
+		{TokenLBRACE, "{"},
+		{TokenRBRACE, "}"},
+		{TokenLBRAC, "["},
+		{TokenRBRAC, "]"},
+		{TokenPLUS, "+"},
+		{TokenMINUS, "-"},
+		{TokenMULTI, "*"},
+		{TokenDIV, "/"},
+		{TokenCOMMA, ","},
+		{TokenCOLON, ":"},
 	}
 
 	for _, expected := range expectedTokens {
