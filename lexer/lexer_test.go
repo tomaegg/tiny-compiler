@@ -2,6 +2,8 @@ package lexer
 
 import (
 	"bytes"
+	"fmt"
+	"log"
 	"math/rand/v2"
 	"testing"
 )
@@ -26,15 +28,76 @@ func TestNextToken(t *testing.T) {
 	t.Run("CALC", testCalc)
 
 	t.Run("COMPREHENSIVE", TestComprehensiveTokenParsing)
+
+	t.Run("RANDOM", TestNextTokenRand)
 }
 
 // TODO: 根据数组:	tokens []TokenDesc
-// 生成随机token进行测试, 其中id/numbe/comments是需要自己生成的
+// 生成随机token进行测试, 其中id/number/comments是需要自己生成的
 // number的生成是显然的, id的生成已经给你写好了
 // 只需要随机取tokens即可, 利用token.Literal()方法得到token
 // 再次测试一下token的生成是否正确
 // 注意写入[]byte时可以用fmt.Appendf方法
 func TestNextTokenRand(t *testing.T) {
+	const testCount = 1000 // 设置生成的随机token数量
+	var b bytes.Buffer
+
+	for i := 0; i < testCount; i++ {
+		// 随机选择一个TokenDesc
+		tokenIndex := rand.IntN(len(tokens))
+		token := tokens[tokenIndex]
+
+		// 如果token为nil，跳过
+		if token == nil {
+			continue
+		}
+
+		// 根据token类型生成对应的字面量
+		switch token.Type() {
+		case TokenID:
+			b.Write(genTokenID())
+		case TokenNUMBER:
+			fmt.Fprintf(&b, "%d", rand.IntN(10000)) // 随机生成一个数字
+		case TokenSCOMMENT:
+			fmt.Fprintf(&b, "// Random comment %d\n", rand.IntN(100))
+		case TokenMCOMMENT:
+			fmt.Fprintf(&b, "/* Random multi-line comment %d */", rand.IntN(100))
+		default:
+			b.WriteString(token.Literal())
+		}
+
+		// 添加空格分隔符
+		b.WriteByte(' ')
+	}
+
+	// 创建Lexer并解析生成的随机token
+	reader := bytes.NewReader(b.Bytes())
+	lexer := NewRustLikeLexer(reader)
+
+	for i := 0; i < testCount; i++ {
+		tk := lexer.NextToken()
+		if tk.Type() == TokenWS {
+			tk = lexer.NextToken() // 跳过空格
+		}
+
+		// 打印识别出的token信息
+		log.Printf("Token Type: %s, Literal: %s", tokenSymbolicNames[tk.Type()], tk.Literal())
+
+		// 验证生成的token是否正确
+		if tk.Type() < 0 || tk.Type() >= len(tokens) || tokens[tk.Type()] == nil {
+			t.Errorf("unexpected token type: %d", tk.Type())
+		} else {
+			expectedLiteral := tokens[tk.Type()].Literal()
+			if tk.Literal() != expectedLiteral && tk.Type() != TokenID && tk.Type() != TokenNUMBER {
+				t.Errorf("expected literal '%s', got '%s'", expectedLiteral, tk.Literal())
+			}
+		}
+	}
+
+	tk := lexer.NextToken()
+	if tk.Type() != TokenEOF {
+		t.Errorf("expected EOF, got %d", tk.Type())
+	}
 }
 
 func genTokenID() []byte {
