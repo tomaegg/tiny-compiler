@@ -290,7 +290,7 @@ func (rl *RustLikeLexer) tokenKeywordorID() Token {
 	}
 
 	// 非关键字则视为标识符
-	if text.Len() > 0 {
+	if len(literal) > 0 {
 		return NewTokenWithText(TokenID, literal, sline, scol)
 	}
 
@@ -314,7 +314,7 @@ func (rl *RustLikeLexer) tokenNumber() Token {
 	}
 
 	literal := text.String()
-	if text.Len() > 0 {
+	if len(literal) > 0 {
 		return NewTokenWithText(TokenNUMBER, literal, sline, scol)
 	}
 

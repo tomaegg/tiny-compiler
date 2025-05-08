@@ -3,7 +3,6 @@ package lexer
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"math/rand/v2"
 	"testing"
 )
@@ -42,31 +41,44 @@ func TestNextTokenRand(t *testing.T) {
 	const testCount = 1000 // 设置生成的随机token数量
 	var b bytes.Buffer
 
+	// 随机生成指定数量的token
+	generatedTokens := make([]Token, 0, testCount)
 	for i := 0; i < testCount; i++ {
 		// 随机选择一个TokenDesc
 		tokenIndex := rand.IntN(len(tokens))
 		token := tokens[tokenIndex]
 
-		// 如果token为nil，跳过
-		if token == nil {
+		if token == nil || token.Type() == TokenWS || token.Type() == TokenEOF || token.Type() == TokenUNKNONW {
 			continue
 		}
 
 		// 根据token类型生成对应的字面量
+		var generatedToken Token
 		switch token.Type() {
 		case TokenID:
-			b.Write(genTokenID())
+			id := genTokenID()
+			b.Write(id)
+			generatedToken = NewTokenWithText(TokenID, string(id), 0, 0)
 		case TokenNUMBER:
-			fmt.Fprintf(&b, "%d", rand.IntN(10000)) // 随机生成一个数字
+			number := fmt.Appendf(nil, "%d", rand.IntN(10000)) // 使用 fmt.Appendf 生成随机数字
+			b.Write(number)
+			generatedToken = NewTokenWithText(TokenNUMBER, string(number), 0, 0)
 		case TokenSCOMMENT:
-			fmt.Fprintf(&b, "// Random comment %d\n", rand.IntN(100))
+			comment := fmt.Appendf(nil, "// Random comment %d\n", rand.IntN(100))
+			b.Write(comment)
+			generatedToken = NewTokenWithText(TokenSCOMMENT, string(comment), 0, 0)
 		case TokenMCOMMENT:
-			fmt.Fprintf(&b, "/* Random multi-line comment %d */", rand.IntN(100))
+			comment := fmt.Appendf(nil, "/* Random multi-line comment %d */", rand.IntN(100))
+			b.Write(comment)
+			generatedToken = NewTokenWithText(TokenMCOMMENT, string(comment), 0, 0)
 		default:
 			b.WriteString(token.Literal())
+			generatedToken = NewTokenWithText(token.Type(), token.Literal(), 0, 0)
 		}
 
-		// 添加空格分隔符
+		// 添加生成的Token到列表
+		generatedTokens = append(generatedTokens, generatedToken)
+
 		b.WriteByte(' ')
 	}
 
@@ -74,27 +86,30 @@ func TestNextTokenRand(t *testing.T) {
 	reader := bytes.NewReader(b.Bytes())
 	lexer := NewRustLikeLexer(reader)
 
-	for i := 0; i < testCount; i++ {
+	for i, expectedToken := range generatedTokens {
 		tk := lexer.NextToken()
 		if tk.Type() == TokenWS {
 			tk = lexer.NextToken() // 跳过空格
 		}
 
 		// 打印识别出的token信息
-		log.Printf("Token Type: %s, Literal: %s", tokenSymbolicNames[tk.Type()], tk.Literal())
+		t.Logf("Token %d: Recognized Token: %s", i, tk.String())
 
 		// 验证生成的token是否正确
-		if tk.Type() < 0 || tk.Type() >= len(tokens) || tokens[tk.Type()] == nil {
-			t.Errorf("unexpected token type: %d", tk.Type())
-		} else {
-			expectedLiteral := tokens[tk.Type()].Literal()
-			if tk.Literal() != expectedLiteral && tk.Type() != TokenID && tk.Type() != TokenNUMBER {
-				t.Errorf("expected literal '%s', got '%s'", expectedLiteral, tk.Literal())
-			}
+		if tk.Type() != expectedToken.Type() {
+			t.Errorf("Token %d: expected type %s, got %s",
+				i, tokenSymbolicNames[expectedToken.Type()], tokenSymbolicNames[tk.Type()])
+		} else if tk.Literal() != expectedToken.Literal() && tk.Type() != TokenID && tk.Type() != TokenNUMBER {
+			t.Errorf("Token %d: expected literal '%s', got '%s'",
+				i, expectedToken.Literal(), tk.Literal())
 		}
 	}
 
+	// Ensure the next token is EOF
 	tk := lexer.NextToken()
+	if tk.Type() == TokenWS {
+		tk = lexer.NextToken()
+	}
 	if tk.Type() != TokenEOF {
 		t.Errorf("expected EOF, got %d", tk.Type())
 	}
@@ -178,7 +193,7 @@ func testNextTokenCOMMENT(t *testing.T) {
 
 func testNextTokenKeywordorID(t *testing.T) {
 	b := []byte(
-		`let i32 if else return mut fn loop for in break continue identifier123 _anotherID`,
+		`let i32 if else return mut fn loop for in break continue while identifier123 _anotherID`,
 	)
 	reader := bytes.NewReader(b)
 	lexer := NewRustLikeLexer(reader)
@@ -199,6 +214,7 @@ func testNextTokenKeywordorID(t *testing.T) {
 		{TokenIN, "in"},
 		{TokenBREAK, "break"},
 		{TokenCONTINUE, "continue"},
+		{TokenWhile, "while"},
 		{TokenID, "identifier123"},
 		{TokenID, "_anotherID"},
 	}
