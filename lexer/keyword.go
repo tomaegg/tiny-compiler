@@ -37,6 +37,7 @@ func initKWTable() {
 	kwTable.put(TokenLOOP)
 	kwTable.put(TokenBREAK)
 	kwTable.put(TokenCONTINUE)
+	kwTable.put(TokenWhile)
 }
 
 func (kw *keywordTable) put(tkType TokenType) {
