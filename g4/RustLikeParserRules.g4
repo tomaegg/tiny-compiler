@@ -44,7 +44,6 @@ stat:
 	| stat_return SEMI
 	| var_declare SEMI
 	| var_assign SEMI
-	| stat_return SEMI
 	| expr SEMI
 	| stat_if_else
 	| stat_while

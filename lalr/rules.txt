@@ -1,0 +1,66 @@
+S' -> prog
+
+prog -> declaration
+
+declaration -> declares
+declares -> ''
+declares -> func_declaration declares
+
+type -> INT32
+var_type -> : type
+
+expr -> expr * expr
+expr -> expr / expr
+expr -> expr + expr
+expr -> expr - expr
+expr -> ( expr )
+expr -> func_call
+expr -> ID
+expr -> NUMBER
+
+func_call -> ID func_call_list
+func_call_list -> ( func_call_param )
+func_call_list -> ( )
+func_call_param -> expr
+func_call_param -> func_call_param , expr
+
+func_declaration -> func_declaration_header block
+func_declaration -> func_declaration_header func_declaration_return block
+func_declaration_header -> FN ID fps_list
+func_declaration_return -> ARROW type
+
+fps_list -> ( fps )
+fps_list -> ( )
+fps -> fp
+fps -> fps , fp
+fp -> MUT ID var_type
+fp -> ID var_type
+
+
+stats -> ''
+stats -> stats stat
+
+block -> { stats }
+
+stat -> block
+stat -> expr ;
+stat -> stat_return ;
+stat -> var_declare ;
+stat -> var_assign ;
+stat -> stat_if_else ;
+stat -> stat_while ;
+stat -> stat_loop ;
+stat -> ;
+
+stat_return -> RETURN
+stat_return-> RETURN expr
+stat_if_else -> IF expr block
+stat_if_else -> IF expr block ELSE block
+stat_while -> WHILE expr block
+stat_loop -> LOOP block
+var_init -> = expr
+var_assign -> ID = expr
+var_declare -> LET MUT ID var_type 
+var_declare -> LET MUT ID 
+var_declare -> LET ID var_type 
+var_declare -> LET ID 
