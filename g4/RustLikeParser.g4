@@ -1,11 +1,11 @@
-parser grammar RustLikeParserRules;
+parser grammar RustLikeParser;
 options {
-	tokenVocab = RustLikeLexerRules;
+	tokenVocab = RustLikeLexer;
 }
 
 prog: declaration;
 
-declaration: func_declaration;
+declaration: func_declaration*;
 
 expr:
 	expr (MULT | DIV) expr // 乘除

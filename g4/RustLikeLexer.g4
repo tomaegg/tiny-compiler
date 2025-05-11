@@ -1,4 +1,4 @@
-lexer grammar RustLikeLexerRules;
+lexer grammar RustLikeLexer;
 
 // comments
 SL_COMMENT: '//' (~'\n')* '\n' -> skip;
