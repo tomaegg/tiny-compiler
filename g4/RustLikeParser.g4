@@ -8,15 +8,13 @@ prog: declaration;
 declaration: func_declaration*;
 
 expr:
-	expr (MULT | DIV) expr // 乘除
-	| expr (PLUS | MINUS) expr // 加减
-	| expr (EQ | NE | LT | GT | LE | GE) expr // 比较
-	| LPAREN expr RPAREN // 加括号
-	| func_call // 函数调用
-	| ID
-	| NUMBER;
-
-func_call: ID func_call_list;
+	expr (MULT | DIV) expr						# ExprMulDiv
+	| expr (PLUS | MINUS) expr					# ExprAddSub
+	| expr (EQ | NE | LT | GT | LE | GE) expr	# ExprCmp
+	| LPAREN expr RPAREN						# ExprParen
+	| ID func_call_list							# ExprFuncCall
+	| ID										# ExprID
+	| NUMBER									# ExprNum;
 
 func_call_list: LPAREN func_call_param RPAREN;
 
@@ -40,29 +38,16 @@ type: INT32;
 block: LBRACE stat* RBRACE;
 
 stat:
-	block
-	| stat_return SEMI
-	| var_declare SEMI
-	| var_assign SEMI
-	| expr SEMI
-	| stat_if_else
-	| stat_while
-	| stat_loop
-	| SEMI;
-
-stat_return: RETURN expr?;
-
-var_declare:
-	LET MUT? ID var_type? var_init?; // 变量声明
+	block												# StatBlock
+	| RETURN expr? SEMI									# StatFuncReturn
+	| LET MUT? ID var_type? var_init? SEMI				# StatVarDeclare
+	| ID ASSIGN expr SEMI								# StatVarAssign
+	| expr SEMI											# StatExpr
+	| IF expr block (ELSE IF expr block)* (ELSE block)?	# StatIfElse
+	| WHILE expr block									# StatWhile
+	| LOOP block										# StatLoop
+	| SEMI												# StatEmpty;
 
 var_type: COLON type;
 
 var_init: ASSIGN expr;
-
-var_assign: ID ASSIGN expr; // 变量赋值
-
-stat_if_else: IF expr block (ELSE IF expr block)* (ELSE block)?;
-
-stat_while: WHILE expr block;
-
-stat_loop: LOOP block;

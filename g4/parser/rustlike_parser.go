@@ -47,103 +47,92 @@ func rustlikeparserParserInit() {
 		"LBRACE", "RBRACE", "ARROW", "DOT", "DOT2",
 	}
 	staticData.RuleNames = []string{
-		"prog", "declaration", "expr", "func_call", "func_call_list", "func_call_param",
+		"prog", "declaration", "expr", "func_call_list", "func_call_param",
 		"func_declaration", "func_declaration_header", "func_declaration_return",
-		"fps_list", "fps", "fp", "type", "block", "stat", "stat_return", "var_declare",
-		"var_type", "var_init", "var_assign", "stat_if_else", "stat_while",
-		"stat_loop",
+		"fps_list", "fps", "fp", "type", "block", "stat", "var_type", "var_init",
 	}
 	staticData.PredictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
-		4, 1, 39, 211, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
+		4, 1, 39, 185, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
 		4, 2, 5, 7, 5, 2, 6, 7, 6, 2, 7, 7, 7, 2, 8, 7, 8, 2, 9, 7, 9, 2, 10, 7,
 		10, 2, 11, 7, 11, 2, 12, 7, 12, 2, 13, 7, 13, 2, 14, 7, 14, 2, 15, 7, 15,
-		2, 16, 7, 16, 2, 17, 7, 17, 2, 18, 7, 18, 2, 19, 7, 19, 2, 20, 7, 20, 2,
-		21, 7, 21, 2, 22, 7, 22, 1, 0, 1, 0, 1, 1, 5, 1, 50, 8, 1, 10, 1, 12, 1,
-		53, 9, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 3, 2, 63, 8,
-		2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 5, 2, 74, 8, 2,
-		10, 2, 12, 2, 77, 9, 2, 1, 3, 1, 3, 1, 3, 1, 4, 1, 4, 1, 4, 1, 4, 1, 5,
-		1, 5, 1, 5, 5, 5, 89, 8, 5, 10, 5, 12, 5, 92, 9, 5, 1, 5, 3, 5, 95, 8,
-		5, 1, 6, 1, 6, 3, 6, 99, 8, 6, 1, 6, 1, 6, 1, 7, 1, 7, 1, 7, 1, 7, 1, 8,
-		1, 8, 1, 8, 1, 9, 1, 9, 1, 9, 1, 9, 1, 10, 1, 10, 1, 10, 5, 10, 117, 8,
-		10, 10, 10, 12, 10, 120, 9, 10, 1, 10, 3, 10, 123, 8, 10, 1, 11, 3, 11,
-		126, 8, 11, 1, 11, 1, 11, 1, 11, 1, 11, 1, 12, 1, 12, 1, 13, 1, 13, 5,
-		13, 136, 8, 13, 10, 13, 12, 13, 139, 9, 13, 1, 13, 1, 13, 1, 14, 1, 14,
-		1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1,
-		14, 1, 14, 1, 14, 1, 14, 1, 14, 3, 14, 160, 8, 14, 1, 15, 1, 15, 3, 15,
-		164, 8, 15, 1, 16, 1, 16, 3, 16, 168, 8, 16, 1, 16, 1, 16, 3, 16, 172,
-		8, 16, 1, 16, 3, 16, 175, 8, 16, 1, 17, 1, 17, 1, 17, 1, 18, 1, 18, 1,
-		18, 1, 19, 1, 19, 1, 19, 1, 19, 1, 20, 1, 20, 1, 20, 1, 20, 1, 20, 1, 20,
-		1, 20, 1, 20, 5, 20, 195, 8, 20, 10, 20, 12, 20, 198, 9, 20, 1, 20, 1,
-		20, 3, 20, 202, 8, 20, 1, 21, 1, 21, 1, 21, 1, 21, 1, 22, 1, 22, 1, 22,
-		1, 22, 0, 1, 4, 23, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26,
-		28, 30, 32, 34, 36, 38, 40, 42, 44, 0, 3, 1, 0, 19, 20, 1, 0, 17, 18, 1,
-		0, 21, 26, 215, 0, 46, 1, 0, 0, 0, 2, 51, 1, 0, 0, 0, 4, 62, 1, 0, 0, 0,
-		6, 78, 1, 0, 0, 0, 8, 81, 1, 0, 0, 0, 10, 94, 1, 0, 0, 0, 12, 96, 1, 0,
-		0, 0, 14, 102, 1, 0, 0, 0, 16, 106, 1, 0, 0, 0, 18, 109, 1, 0, 0, 0, 20,
-		122, 1, 0, 0, 0, 22, 125, 1, 0, 0, 0, 24, 131, 1, 0, 0, 0, 26, 133, 1,
-		0, 0, 0, 28, 159, 1, 0, 0, 0, 30, 161, 1, 0, 0, 0, 32, 165, 1, 0, 0, 0,
-		34, 176, 1, 0, 0, 0, 36, 179, 1, 0, 0, 0, 38, 182, 1, 0, 0, 0, 40, 186,
-		1, 0, 0, 0, 42, 203, 1, 0, 0, 0, 44, 207, 1, 0, 0, 0, 46, 47, 3, 2, 1,
-		0, 47, 1, 1, 0, 0, 0, 48, 50, 3, 12, 6, 0, 49, 48, 1, 0, 0, 0, 50, 53,
-		1, 0, 0, 0, 51, 49, 1, 0, 0, 0, 51, 52, 1, 0, 0, 0, 52, 3, 1, 0, 0, 0,
-		53, 51, 1, 0, 0, 0, 54, 55, 6, 2, -1, 0, 55, 56, 5, 31, 0, 0, 56, 57, 3,
-		4, 2, 0, 57, 58, 5, 32, 0, 0, 58, 63, 1, 0, 0, 0, 59, 63, 3, 6, 3, 0, 60,
-		63, 5, 15, 0, 0, 61, 63, 5, 16, 0, 0, 62, 54, 1, 0, 0, 0, 62, 59, 1, 0,
-		0, 0, 62, 60, 1, 0, 0, 0, 62, 61, 1, 0, 0, 0, 63, 75, 1, 0, 0, 0, 64, 65,
-		10, 7, 0, 0, 65, 66, 7, 0, 0, 0, 66, 74, 3, 4, 2, 8, 67, 68, 10, 6, 0,
-		0, 68, 69, 7, 1, 0, 0, 69, 74, 3, 4, 2, 7, 70, 71, 10, 5, 0, 0, 71, 72,
-		7, 2, 0, 0, 72, 74, 3, 4, 2, 6, 73, 64, 1, 0, 0, 0, 73, 67, 1, 0, 0, 0,
-		73, 70, 1, 0, 0, 0, 74, 77, 1, 0, 0, 0, 75, 73, 1, 0, 0, 0, 75, 76, 1,
-		0, 0, 0, 76, 5, 1, 0, 0, 0, 77, 75, 1, 0, 0, 0, 78, 79, 5, 15, 0, 0, 79,
-		80, 3, 8, 4, 0, 80, 7, 1, 0, 0, 0, 81, 82, 5, 31, 0, 0, 82, 83, 3, 10,
-		5, 0, 83, 84, 5, 32, 0, 0, 84, 9, 1, 0, 0, 0, 85, 90, 3, 4, 2, 0, 86, 87,
-		5, 30, 0, 0, 87, 89, 3, 4, 2, 0, 88, 86, 1, 0, 0, 0, 89, 92, 1, 0, 0, 0,
-		90, 88, 1, 0, 0, 0, 90, 91, 1, 0, 0, 0, 91, 95, 1, 0, 0, 0, 92, 90, 1,
-		0, 0, 0, 93, 95, 1, 0, 0, 0, 94, 85, 1, 0, 0, 0, 94, 93, 1, 0, 0, 0, 95,
-		11, 1, 0, 0, 0, 96, 98, 3, 14, 7, 0, 97, 99, 3, 16, 8, 0, 98, 97, 1, 0,
-		0, 0, 98, 99, 1, 0, 0, 0, 99, 100, 1, 0, 0, 0, 100, 101, 3, 26, 13, 0,
-		101, 13, 1, 0, 0, 0, 102, 103, 5, 11, 0, 0, 103, 104, 5, 15, 0, 0, 104,
-		105, 3, 18, 9, 0, 105, 15, 1, 0, 0, 0, 106, 107, 5, 37, 0, 0, 107, 108,
-		3, 24, 12, 0, 108, 17, 1, 0, 0, 0, 109, 110, 5, 31, 0, 0, 110, 111, 3,
-		20, 10, 0, 111, 112, 5, 32, 0, 0, 112, 19, 1, 0, 0, 0, 113, 118, 3, 22,
-		11, 0, 114, 115, 5, 30, 0, 0, 115, 117, 3, 22, 11, 0, 116, 114, 1, 0, 0,
-		0, 117, 120, 1, 0, 0, 0, 118, 116, 1, 0, 0, 0, 118, 119, 1, 0, 0, 0, 119,
-		123, 1, 0, 0, 0, 120, 118, 1, 0, 0, 0, 121, 123, 1, 0, 0, 0, 122, 113,
-		1, 0, 0, 0, 122, 121, 1, 0, 0, 0, 123, 21, 1, 0, 0, 0, 124, 126, 5, 10,
-		0, 0, 125, 124, 1, 0, 0, 0, 125, 126, 1, 0, 0, 0, 126, 127, 1, 0, 0, 0,
-		127, 128, 5, 15, 0, 0, 128, 129, 5, 29, 0, 0, 129, 130, 3, 24, 12, 0, 130,
-		23, 1, 0, 0, 0, 131, 132, 5, 4, 0, 0, 132, 25, 1, 0, 0, 0, 133, 137, 5,
-		35, 0, 0, 134, 136, 3, 28, 14, 0, 135, 134, 1, 0, 0, 0, 136, 139, 1, 0,
-		0, 0, 137, 135, 1, 0, 0, 0, 137, 138, 1, 0, 0, 0, 138, 140, 1, 0, 0, 0,
-		139, 137, 1, 0, 0, 0, 140, 141, 5, 36, 0, 0, 141, 27, 1, 0, 0, 0, 142,
-		160, 3, 26, 13, 0, 143, 144, 3, 30, 15, 0, 144, 145, 5, 28, 0, 0, 145,
-		160, 1, 0, 0, 0, 146, 147, 3, 32, 16, 0, 147, 148, 5, 28, 0, 0, 148, 160,
-		1, 0, 0, 0, 149, 150, 3, 38, 19, 0, 150, 151, 5, 28, 0, 0, 151, 160, 1,
-		0, 0, 0, 152, 153, 3, 4, 2, 0, 153, 154, 5, 28, 0, 0, 154, 160, 1, 0, 0,
-		0, 155, 160, 3, 40, 20, 0, 156, 160, 3, 42, 21, 0, 157, 160, 3, 44, 22,
-		0, 158, 160, 5, 28, 0, 0, 159, 142, 1, 0, 0, 0, 159, 143, 1, 0, 0, 0, 159,
-		146, 1, 0, 0, 0, 159, 149, 1, 0, 0, 0, 159, 152, 1, 0, 0, 0, 159, 155,
-		1, 0, 0, 0, 159, 156, 1, 0, 0, 0, 159, 157, 1, 0, 0, 0, 159, 158, 1, 0,
-		0, 0, 160, 29, 1, 0, 0, 0, 161, 163, 5, 9, 0, 0, 162, 164, 3, 4, 2, 0,
-		163, 162, 1, 0, 0, 0, 163, 164, 1, 0, 0, 0, 164, 31, 1, 0, 0, 0, 165, 167,
-		5, 5, 0, 0, 166, 168, 5, 10, 0, 0, 167, 166, 1, 0, 0, 0, 167, 168, 1, 0,
-		0, 0, 168, 169, 1, 0, 0, 0, 169, 171, 5, 15, 0, 0, 170, 172, 3, 34, 17,
-		0, 171, 170, 1, 0, 0, 0, 171, 172, 1, 0, 0, 0, 172, 174, 1, 0, 0, 0, 173,
-		175, 3, 36, 18, 0, 174, 173, 1, 0, 0, 0, 174, 175, 1, 0, 0, 0, 175, 33,
-		1, 0, 0, 0, 176, 177, 5, 29, 0, 0, 177, 178, 3, 24, 12, 0, 178, 35, 1,
-		0, 0, 0, 179, 180, 5, 27, 0, 0, 180, 181, 3, 4, 2, 0, 181, 37, 1, 0, 0,
-		0, 182, 183, 5, 15, 0, 0, 183, 184, 5, 27, 0, 0, 184, 185, 3, 4, 2, 0,
-		185, 39, 1, 0, 0, 0, 186, 187, 5, 6, 0, 0, 187, 188, 3, 4, 2, 0, 188, 196,
-		3, 26, 13, 0, 189, 190, 5, 7, 0, 0, 190, 191, 5, 6, 0, 0, 191, 192, 3,
-		4, 2, 0, 192, 193, 3, 26, 13, 0, 193, 195, 1, 0, 0, 0, 194, 189, 1, 0,
-		0, 0, 195, 198, 1, 0, 0, 0, 196, 194, 1, 0, 0, 0, 196, 197, 1, 0, 0, 0,
-		197, 201, 1, 0, 0, 0, 198, 196, 1, 0, 0, 0, 199, 200, 5, 7, 0, 0, 200,
-		202, 3, 26, 13, 0, 201, 199, 1, 0, 0, 0, 201, 202, 1, 0, 0, 0, 202, 41,
-		1, 0, 0, 0, 203, 204, 5, 8, 0, 0, 204, 205, 3, 4, 2, 0, 205, 206, 3, 26,
-		13, 0, 206, 43, 1, 0, 0, 0, 207, 208, 5, 12, 0, 0, 208, 209, 3, 26, 13,
-		0, 209, 45, 1, 0, 0, 0, 18, 51, 62, 73, 75, 90, 94, 98, 118, 122, 125,
-		137, 159, 163, 167, 171, 174, 196, 201,
+		1, 0, 1, 0, 1, 1, 5, 1, 36, 8, 1, 10, 1, 12, 1, 39, 9, 1, 1, 2, 1, 2, 1,
+		2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 3, 2, 50, 8, 2, 1, 2, 1, 2, 1, 2,
+		1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 5, 2, 61, 8, 2, 10, 2, 12, 2, 64, 9,
+		2, 1, 3, 1, 3, 1, 3, 1, 3, 1, 4, 1, 4, 1, 4, 5, 4, 73, 8, 4, 10, 4, 12,
+		4, 76, 9, 4, 1, 4, 3, 4, 79, 8, 4, 1, 5, 1, 5, 3, 5, 83, 8, 5, 1, 5, 1,
+		5, 1, 6, 1, 6, 1, 6, 1, 6, 1, 7, 1, 7, 1, 7, 1, 8, 1, 8, 1, 8, 1, 8, 1,
+		9, 1, 9, 1, 9, 5, 9, 101, 8, 9, 10, 9, 12, 9, 104, 9, 9, 1, 9, 3, 9, 107,
+		8, 9, 1, 10, 3, 10, 110, 8, 10, 1, 10, 1, 10, 1, 10, 1, 10, 1, 11, 1, 11,
+		1, 12, 1, 12, 5, 12, 120, 8, 12, 10, 12, 12, 12, 123, 9, 12, 1, 12, 1,
+		12, 1, 13, 1, 13, 1, 13, 3, 13, 130, 8, 13, 1, 13, 1, 13, 1, 13, 3, 13,
+		135, 8, 13, 1, 13, 1, 13, 3, 13, 139, 8, 13, 1, 13, 3, 13, 142, 8, 13,
+		1, 13, 1, 13, 1, 13, 1, 13, 1, 13, 1, 13, 1, 13, 1, 13, 1, 13, 1, 13, 1,
+		13, 1, 13, 1, 13, 1, 13, 1, 13, 1, 13, 1, 13, 5, 13, 161, 8, 13, 10, 13,
+		12, 13, 164, 9, 13, 1, 13, 1, 13, 3, 13, 168, 8, 13, 1, 13, 1, 13, 1, 13,
+		1, 13, 1, 13, 1, 13, 1, 13, 3, 13, 177, 8, 13, 1, 14, 1, 14, 1, 14, 1,
+		15, 1, 15, 1, 15, 1, 15, 0, 1, 4, 16, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18,
+		20, 22, 24, 26, 28, 30, 0, 3, 1, 0, 19, 20, 1, 0, 17, 18, 1, 0, 21, 26,
+		196, 0, 32, 1, 0, 0, 0, 2, 37, 1, 0, 0, 0, 4, 49, 1, 0, 0, 0, 6, 65, 1,
+		0, 0, 0, 8, 78, 1, 0, 0, 0, 10, 80, 1, 0, 0, 0, 12, 86, 1, 0, 0, 0, 14,
+		90, 1, 0, 0, 0, 16, 93, 1, 0, 0, 0, 18, 106, 1, 0, 0, 0, 20, 109, 1, 0,
+		0, 0, 22, 115, 1, 0, 0, 0, 24, 117, 1, 0, 0, 0, 26, 176, 1, 0, 0, 0, 28,
+		178, 1, 0, 0, 0, 30, 181, 1, 0, 0, 0, 32, 33, 3, 2, 1, 0, 33, 1, 1, 0,
+		0, 0, 34, 36, 3, 10, 5, 0, 35, 34, 1, 0, 0, 0, 36, 39, 1, 0, 0, 0, 37,
+		35, 1, 0, 0, 0, 37, 38, 1, 0, 0, 0, 38, 3, 1, 0, 0, 0, 39, 37, 1, 0, 0,
+		0, 40, 41, 6, 2, -1, 0, 41, 42, 5, 31, 0, 0, 42, 43, 3, 4, 2, 0, 43, 44,
+		5, 32, 0, 0, 44, 50, 1, 0, 0, 0, 45, 46, 5, 15, 0, 0, 46, 50, 3, 6, 3,
+		0, 47, 50, 5, 15, 0, 0, 48, 50, 5, 16, 0, 0, 49, 40, 1, 0, 0, 0, 49, 45,
+		1, 0, 0, 0, 49, 47, 1, 0, 0, 0, 49, 48, 1, 0, 0, 0, 50, 62, 1, 0, 0, 0,
+		51, 52, 10, 7, 0, 0, 52, 53, 7, 0, 0, 0, 53, 61, 3, 4, 2, 8, 54, 55, 10,
+		6, 0, 0, 55, 56, 7, 1, 0, 0, 56, 61, 3, 4, 2, 7, 57, 58, 10, 5, 0, 0, 58,
+		59, 7, 2, 0, 0, 59, 61, 3, 4, 2, 6, 60, 51, 1, 0, 0, 0, 60, 54, 1, 0, 0,
+		0, 60, 57, 1, 0, 0, 0, 61, 64, 1, 0, 0, 0, 62, 60, 1, 0, 0, 0, 62, 63,
+		1, 0, 0, 0, 63, 5, 1, 0, 0, 0, 64, 62, 1, 0, 0, 0, 65, 66, 5, 31, 0, 0,
+		66, 67, 3, 8, 4, 0, 67, 68, 5, 32, 0, 0, 68, 7, 1, 0, 0, 0, 69, 74, 3,
+		4, 2, 0, 70, 71, 5, 30, 0, 0, 71, 73, 3, 4, 2, 0, 72, 70, 1, 0, 0, 0, 73,
+		76, 1, 0, 0, 0, 74, 72, 1, 0, 0, 0, 74, 75, 1, 0, 0, 0, 75, 79, 1, 0, 0,
+		0, 76, 74, 1, 0, 0, 0, 77, 79, 1, 0, 0, 0, 78, 69, 1, 0, 0, 0, 78, 77,
+		1, 0, 0, 0, 79, 9, 1, 0, 0, 0, 80, 82, 3, 12, 6, 0, 81, 83, 3, 14, 7, 0,
+		82, 81, 1, 0, 0, 0, 82, 83, 1, 0, 0, 0, 83, 84, 1, 0, 0, 0, 84, 85, 3,
+		24, 12, 0, 85, 11, 1, 0, 0, 0, 86, 87, 5, 11, 0, 0, 87, 88, 5, 15, 0, 0,
+		88, 89, 3, 16, 8, 0, 89, 13, 1, 0, 0, 0, 90, 91, 5, 37, 0, 0, 91, 92, 3,
+		22, 11, 0, 92, 15, 1, 0, 0, 0, 93, 94, 5, 31, 0, 0, 94, 95, 3, 18, 9, 0,
+		95, 96, 5, 32, 0, 0, 96, 17, 1, 0, 0, 0, 97, 102, 3, 20, 10, 0, 98, 99,
+		5, 30, 0, 0, 99, 101, 3, 20, 10, 0, 100, 98, 1, 0, 0, 0, 101, 104, 1, 0,
+		0, 0, 102, 100, 1, 0, 0, 0, 102, 103, 1, 0, 0, 0, 103, 107, 1, 0, 0, 0,
+		104, 102, 1, 0, 0, 0, 105, 107, 1, 0, 0, 0, 106, 97, 1, 0, 0, 0, 106, 105,
+		1, 0, 0, 0, 107, 19, 1, 0, 0, 0, 108, 110, 5, 10, 0, 0, 109, 108, 1, 0,
+		0, 0, 109, 110, 1, 0, 0, 0, 110, 111, 1, 0, 0, 0, 111, 112, 5, 15, 0, 0,
+		112, 113, 5, 29, 0, 0, 113, 114, 3, 22, 11, 0, 114, 21, 1, 0, 0, 0, 115,
+		116, 5, 4, 0, 0, 116, 23, 1, 0, 0, 0, 117, 121, 5, 35, 0, 0, 118, 120,
+		3, 26, 13, 0, 119, 118, 1, 0, 0, 0, 120, 123, 1, 0, 0, 0, 121, 119, 1,
+		0, 0, 0, 121, 122, 1, 0, 0, 0, 122, 124, 1, 0, 0, 0, 123, 121, 1, 0, 0,
+		0, 124, 125, 5, 36, 0, 0, 125, 25, 1, 0, 0, 0, 126, 177, 3, 24, 12, 0,
+		127, 129, 5, 9, 0, 0, 128, 130, 3, 4, 2, 0, 129, 128, 1, 0, 0, 0, 129,
+		130, 1, 0, 0, 0, 130, 131, 1, 0, 0, 0, 131, 177, 5, 28, 0, 0, 132, 134,
+		5, 5, 0, 0, 133, 135, 5, 10, 0, 0, 134, 133, 1, 0, 0, 0, 134, 135, 1, 0,
+		0, 0, 135, 136, 1, 0, 0, 0, 136, 138, 5, 15, 0, 0, 137, 139, 3, 28, 14,
+		0, 138, 137, 1, 0, 0, 0, 138, 139, 1, 0, 0, 0, 139, 141, 1, 0, 0, 0, 140,
+		142, 3, 30, 15, 0, 141, 140, 1, 0, 0, 0, 141, 142, 1, 0, 0, 0, 142, 143,
+		1, 0, 0, 0, 143, 177, 5, 28, 0, 0, 144, 145, 5, 15, 0, 0, 145, 146, 5,
+		27, 0, 0, 146, 147, 3, 4, 2, 0, 147, 148, 5, 28, 0, 0, 148, 177, 1, 0,
+		0, 0, 149, 150, 3, 4, 2, 0, 150, 151, 5, 28, 0, 0, 151, 177, 1, 0, 0, 0,
+		152, 153, 5, 6, 0, 0, 153, 154, 3, 4, 2, 0, 154, 162, 3, 24, 12, 0, 155,
+		156, 5, 7, 0, 0, 156, 157, 5, 6, 0, 0, 157, 158, 3, 4, 2, 0, 158, 159,
+		3, 24, 12, 0, 159, 161, 1, 0, 0, 0, 160, 155, 1, 0, 0, 0, 161, 164, 1,
+		0, 0, 0, 162, 160, 1, 0, 0, 0, 162, 163, 1, 0, 0, 0, 163, 167, 1, 0, 0,
+		0, 164, 162, 1, 0, 0, 0, 165, 166, 5, 7, 0, 0, 166, 168, 3, 24, 12, 0,
+		167, 165, 1, 0, 0, 0, 167, 168, 1, 0, 0, 0, 168, 177, 1, 0, 0, 0, 169,
+		170, 5, 8, 0, 0, 170, 171, 3, 4, 2, 0, 171, 172, 3, 24, 12, 0, 172, 177,
+		1, 0, 0, 0, 173, 174, 5, 12, 0, 0, 174, 177, 3, 24, 12, 0, 175, 177, 5,
+		28, 0, 0, 176, 126, 1, 0, 0, 0, 176, 127, 1, 0, 0, 0, 176, 132, 1, 0, 0,
+		0, 176, 144, 1, 0, 0, 0, 176, 149, 1, 0, 0, 0, 176, 152, 1, 0, 0, 0, 176,
+		169, 1, 0, 0, 0, 176, 173, 1, 0, 0, 0, 176, 175, 1, 0, 0, 0, 177, 27, 1,
+		0, 0, 0, 178, 179, 5, 29, 0, 0, 179, 180, 3, 22, 11, 0, 180, 29, 1, 0,
+		0, 0, 181, 182, 5, 27, 0, 0, 182, 183, 3, 4, 2, 0, 183, 31, 1, 0, 0, 0,
+		18, 37, 49, 60, 62, 74, 78, 82, 102, 106, 109, 121, 129, 134, 138, 141,
+		162, 167, 176,
 	}
 	deserializer := antlr.NewATNDeserializer(nil)
 	staticData.atn = deserializer.Deserialize(staticData.serializedATN)
@@ -228,26 +217,19 @@ const (
 	RustLikeParserRULE_prog                    = 0
 	RustLikeParserRULE_declaration             = 1
 	RustLikeParserRULE_expr                    = 2
-	RustLikeParserRULE_func_call               = 3
-	RustLikeParserRULE_func_call_list          = 4
-	RustLikeParserRULE_func_call_param         = 5
-	RustLikeParserRULE_func_declaration        = 6
-	RustLikeParserRULE_func_declaration_header = 7
-	RustLikeParserRULE_func_declaration_return = 8
-	RustLikeParserRULE_fps_list                = 9
-	RustLikeParserRULE_fps                     = 10
-	RustLikeParserRULE_fp                      = 11
-	RustLikeParserRULE_type                    = 12
-	RustLikeParserRULE_block                   = 13
-	RustLikeParserRULE_stat                    = 14
-	RustLikeParserRULE_stat_return             = 15
-	RustLikeParserRULE_var_declare             = 16
-	RustLikeParserRULE_var_type                = 17
-	RustLikeParserRULE_var_init                = 18
-	RustLikeParserRULE_var_assign              = 19
-	RustLikeParserRULE_stat_if_else            = 20
-	RustLikeParserRULE_stat_while              = 21
-	RustLikeParserRULE_stat_loop               = 22
+	RustLikeParserRULE_func_call_list          = 3
+	RustLikeParserRULE_func_call_param         = 4
+	RustLikeParserRULE_func_declaration        = 5
+	RustLikeParserRULE_func_declaration_header = 6
+	RustLikeParserRULE_func_declaration_return = 7
+	RustLikeParserRULE_fps_list                = 8
+	RustLikeParserRULE_fps                     = 9
+	RustLikeParserRULE_fp                      = 10
+	RustLikeParserRULE_type                    = 11
+	RustLikeParserRULE_block                   = 12
+	RustLikeParserRULE_stat                    = 13
+	RustLikeParserRULE_var_type                = 14
+	RustLikeParserRULE_var_init                = 15
 )
 
 // IProgContext is an interface to support dynamic dispatch.
@@ -337,7 +319,7 @@ func (p *RustLikeParser) Prog() (localctx IProgContext) {
 	p.EnterRule(localctx, 0, RustLikeParserRULE_prog)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(46)
+		p.SetState(32)
 		p.Declaration()
 	}
 
@@ -468,7 +450,7 @@ func (p *RustLikeParser) Declaration() (localctx IDeclarationContext) {
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(51)
+	p.SetState(37)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -477,11 +459,11 @@ func (p *RustLikeParser) Declaration() (localctx IDeclarationContext) {
 
 	for _la == RustLikeParserFN {
 		{
-			p.SetState(48)
+			p.SetState(34)
 			p.Func_declaration()
 		}
 
-		p.SetState(53)
+		p.SetState(39)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -508,26 +490,6 @@ type IExprContext interface {
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
-
-	// Getter signatures
-	LPAREN() antlr.TerminalNode
-	AllExpr() []IExprContext
-	Expr(i int) IExprContext
-	RPAREN() antlr.TerminalNode
-	Func_call() IFunc_callContext
-	ID() antlr.TerminalNode
-	NUMBER() antlr.TerminalNode
-	MULT() antlr.TerminalNode
-	DIV() antlr.TerminalNode
-	PLUS() antlr.TerminalNode
-	MINUS() antlr.TerminalNode
-	EQ() antlr.TerminalNode
-	NE() antlr.TerminalNode
-	LT() antlr.TerminalNode
-	GT() antlr.TerminalNode
-	LE() antlr.TerminalNode
-	GE() antlr.TerminalNode
-
 	// IsExprContext differentiates from other interfaces.
 	IsExprContext()
 }
@@ -564,11 +526,37 @@ func NewExprContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokin
 
 func (s *ExprContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *ExprContext) LPAREN() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserLPAREN, 0)
+func (s *ExprContext) CopyAll(ctx *ExprContext) {
+	s.CopyFrom(&ctx.BaseParserRuleContext)
 }
 
-func (s *ExprContext) AllExpr() []IExprContext {
+func (s *ExprContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ExprContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+type ExprAddSubContext struct {
+	ExprContext
+}
+
+func NewExprAddSubContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ExprAddSubContext {
+	var p = new(ExprAddSubContext)
+
+	InitEmptyExprContext(&p.ExprContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExprContext))
+
+	return p
+}
+
+func (s *ExprAddSubContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ExprAddSubContext) AllExpr() []IExprContext {
 	children := s.GetChildren()
 	len := 0
 	for _, ctx := range children {
@@ -589,7 +577,7 @@ func (s *ExprContext) AllExpr() []IExprContext {
 	return tst
 }
 
-func (s *ExprContext) Expr(i int) IExprContext {
+func (s *ExprAddSubContext) Expr(i int) IExprContext {
 	var t antlr.RuleContext
 	j := 0
 	for _, ctx := range s.GetChildren() {
@@ -609,14 +597,52 @@ func (s *ExprContext) Expr(i int) IExprContext {
 	return t.(IExprContext)
 }
 
-func (s *ExprContext) RPAREN() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserRPAREN, 0)
+func (s *ExprAddSubContext) PLUS() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserPLUS, 0)
 }
 
-func (s *ExprContext) Func_call() IFunc_callContext {
+func (s *ExprAddSubContext) MINUS() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserMINUS, 0)
+}
+
+func (s *ExprAddSubContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterExprAddSub(s)
+	}
+}
+
+func (s *ExprAddSubContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitExprAddSub(s)
+	}
+}
+
+type ExprParenContext struct {
+	ExprContext
+}
+
+func NewExprParenContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ExprParenContext {
+	var p = new(ExprParenContext)
+
+	InitEmptyExprContext(&p.ExprContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExprContext))
+
+	return p
+}
+
+func (s *ExprParenContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ExprParenContext) LPAREN() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserLPAREN, 0)
+}
+
+func (s *ExprParenContext) Expr() IExprContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IFunc_callContext); ok {
+		if _, ok := ctx.(IExprContext); ok {
 			t = ctx.(antlr.RuleContext)
 			break
 		}
@@ -626,74 +652,314 @@ func (s *ExprContext) Func_call() IFunc_callContext {
 		return nil
 	}
 
-	return t.(IFunc_callContext)
+	return t.(IExprContext)
 }
 
-func (s *ExprContext) ID() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserID, 0)
+func (s *ExprParenContext) RPAREN() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserRPAREN, 0)
 }
 
-func (s *ExprContext) NUMBER() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserNUMBER, 0)
-}
-
-func (s *ExprContext) MULT() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserMULT, 0)
-}
-
-func (s *ExprContext) DIV() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserDIV, 0)
-}
-
-func (s *ExprContext) PLUS() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserPLUS, 0)
-}
-
-func (s *ExprContext) MINUS() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserMINUS, 0)
-}
-
-func (s *ExprContext) EQ() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserEQ, 0)
-}
-
-func (s *ExprContext) NE() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserNE, 0)
-}
-
-func (s *ExprContext) LT() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserLT, 0)
-}
-
-func (s *ExprContext) GT() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserGT, 0)
-}
-
-func (s *ExprContext) LE() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserLE, 0)
-}
-
-func (s *ExprContext) GE() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserGE, 0)
-}
-
-func (s *ExprContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *ExprContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *ExprContext) EnterRule(listener antlr.ParseTreeListener) {
+func (s *ExprParenContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.EnterExpr(s)
+		listenerT.EnterExprParen(s)
 	}
 }
 
-func (s *ExprContext) ExitRule(listener antlr.ParseTreeListener) {
+func (s *ExprParenContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.ExitExpr(s)
+		listenerT.ExitExprParen(s)
+	}
+}
+
+type ExprNumContext struct {
+	ExprContext
+}
+
+func NewExprNumContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ExprNumContext {
+	var p = new(ExprNumContext)
+
+	InitEmptyExprContext(&p.ExprContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExprContext))
+
+	return p
+}
+
+func (s *ExprNumContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ExprNumContext) NUMBER() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserNUMBER, 0)
+}
+
+func (s *ExprNumContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterExprNum(s)
+	}
+}
+
+func (s *ExprNumContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitExprNum(s)
+	}
+}
+
+type ExprMulDivContext struct {
+	ExprContext
+}
+
+func NewExprMulDivContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ExprMulDivContext {
+	var p = new(ExprMulDivContext)
+
+	InitEmptyExprContext(&p.ExprContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExprContext))
+
+	return p
+}
+
+func (s *ExprMulDivContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ExprMulDivContext) AllExpr() []IExprContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExprContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExprContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExprContext); ok {
+			tst[i] = t.(IExprContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *ExprMulDivContext) Expr(i int) IExprContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExprContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExprContext)
+}
+
+func (s *ExprMulDivContext) MULT() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserMULT, 0)
+}
+
+func (s *ExprMulDivContext) DIV() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserDIV, 0)
+}
+
+func (s *ExprMulDivContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterExprMulDiv(s)
+	}
+}
+
+func (s *ExprMulDivContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitExprMulDiv(s)
+	}
+}
+
+type ExprCmpContext struct {
+	ExprContext
+}
+
+func NewExprCmpContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ExprCmpContext {
+	var p = new(ExprCmpContext)
+
+	InitEmptyExprContext(&p.ExprContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExprContext))
+
+	return p
+}
+
+func (s *ExprCmpContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ExprCmpContext) AllExpr() []IExprContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExprContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExprContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExprContext); ok {
+			tst[i] = t.(IExprContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *ExprCmpContext) Expr(i int) IExprContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExprContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExprContext)
+}
+
+func (s *ExprCmpContext) EQ() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserEQ, 0)
+}
+
+func (s *ExprCmpContext) NE() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserNE, 0)
+}
+
+func (s *ExprCmpContext) LT() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserLT, 0)
+}
+
+func (s *ExprCmpContext) GT() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserGT, 0)
+}
+
+func (s *ExprCmpContext) LE() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserLE, 0)
+}
+
+func (s *ExprCmpContext) GE() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserGE, 0)
+}
+
+func (s *ExprCmpContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterExprCmp(s)
+	}
+}
+
+func (s *ExprCmpContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitExprCmp(s)
+	}
+}
+
+type ExprFuncCallContext struct {
+	ExprContext
+}
+
+func NewExprFuncCallContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ExprFuncCallContext {
+	var p = new(ExprFuncCallContext)
+
+	InitEmptyExprContext(&p.ExprContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExprContext))
+
+	return p
+}
+
+func (s *ExprFuncCallContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ExprFuncCallContext) ID() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserID, 0)
+}
+
+func (s *ExprFuncCallContext) Func_call_list() IFunc_call_listContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IFunc_call_listContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IFunc_call_listContext)
+}
+
+func (s *ExprFuncCallContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterExprFuncCall(s)
+	}
+}
+
+func (s *ExprFuncCallContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitExprFuncCall(s)
+	}
+}
+
+type ExprIDContext struct {
+	ExprContext
+}
+
+func NewExprIDContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ExprIDContext {
+	var p = new(ExprIDContext)
+
+	InitEmptyExprContext(&p.ExprContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExprContext))
+
+	return p
+}
+
+func (s *ExprIDContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ExprIDContext) ID() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserID, 0)
+}
+
+func (s *ExprIDContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterExprID(s)
+	}
+}
+
+func (s *ExprIDContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitExprID(s)
 	}
 }
 
@@ -715,7 +981,7 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(62)
+	p.SetState(49)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -723,8 +989,12 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 
 	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 1, p.GetParserRuleContext()) {
 	case 1:
+		localctx = NewExprParenContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
+
 		{
-			p.SetState(55)
+			p.SetState(41)
 			p.Match(RustLikeParserLPAREN)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -732,11 +1002,11 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 			}
 		}
 		{
-			p.SetState(56)
+			p.SetState(42)
 			p.expr(0)
 		}
 		{
-			p.SetState(57)
+			p.SetState(43)
 			p.Match(RustLikeParserRPAREN)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -745,14 +1015,28 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 		}
 
 	case 2:
+		localctx = NewExprFuncCallContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
 		{
-			p.SetState(59)
-			p.Func_call()
+			p.SetState(45)
+			p.Match(RustLikeParserID)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(46)
+			p.Func_call_list()
 		}
 
 	case 3:
+		localctx = NewExprIDContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
 		{
-			p.SetState(60)
+			p.SetState(47)
 			p.Match(RustLikeParserID)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -761,8 +1045,11 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 		}
 
 	case 4:
+		localctx = NewExprNumContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
 		{
-			p.SetState(61)
+			p.SetState(48)
 			p.Match(RustLikeParserNUMBER)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -774,7 +1061,7 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 		goto errorExit
 	}
 	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
-	p.SetState(75)
+	p.SetState(62)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -789,7 +1076,7 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 				p.TriggerExitRuleEvent()
 			}
 			_prevctx = localctx
-			p.SetState(73)
+			p.SetState(60)
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
@@ -797,16 +1084,16 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 
 			switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 2, p.GetParserRuleContext()) {
 			case 1:
-				localctx = NewExprContext(p, _parentctx, _parentState)
+				localctx = NewExprMulDivContext(p, NewExprContext(p, _parentctx, _parentState))
 				p.PushNewRecursionContext(localctx, _startState, RustLikeParserRULE_expr)
-				p.SetState(64)
+				p.SetState(51)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 7)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 7)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(65)
+					p.SetState(52)
 					_la = p.GetTokenStream().LA(1)
 
 					if !(_la == RustLikeParserMULT || _la == RustLikeParserDIV) {
@@ -817,21 +1104,21 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 					}
 				}
 				{
-					p.SetState(66)
+					p.SetState(53)
 					p.expr(8)
 				}
 
 			case 2:
-				localctx = NewExprContext(p, _parentctx, _parentState)
+				localctx = NewExprAddSubContext(p, NewExprContext(p, _parentctx, _parentState))
 				p.PushNewRecursionContext(localctx, _startState, RustLikeParserRULE_expr)
-				p.SetState(67)
+				p.SetState(54)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 6)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 6)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(68)
+					p.SetState(55)
 					_la = p.GetTokenStream().LA(1)
 
 					if !(_la == RustLikeParserPLUS || _la == RustLikeParserMINUS) {
@@ -842,21 +1129,21 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 					}
 				}
 				{
-					p.SetState(69)
+					p.SetState(56)
 					p.expr(7)
 				}
 
 			case 3:
-				localctx = NewExprContext(p, _parentctx, _parentState)
+				localctx = NewExprCmpContext(p, NewExprContext(p, _parentctx, _parentState))
 				p.PushNewRecursionContext(localctx, _startState, RustLikeParserRULE_expr)
-				p.SetState(70)
+				p.SetState(57)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 5)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 5)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(71)
+					p.SetState(58)
 					_la = p.GetTokenStream().LA(1)
 
 					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&132120576) != 0) {
@@ -867,7 +1154,7 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 					}
 				}
 				{
-					p.SetState(72)
+					p.SetState(59)
 					p.expr(6)
 				}
 
@@ -876,7 +1163,7 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 			}
 
 		}
-		p.SetState(77)
+		p.SetState(64)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -896,123 +1183,6 @@ errorExit:
 		p.SetError(nil)
 	}
 	p.UnrollRecursionContexts(_parentctx)
-	return localctx
-	goto errorExit // Trick to prevent compiler error if the label is not used
-}
-
-// IFunc_callContext is an interface to support dynamic dispatch.
-type IFunc_callContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	ID() antlr.TerminalNode
-	Func_call_list() IFunc_call_listContext
-
-	// IsFunc_callContext differentiates from other interfaces.
-	IsFunc_callContext()
-}
-
-type Func_callContext struct {
-	antlr.BaseParserRuleContext
-	parser antlr.Parser
-}
-
-func NewEmptyFunc_callContext() *Func_callContext {
-	var p = new(Func_callContext)
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_func_call
-	return p
-}
-
-func InitEmptyFunc_callContext(p *Func_callContext) {
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_func_call
-}
-
-func (*Func_callContext) IsFunc_callContext() {}
-
-func NewFunc_callContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *Func_callContext {
-	var p = new(Func_callContext)
-
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
-
-	p.parser = parser
-	p.RuleIndex = RustLikeParserRULE_func_call
-
-	return p
-}
-
-func (s *Func_callContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *Func_callContext) ID() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserID, 0)
-}
-
-func (s *Func_callContext) Func_call_list() IFunc_call_listContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IFunc_call_listContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IFunc_call_listContext)
-}
-
-func (s *Func_callContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *Func_callContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *Func_callContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.EnterFunc_call(s)
-	}
-}
-
-func (s *Func_callContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.ExitFunc_call(s)
-	}
-}
-
-func (p *RustLikeParser) Func_call() (localctx IFunc_callContext) {
-	localctx = NewFunc_callContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 6, RustLikeParserRULE_func_call)
-	p.EnterOuterAlt(localctx, 1)
-	{
-		p.SetState(78)
-		p.Match(RustLikeParserID)
-		if p.HasError() {
-			// Recognition error - abort rule
-			goto errorExit
-		}
-	}
-	{
-		p.SetState(79)
-		p.Func_call_list()
-	}
-
-errorExit:
-	if p.HasError() {
-		v := p.GetError()
-		localctx.SetException(v)
-		p.GetErrorHandler().ReportError(p, v)
-		p.GetErrorHandler().Recover(p, v)
-		p.SetError(nil)
-	}
-	p.ExitRule()
 	return localctx
 	goto errorExit // Trick to prevent compiler error if the label is not used
 }
@@ -1111,10 +1281,10 @@ func (s *Func_call_listContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *RustLikeParser) Func_call_list() (localctx IFunc_call_listContext) {
 	localctx = NewFunc_call_listContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 8, RustLikeParserRULE_func_call_list)
+	p.EnterRule(localctx, 6, RustLikeParserRULE_func_call_list)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(81)
+		p.SetState(65)
 		p.Match(RustLikeParserLPAREN)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -1122,11 +1292,11 @@ func (p *RustLikeParser) Func_call_list() (localctx IFunc_call_listContext) {
 		}
 	}
 	{
-		p.SetState(82)
+		p.SetState(66)
 		p.Func_call_param()
 	}
 	{
-		p.SetState(83)
+		p.SetState(67)
 		p.Match(RustLikeParserRPAREN)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -1267,10 +1437,10 @@ func (s *Func_call_paramContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *RustLikeParser) Func_call_param() (localctx IFunc_call_paramContext) {
 	localctx = NewFunc_call_paramContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 10, RustLikeParserRULE_func_call_param)
+	p.EnterRule(localctx, 8, RustLikeParserRULE_func_call_param)
 	var _la int
 
-	p.SetState(94)
+	p.SetState(78)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -1280,10 +1450,10 @@ func (p *RustLikeParser) Func_call_param() (localctx IFunc_call_paramContext) {
 	case RustLikeParserID, RustLikeParserNUMBER, RustLikeParserLPAREN:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(85)
+			p.SetState(69)
 			p.expr(0)
 		}
-		p.SetState(90)
+		p.SetState(74)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -1292,7 +1462,7 @@ func (p *RustLikeParser) Func_call_param() (localctx IFunc_call_paramContext) {
 
 		for _la == RustLikeParserCOMMA {
 			{
-				p.SetState(86)
+				p.SetState(70)
 				p.Match(RustLikeParserCOMMA)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -1300,11 +1470,11 @@ func (p *RustLikeParser) Func_call_param() (localctx IFunc_call_paramContext) {
 				}
 			}
 			{
-				p.SetState(87)
+				p.SetState(71)
 				p.expr(0)
 			}
 
-			p.SetState(92)
+			p.SetState(76)
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
@@ -1451,15 +1621,15 @@ func (s *Func_declarationContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *RustLikeParser) Func_declaration() (localctx IFunc_declarationContext) {
 	localctx = NewFunc_declarationContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 12, RustLikeParserRULE_func_declaration)
+	p.EnterRule(localctx, 10, RustLikeParserRULE_func_declaration)
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(96)
+		p.SetState(80)
 		p.Func_declaration_header()
 	}
-	p.SetState(98)
+	p.SetState(82)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -1468,13 +1638,13 @@ func (p *RustLikeParser) Func_declaration() (localctx IFunc_declarationContext) 
 
 	if _la == RustLikeParserARROW {
 		{
-			p.SetState(97)
+			p.SetState(81)
 			p.Func_declaration_return()
 		}
 
 	}
 	{
-		p.SetState(100)
+		p.SetState(84)
 		p.Block()
 	}
 
@@ -1585,10 +1755,10 @@ func (s *Func_declaration_headerContext) ExitRule(listener antlr.ParseTreeListen
 
 func (p *RustLikeParser) Func_declaration_header() (localctx IFunc_declaration_headerContext) {
 	localctx = NewFunc_declaration_headerContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 14, RustLikeParserRULE_func_declaration_header)
+	p.EnterRule(localctx, 12, RustLikeParserRULE_func_declaration_header)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(102)
+		p.SetState(86)
 		p.Match(RustLikeParserFN)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -1596,7 +1766,7 @@ func (p *RustLikeParser) Func_declaration_header() (localctx IFunc_declaration_h
 		}
 	}
 	{
-		p.SetState(103)
+		p.SetState(87)
 		p.Match(RustLikeParserID)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -1604,7 +1774,7 @@ func (p *RustLikeParser) Func_declaration_header() (localctx IFunc_declaration_h
 		}
 	}
 	{
-		p.SetState(104)
+		p.SetState(88)
 		p.Fps_list()
 	}
 
@@ -1710,10 +1880,10 @@ func (s *Func_declaration_returnContext) ExitRule(listener antlr.ParseTreeListen
 
 func (p *RustLikeParser) Func_declaration_return() (localctx IFunc_declaration_returnContext) {
 	localctx = NewFunc_declaration_returnContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 16, RustLikeParserRULE_func_declaration_return)
+	p.EnterRule(localctx, 14, RustLikeParserRULE_func_declaration_return)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(106)
+		p.SetState(90)
 		p.Match(RustLikeParserARROW)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -1721,7 +1891,7 @@ func (p *RustLikeParser) Func_declaration_return() (localctx IFunc_declaration_r
 		}
 	}
 	{
-		p.SetState(107)
+		p.SetState(91)
 		p.Type_()
 	}
 
@@ -1832,10 +2002,10 @@ func (s *Fps_listContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *RustLikeParser) Fps_list() (localctx IFps_listContext) {
 	localctx = NewFps_listContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 18, RustLikeParserRULE_fps_list)
+	p.EnterRule(localctx, 16, RustLikeParserRULE_fps_list)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(109)
+		p.SetState(93)
 		p.Match(RustLikeParserLPAREN)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -1843,11 +2013,11 @@ func (p *RustLikeParser) Fps_list() (localctx IFps_listContext) {
 		}
 	}
 	{
-		p.SetState(110)
+		p.SetState(94)
 		p.Fps()
 	}
 	{
-		p.SetState(111)
+		p.SetState(95)
 		p.Match(RustLikeParserRPAREN)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -1988,10 +2158,10 @@ func (s *FpsContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *RustLikeParser) Fps() (localctx IFpsContext) {
 	localctx = NewFpsContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 20, RustLikeParserRULE_fps)
+	p.EnterRule(localctx, 18, RustLikeParserRULE_fps)
 	var _la int
 
-	p.SetState(122)
+	p.SetState(106)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -2001,10 +2171,10 @@ func (p *RustLikeParser) Fps() (localctx IFpsContext) {
 	case RustLikeParserMUT, RustLikeParserID:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(113)
+			p.SetState(97)
 			p.Fp()
 		}
-		p.SetState(118)
+		p.SetState(102)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -2013,7 +2183,7 @@ func (p *RustLikeParser) Fps() (localctx IFpsContext) {
 
 		for _la == RustLikeParserCOMMA {
 			{
-				p.SetState(114)
+				p.SetState(98)
 				p.Match(RustLikeParserCOMMA)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -2021,11 +2191,11 @@ func (p *RustLikeParser) Fps() (localctx IFpsContext) {
 				}
 			}
 			{
-				p.SetState(115)
+				p.SetState(99)
 				p.Fp()
 			}
 
-			p.SetState(120)
+			p.SetState(104)
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
@@ -2153,11 +2323,11 @@ func (s *FpContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *RustLikeParser) Fp() (localctx IFpContext) {
 	localctx = NewFpContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 22, RustLikeParserRULE_fp)
+	p.EnterRule(localctx, 20, RustLikeParserRULE_fp)
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(125)
+	p.SetState(109)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -2166,7 +2336,7 @@ func (p *RustLikeParser) Fp() (localctx IFpContext) {
 
 	if _la == RustLikeParserMUT {
 		{
-			p.SetState(124)
+			p.SetState(108)
 			p.Match(RustLikeParserMUT)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -2176,7 +2346,7 @@ func (p *RustLikeParser) Fp() (localctx IFpContext) {
 
 	}
 	{
-		p.SetState(127)
+		p.SetState(111)
 		p.Match(RustLikeParserID)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2184,7 +2354,7 @@ func (p *RustLikeParser) Fp() (localctx IFpContext) {
 		}
 	}
 	{
-		p.SetState(128)
+		p.SetState(112)
 		p.Match(RustLikeParserCOLON)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2192,7 +2362,7 @@ func (p *RustLikeParser) Fp() (localctx IFpContext) {
 		}
 	}
 	{
-		p.SetState(129)
+		p.SetState(113)
 		p.Type_()
 	}
 
@@ -2281,10 +2451,10 @@ func (s *TypeContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *RustLikeParser) Type_() (localctx ITypeContext) {
 	localctx = NewTypeContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 24, RustLikeParserRULE_type)
+	p.EnterRule(localctx, 22, RustLikeParserRULE_type)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(131)
+		p.SetState(115)
 		p.Match(RustLikeParserINT32)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2425,19 +2595,19 @@ func (s *BlockContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *RustLikeParser) Block() (localctx IBlockContext) {
 	localctx = NewBlockContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 26, RustLikeParserRULE_block)
+	p.EnterRule(localctx, 24, RustLikeParserRULE_block)
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(133)
+		p.SetState(117)
 		p.Match(RustLikeParserLBRACE)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
-	p.SetState(137)
+	p.SetState(121)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -2446,11 +2616,11 @@ func (p *RustLikeParser) Block() (localctx IBlockContext) {
 
 	for (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&36775760736) != 0 {
 		{
-			p.SetState(134)
+			p.SetState(118)
 			p.Stat()
 		}
 
-		p.SetState(139)
+		p.SetState(123)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -2458,7 +2628,7 @@ func (p *RustLikeParser) Block() (localctx IBlockContext) {
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(140)
+		p.SetState(124)
 		p.Match(RustLikeParserRBRACE)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2485,18 +2655,6 @@ type IStatContext interface {
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
-
-	// Getter signatures
-	Block() IBlockContext
-	Stat_return() IStat_returnContext
-	SEMI() antlr.TerminalNode
-	Var_declare() IVar_declareContext
-	Var_assign() IVar_assignContext
-	Expr() IExprContext
-	Stat_if_else() IStat_if_elseContext
-	Stat_while() IStat_whileContext
-	Stat_loop() IStat_loopContext
-
 	// IsStatContext differentiates from other interfaces.
 	IsStatContext()
 }
@@ -2533,7 +2691,37 @@ func NewStatContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokin
 
 func (s *StatContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *StatContext) Block() IBlockContext {
+func (s *StatContext) CopyAll(ctx *StatContext) {
+	s.CopyFrom(&ctx.BaseParserRuleContext)
+}
+
+func (s *StatContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *StatContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+type StatBlockContext struct {
+	StatContext
+}
+
+func NewStatBlockContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *StatBlockContext {
+	var p = new(StatBlockContext)
+
+	InitEmptyStatContext(&p.StatContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*StatContext))
+
+	return p
+}
+
+func (s *StatBlockContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *StatBlockContext) Block() IBlockContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
 		if _, ok := ctx.(IBlockContext); ok {
@@ -2549,460 +2737,215 @@ func (s *StatContext) Block() IBlockContext {
 	return t.(IBlockContext)
 }
 
-func (s *StatContext) Stat_return() IStat_returnContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IStat_returnContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
+func (s *StatBlockContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterStatBlock(s)
 	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IStat_returnContext)
 }
 
-func (s *StatContext) SEMI() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserSEMI, 0)
+func (s *StatBlockContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitStatBlock(s)
+	}
 }
 
-func (s *StatContext) Var_declare() IVar_declareContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IVar_declareContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IVar_declareContext)
+type StatVarAssignContext struct {
+	StatContext
 }
 
-func (s *StatContext) Var_assign() IVar_assignContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IVar_assignContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
+func NewStatVarAssignContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *StatVarAssignContext {
+	var p = new(StatVarAssignContext)
 
-	if t == nil {
-		return nil
-	}
+	InitEmptyStatContext(&p.StatContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*StatContext))
 
-	return t.(IVar_assignContext)
+	return p
 }
 
-func (s *StatContext) Expr() IExprContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IExprContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IExprContext)
-}
-
-func (s *StatContext) Stat_if_else() IStat_if_elseContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IStat_if_elseContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IStat_if_elseContext)
-}
-
-func (s *StatContext) Stat_while() IStat_whileContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IStat_whileContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IStat_whileContext)
-}
-
-func (s *StatContext) Stat_loop() IStat_loopContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IStat_loopContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IStat_loopContext)
-}
-
-func (s *StatContext) GetRuleContext() antlr.RuleContext {
+func (s *StatVarAssignContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
 
-func (s *StatContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *StatContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.EnterStat(s)
-	}
-}
-
-func (s *StatContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.ExitStat(s)
-	}
-}
-
-func (p *RustLikeParser) Stat() (localctx IStatContext) {
-	localctx = NewStatContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 28, RustLikeParserRULE_stat)
-	p.SetState(159)
-	p.GetErrorHandler().Sync(p)
-	if p.HasError() {
-		goto errorExit
-	}
-
-	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 11, p.GetParserRuleContext()) {
-	case 1:
-		p.EnterOuterAlt(localctx, 1)
-		{
-			p.SetState(142)
-			p.Block()
-		}
-
-	case 2:
-		p.EnterOuterAlt(localctx, 2)
-		{
-			p.SetState(143)
-			p.Stat_return()
-		}
-		{
-			p.SetState(144)
-			p.Match(RustLikeParserSEMI)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-
-	case 3:
-		p.EnterOuterAlt(localctx, 3)
-		{
-			p.SetState(146)
-			p.Var_declare()
-		}
-		{
-			p.SetState(147)
-			p.Match(RustLikeParserSEMI)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-
-	case 4:
-		p.EnterOuterAlt(localctx, 4)
-		{
-			p.SetState(149)
-			p.Var_assign()
-		}
-		{
-			p.SetState(150)
-			p.Match(RustLikeParserSEMI)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-
-	case 5:
-		p.EnterOuterAlt(localctx, 5)
-		{
-			p.SetState(152)
-			p.expr(0)
-		}
-		{
-			p.SetState(153)
-			p.Match(RustLikeParserSEMI)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-
-	case 6:
-		p.EnterOuterAlt(localctx, 6)
-		{
-			p.SetState(155)
-			p.Stat_if_else()
-		}
-
-	case 7:
-		p.EnterOuterAlt(localctx, 7)
-		{
-			p.SetState(156)
-			p.Stat_while()
-		}
-
-	case 8:
-		p.EnterOuterAlt(localctx, 8)
-		{
-			p.SetState(157)
-			p.Stat_loop()
-		}
-
-	case 9:
-		p.EnterOuterAlt(localctx, 9)
-		{
-			p.SetState(158)
-			p.Match(RustLikeParserSEMI)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-
-	case antlr.ATNInvalidAltNumber:
-		goto errorExit
-	}
-
-errorExit:
-	if p.HasError() {
-		v := p.GetError()
-		localctx.SetException(v)
-		p.GetErrorHandler().ReportError(p, v)
-		p.GetErrorHandler().Recover(p, v)
-		p.SetError(nil)
-	}
-	p.ExitRule()
-	return localctx
-	goto errorExit // Trick to prevent compiler error if the label is not used
-}
-
-// IStat_returnContext is an interface to support dynamic dispatch.
-type IStat_returnContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	RETURN() antlr.TerminalNode
-	Expr() IExprContext
-
-	// IsStat_returnContext differentiates from other interfaces.
-	IsStat_returnContext()
-}
-
-type Stat_returnContext struct {
-	antlr.BaseParserRuleContext
-	parser antlr.Parser
-}
-
-func NewEmptyStat_returnContext() *Stat_returnContext {
-	var p = new(Stat_returnContext)
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_stat_return
-	return p
-}
-
-func InitEmptyStat_returnContext(p *Stat_returnContext) {
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_stat_return
-}
-
-func (*Stat_returnContext) IsStat_returnContext() {}
-
-func NewStat_returnContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *Stat_returnContext {
-	var p = new(Stat_returnContext)
-
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
-
-	p.parser = parser
-	p.RuleIndex = RustLikeParserRULE_stat_return
-
-	return p
-}
-
-func (s *Stat_returnContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *Stat_returnContext) RETURN() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserRETURN, 0)
-}
-
-func (s *Stat_returnContext) Expr() IExprContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IExprContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IExprContext)
-}
-
-func (s *Stat_returnContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *Stat_returnContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *Stat_returnContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.EnterStat_return(s)
-	}
-}
-
-func (s *Stat_returnContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.ExitStat_return(s)
-	}
-}
-
-func (p *RustLikeParser) Stat_return() (localctx IStat_returnContext) {
-	localctx = NewStat_returnContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 30, RustLikeParserRULE_stat_return)
-	var _la int
-
-	p.EnterOuterAlt(localctx, 1)
-	{
-		p.SetState(161)
-		p.Match(RustLikeParserRETURN)
-		if p.HasError() {
-			// Recognition error - abort rule
-			goto errorExit
-		}
-	}
-	p.SetState(163)
-	p.GetErrorHandler().Sync(p)
-	if p.HasError() {
-		goto errorExit
-	}
-	_la = p.GetTokenStream().LA(1)
-
-	if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&2147581952) != 0 {
-		{
-			p.SetState(162)
-			p.expr(0)
-		}
-
-	}
-
-errorExit:
-	if p.HasError() {
-		v := p.GetError()
-		localctx.SetException(v)
-		p.GetErrorHandler().ReportError(p, v)
-		p.GetErrorHandler().Recover(p, v)
-		p.SetError(nil)
-	}
-	p.ExitRule()
-	return localctx
-	goto errorExit // Trick to prevent compiler error if the label is not used
-}
-
-// IVar_declareContext is an interface to support dynamic dispatch.
-type IVar_declareContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	LET() antlr.TerminalNode
-	ID() antlr.TerminalNode
-	MUT() antlr.TerminalNode
-	Var_type() IVar_typeContext
-	Var_init() IVar_initContext
-
-	// IsVar_declareContext differentiates from other interfaces.
-	IsVar_declareContext()
-}
-
-type Var_declareContext struct {
-	antlr.BaseParserRuleContext
-	parser antlr.Parser
-}
-
-func NewEmptyVar_declareContext() *Var_declareContext {
-	var p = new(Var_declareContext)
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_var_declare
-	return p
-}
-
-func InitEmptyVar_declareContext(p *Var_declareContext) {
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_var_declare
-}
-
-func (*Var_declareContext) IsVar_declareContext() {}
-
-func NewVar_declareContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *Var_declareContext {
-	var p = new(Var_declareContext)
-
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
-
-	p.parser = parser
-	p.RuleIndex = RustLikeParserRULE_var_declare
-
-	return p
-}
-
-func (s *Var_declareContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *Var_declareContext) LET() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserLET, 0)
-}
-
-func (s *Var_declareContext) ID() antlr.TerminalNode {
+func (s *StatVarAssignContext) ID() antlr.TerminalNode {
 	return s.GetToken(RustLikeParserID, 0)
 }
 
-func (s *Var_declareContext) MUT() antlr.TerminalNode {
+func (s *StatVarAssignContext) ASSIGN() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserASSIGN, 0)
+}
+
+func (s *StatVarAssignContext) Expr() IExprContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExprContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExprContext)
+}
+
+func (s *StatVarAssignContext) SEMI() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserSEMI, 0)
+}
+
+func (s *StatVarAssignContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterStatVarAssign(s)
+	}
+}
+
+func (s *StatVarAssignContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitStatVarAssign(s)
+	}
+}
+
+type StatExprContext struct {
+	StatContext
+}
+
+func NewStatExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *StatExprContext {
+	var p = new(StatExprContext)
+
+	InitEmptyStatContext(&p.StatContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*StatContext))
+
+	return p
+}
+
+func (s *StatExprContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *StatExprContext) Expr() IExprContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExprContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExprContext)
+}
+
+func (s *StatExprContext) SEMI() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserSEMI, 0)
+}
+
+func (s *StatExprContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterStatExpr(s)
+	}
+}
+
+func (s *StatExprContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitStatExpr(s)
+	}
+}
+
+type StatFuncReturnContext struct {
+	StatContext
+}
+
+func NewStatFuncReturnContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *StatFuncReturnContext {
+	var p = new(StatFuncReturnContext)
+
+	InitEmptyStatContext(&p.StatContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*StatContext))
+
+	return p
+}
+
+func (s *StatFuncReturnContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *StatFuncReturnContext) RETURN() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserRETURN, 0)
+}
+
+func (s *StatFuncReturnContext) SEMI() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserSEMI, 0)
+}
+
+func (s *StatFuncReturnContext) Expr() IExprContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExprContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExprContext)
+}
+
+func (s *StatFuncReturnContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterStatFuncReturn(s)
+	}
+}
+
+func (s *StatFuncReturnContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitStatFuncReturn(s)
+	}
+}
+
+type StatVarDeclareContext struct {
+	StatContext
+}
+
+func NewStatVarDeclareContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *StatVarDeclareContext {
+	var p = new(StatVarDeclareContext)
+
+	InitEmptyStatContext(&p.StatContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*StatContext))
+
+	return p
+}
+
+func (s *StatVarDeclareContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *StatVarDeclareContext) LET() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserLET, 0)
+}
+
+func (s *StatVarDeclareContext) ID() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserID, 0)
+}
+
+func (s *StatVarDeclareContext) SEMI() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserSEMI, 0)
+}
+
+func (s *StatVarDeclareContext) MUT() antlr.TerminalNode {
 	return s.GetToken(RustLikeParserMUT, 0)
 }
 
-func (s *Var_declareContext) Var_type() IVar_typeContext {
+func (s *StatVarDeclareContext) Var_type() IVar_typeContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
 		if _, ok := ctx.(IVar_typeContext); ok {
@@ -3018,7 +2961,7 @@ func (s *Var_declareContext) Var_type() IVar_typeContext {
 	return t.(IVar_typeContext)
 }
 
-func (s *Var_declareContext) Var_init() IVar_initContext {
+func (s *StatVarDeclareContext) Var_init() IVar_initContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
 		if _, ok := ctx.(IVar_initContext); ok {
@@ -3034,93 +2977,613 @@ func (s *Var_declareContext) Var_init() IVar_initContext {
 	return t.(IVar_initContext)
 }
 
-func (s *Var_declareContext) GetRuleContext() antlr.RuleContext {
+func (s *StatVarDeclareContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterStatVarDeclare(s)
+	}
+}
+
+func (s *StatVarDeclareContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitStatVarDeclare(s)
+	}
+}
+
+type StatLoopContext struct {
+	StatContext
+}
+
+func NewStatLoopContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *StatLoopContext {
+	var p = new(StatLoopContext)
+
+	InitEmptyStatContext(&p.StatContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*StatContext))
+
+	return p
+}
+
+func (s *StatLoopContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
 
-func (s *Var_declareContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
+func (s *StatLoopContext) LOOP() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserLOOP, 0)
 }
 
-func (s *Var_declareContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.EnterVar_declare(s)
-	}
-}
-
-func (s *Var_declareContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.ExitVar_declare(s)
-	}
-}
-
-func (p *RustLikeParser) Var_declare() (localctx IVar_declareContext) {
-	localctx = NewVar_declareContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 32, RustLikeParserRULE_var_declare)
-	var _la int
-
-	p.EnterOuterAlt(localctx, 1)
-	{
-		p.SetState(165)
-		p.Match(RustLikeParserLET)
-		if p.HasError() {
-			// Recognition error - abort rule
-			goto errorExit
+func (s *StatLoopContext) Block() IBlockContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IBlockContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
 		}
 	}
-	p.SetState(167)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IBlockContext)
+}
+
+func (s *StatLoopContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterStatLoop(s)
+	}
+}
+
+func (s *StatLoopContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitStatLoop(s)
+	}
+}
+
+type StatIfElseContext struct {
+	StatContext
+}
+
+func NewStatIfElseContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *StatIfElseContext {
+	var p = new(StatIfElseContext)
+
+	InitEmptyStatContext(&p.StatContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*StatContext))
+
+	return p
+}
+
+func (s *StatIfElseContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *StatIfElseContext) AllIF() []antlr.TerminalNode {
+	return s.GetTokens(RustLikeParserIF)
+}
+
+func (s *StatIfElseContext) IF(i int) antlr.TerminalNode {
+	return s.GetToken(RustLikeParserIF, i)
+}
+
+func (s *StatIfElseContext) AllExpr() []IExprContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExprContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExprContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExprContext); ok {
+			tst[i] = t.(IExprContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *StatIfElseContext) Expr(i int) IExprContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExprContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExprContext)
+}
+
+func (s *StatIfElseContext) AllBlock() []IBlockContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IBlockContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IBlockContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IBlockContext); ok {
+			tst[i] = t.(IBlockContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *StatIfElseContext) Block(i int) IBlockContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IBlockContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IBlockContext)
+}
+
+func (s *StatIfElseContext) AllELSE() []antlr.TerminalNode {
+	return s.GetTokens(RustLikeParserELSE)
+}
+
+func (s *StatIfElseContext) ELSE(i int) antlr.TerminalNode {
+	return s.GetToken(RustLikeParserELSE, i)
+}
+
+func (s *StatIfElseContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterStatIfElse(s)
+	}
+}
+
+func (s *StatIfElseContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitStatIfElse(s)
+	}
+}
+
+type StatWhileContext struct {
+	StatContext
+}
+
+func NewStatWhileContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *StatWhileContext {
+	var p = new(StatWhileContext)
+
+	InitEmptyStatContext(&p.StatContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*StatContext))
+
+	return p
+}
+
+func (s *StatWhileContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *StatWhileContext) WHILE() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserWHILE, 0)
+}
+
+func (s *StatWhileContext) Expr() IExprContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExprContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExprContext)
+}
+
+func (s *StatWhileContext) Block() IBlockContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IBlockContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IBlockContext)
+}
+
+func (s *StatWhileContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterStatWhile(s)
+	}
+}
+
+func (s *StatWhileContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitStatWhile(s)
+	}
+}
+
+type StatEmptyContext struct {
+	StatContext
+}
+
+func NewStatEmptyContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *StatEmptyContext {
+	var p = new(StatEmptyContext)
+
+	InitEmptyStatContext(&p.StatContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*StatContext))
+
+	return p
+}
+
+func (s *StatEmptyContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *StatEmptyContext) SEMI() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserSEMI, 0)
+}
+
+func (s *StatEmptyContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.EnterStatEmpty(s)
+	}
+}
+
+func (s *StatEmptyContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RustLikeParserListener); ok {
+		listenerT.ExitStatEmpty(s)
+	}
+}
+
+func (p *RustLikeParser) Stat() (localctx IStatContext) {
+	localctx = NewStatContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 26, RustLikeParserRULE_stat)
+	var _la int
+
+	var _alt int
+
+	p.SetState(176)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
 	}
-	_la = p.GetTokenStream().LA(1)
 
-	if _la == RustLikeParserMUT {
+	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 17, p.GetParserRuleContext()) {
+	case 1:
+		localctx = NewStatBlockContext(p, localctx)
+		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(166)
-			p.Match(RustLikeParserMUT)
+			p.SetState(126)
+			p.Block()
+		}
+
+	case 2:
+		localctx = NewStatFuncReturnContext(p, localctx)
+		p.EnterOuterAlt(localctx, 2)
+		{
+			p.SetState(127)
+			p.Match(RustLikeParserRETURN)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		p.SetState(129)
+		p.GetErrorHandler().Sync(p)
+		if p.HasError() {
+			goto errorExit
+		}
+		_la = p.GetTokenStream().LA(1)
+
+		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&2147581952) != 0 {
+			{
+				p.SetState(128)
+				p.expr(0)
+			}
+
+		}
+		{
+			p.SetState(131)
+			p.Match(RustLikeParserSEMI)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
 
-	}
-	{
-		p.SetState(169)
-		p.Match(RustLikeParserID)
+	case 3:
+		localctx = NewStatVarDeclareContext(p, localctx)
+		p.EnterOuterAlt(localctx, 3)
+		{
+			p.SetState(132)
+			p.Match(RustLikeParserLET)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		p.SetState(134)
+		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
-			// Recognition error - abort rule
 			goto errorExit
 		}
-	}
-	p.SetState(171)
-	p.GetErrorHandler().Sync(p)
-	if p.HasError() {
-		goto errorExit
-	}
-	_la = p.GetTokenStream().LA(1)
+		_la = p.GetTokenStream().LA(1)
 
-	if _la == RustLikeParserCOLON {
+		if _la == RustLikeParserMUT {
+			{
+				p.SetState(133)
+				p.Match(RustLikeParserMUT)
+				if p.HasError() {
+					// Recognition error - abort rule
+					goto errorExit
+				}
+			}
+
+		}
+		{
+			p.SetState(136)
+			p.Match(RustLikeParserID)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		p.SetState(138)
+		p.GetErrorHandler().Sync(p)
+		if p.HasError() {
+			goto errorExit
+		}
+		_la = p.GetTokenStream().LA(1)
+
+		if _la == RustLikeParserCOLON {
+			{
+				p.SetState(137)
+				p.Var_type()
+			}
+
+		}
+		p.SetState(141)
+		p.GetErrorHandler().Sync(p)
+		if p.HasError() {
+			goto errorExit
+		}
+		_la = p.GetTokenStream().LA(1)
+
+		if _la == RustLikeParserASSIGN {
+			{
+				p.SetState(140)
+				p.Var_init()
+			}
+
+		}
+		{
+			p.SetState(143)
+			p.Match(RustLikeParserSEMI)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+
+	case 4:
+		localctx = NewStatVarAssignContext(p, localctx)
+		p.EnterOuterAlt(localctx, 4)
+		{
+			p.SetState(144)
+			p.Match(RustLikeParserID)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(145)
+			p.Match(RustLikeParserASSIGN)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(146)
+			p.expr(0)
+		}
+		{
+			p.SetState(147)
+			p.Match(RustLikeParserSEMI)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+
+	case 5:
+		localctx = NewStatExprContext(p, localctx)
+		p.EnterOuterAlt(localctx, 5)
+		{
+			p.SetState(149)
+			p.expr(0)
+		}
+		{
+			p.SetState(150)
+			p.Match(RustLikeParserSEMI)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+
+	case 6:
+		localctx = NewStatIfElseContext(p, localctx)
+		p.EnterOuterAlt(localctx, 6)
+		{
+			p.SetState(152)
+			p.Match(RustLikeParserIF)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(153)
+			p.expr(0)
+		}
+		{
+			p.SetState(154)
+			p.Block()
+		}
+		p.SetState(162)
+		p.GetErrorHandler().Sync(p)
+		if p.HasError() {
+			goto errorExit
+		}
+		_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 15, p.GetParserRuleContext())
+		if p.HasError() {
+			goto errorExit
+		}
+		for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
+			if _alt == 1 {
+				{
+					p.SetState(155)
+					p.Match(RustLikeParserELSE)
+					if p.HasError() {
+						// Recognition error - abort rule
+						goto errorExit
+					}
+				}
+				{
+					p.SetState(156)
+					p.Match(RustLikeParserIF)
+					if p.HasError() {
+						// Recognition error - abort rule
+						goto errorExit
+					}
+				}
+				{
+					p.SetState(157)
+					p.expr(0)
+				}
+				{
+					p.SetState(158)
+					p.Block()
+				}
+
+			}
+			p.SetState(164)
+			p.GetErrorHandler().Sync(p)
+			if p.HasError() {
+				goto errorExit
+			}
+			_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 15, p.GetParserRuleContext())
+			if p.HasError() {
+				goto errorExit
+			}
+		}
+		p.SetState(167)
+		p.GetErrorHandler().Sync(p)
+		if p.HasError() {
+			goto errorExit
+		}
+		_la = p.GetTokenStream().LA(1)
+
+		if _la == RustLikeParserELSE {
+			{
+				p.SetState(165)
+				p.Match(RustLikeParserELSE)
+				if p.HasError() {
+					// Recognition error - abort rule
+					goto errorExit
+				}
+			}
+			{
+				p.SetState(166)
+				p.Block()
+			}
+
+		}
+
+	case 7:
+		localctx = NewStatWhileContext(p, localctx)
+		p.EnterOuterAlt(localctx, 7)
+		{
+			p.SetState(169)
+			p.Match(RustLikeParserWHILE)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
 		{
 			p.SetState(170)
-			p.Var_type()
+			p.expr(0)
+		}
+		{
+			p.SetState(171)
+			p.Block()
 		}
 
-	}
-	p.SetState(174)
-	p.GetErrorHandler().Sync(p)
-	if p.HasError() {
-		goto errorExit
-	}
-	_la = p.GetTokenStream().LA(1)
-
-	if _la == RustLikeParserASSIGN {
+	case 8:
+		localctx = NewStatLoopContext(p, localctx)
+		p.EnterOuterAlt(localctx, 8)
 		{
 			p.SetState(173)
-			p.Var_init()
+			p.Match(RustLikeParserLOOP)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(174)
+			p.Block()
 		}
 
+	case 9:
+		localctx = NewStatEmptyContext(p, localctx)
+		p.EnterOuterAlt(localctx, 9)
+		{
+			p.SetState(175)
+			p.Match(RustLikeParserSEMI)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+
+	case antlr.ATNInvalidAltNumber:
+		goto errorExit
 	}
 
 errorExit:
@@ -3225,10 +3688,10 @@ func (s *Var_typeContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *RustLikeParser) Var_type() (localctx IVar_typeContext) {
 	localctx = NewVar_typeContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 34, RustLikeParserRULE_var_type)
+	p.EnterRule(localctx, 28, RustLikeParserRULE_var_type)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(176)
+		p.SetState(178)
 		p.Match(RustLikeParserCOLON)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -3236,7 +3699,7 @@ func (p *RustLikeParser) Var_type() (localctx IVar_typeContext) {
 		}
 	}
 	{
-		p.SetState(177)
+		p.SetState(179)
 		p.Type_()
 	}
 
@@ -3342,682 +3805,19 @@ func (s *Var_initContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *RustLikeParser) Var_init() (localctx IVar_initContext) {
 	localctx = NewVar_initContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 36, RustLikeParserRULE_var_init)
+	p.EnterRule(localctx, 30, RustLikeParserRULE_var_init)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(179)
+		p.SetState(181)
 		p.Match(RustLikeParserASSIGN)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
-	{
-		p.SetState(180)
-		p.expr(0)
-	}
-
-errorExit:
-	if p.HasError() {
-		v := p.GetError()
-		localctx.SetException(v)
-		p.GetErrorHandler().ReportError(p, v)
-		p.GetErrorHandler().Recover(p, v)
-		p.SetError(nil)
-	}
-	p.ExitRule()
-	return localctx
-	goto errorExit // Trick to prevent compiler error if the label is not used
-}
-
-// IVar_assignContext is an interface to support dynamic dispatch.
-type IVar_assignContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	ID() antlr.TerminalNode
-	ASSIGN() antlr.TerminalNode
-	Expr() IExprContext
-
-	// IsVar_assignContext differentiates from other interfaces.
-	IsVar_assignContext()
-}
-
-type Var_assignContext struct {
-	antlr.BaseParserRuleContext
-	parser antlr.Parser
-}
-
-func NewEmptyVar_assignContext() *Var_assignContext {
-	var p = new(Var_assignContext)
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_var_assign
-	return p
-}
-
-func InitEmptyVar_assignContext(p *Var_assignContext) {
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_var_assign
-}
-
-func (*Var_assignContext) IsVar_assignContext() {}
-
-func NewVar_assignContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *Var_assignContext {
-	var p = new(Var_assignContext)
-
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
-
-	p.parser = parser
-	p.RuleIndex = RustLikeParserRULE_var_assign
-
-	return p
-}
-
-func (s *Var_assignContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *Var_assignContext) ID() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserID, 0)
-}
-
-func (s *Var_assignContext) ASSIGN() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserASSIGN, 0)
-}
-
-func (s *Var_assignContext) Expr() IExprContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IExprContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IExprContext)
-}
-
-func (s *Var_assignContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *Var_assignContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *Var_assignContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.EnterVar_assign(s)
-	}
-}
-
-func (s *Var_assignContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.ExitVar_assign(s)
-	}
-}
-
-func (p *RustLikeParser) Var_assign() (localctx IVar_assignContext) {
-	localctx = NewVar_assignContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 38, RustLikeParserRULE_var_assign)
-	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(182)
-		p.Match(RustLikeParserID)
-		if p.HasError() {
-			// Recognition error - abort rule
-			goto errorExit
-		}
-	}
-	{
-		p.SetState(183)
-		p.Match(RustLikeParserASSIGN)
-		if p.HasError() {
-			// Recognition error - abort rule
-			goto errorExit
-		}
-	}
-	{
-		p.SetState(184)
 		p.expr(0)
-	}
-
-errorExit:
-	if p.HasError() {
-		v := p.GetError()
-		localctx.SetException(v)
-		p.GetErrorHandler().ReportError(p, v)
-		p.GetErrorHandler().Recover(p, v)
-		p.SetError(nil)
-	}
-	p.ExitRule()
-	return localctx
-	goto errorExit // Trick to prevent compiler error if the label is not used
-}
-
-// IStat_if_elseContext is an interface to support dynamic dispatch.
-type IStat_if_elseContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	AllIF() []antlr.TerminalNode
-	IF(i int) antlr.TerminalNode
-	AllExpr() []IExprContext
-	Expr(i int) IExprContext
-	AllBlock() []IBlockContext
-	Block(i int) IBlockContext
-	AllELSE() []antlr.TerminalNode
-	ELSE(i int) antlr.TerminalNode
-
-	// IsStat_if_elseContext differentiates from other interfaces.
-	IsStat_if_elseContext()
-}
-
-type Stat_if_elseContext struct {
-	antlr.BaseParserRuleContext
-	parser antlr.Parser
-}
-
-func NewEmptyStat_if_elseContext() *Stat_if_elseContext {
-	var p = new(Stat_if_elseContext)
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_stat_if_else
-	return p
-}
-
-func InitEmptyStat_if_elseContext(p *Stat_if_elseContext) {
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_stat_if_else
-}
-
-func (*Stat_if_elseContext) IsStat_if_elseContext() {}
-
-func NewStat_if_elseContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *Stat_if_elseContext {
-	var p = new(Stat_if_elseContext)
-
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
-
-	p.parser = parser
-	p.RuleIndex = RustLikeParserRULE_stat_if_else
-
-	return p
-}
-
-func (s *Stat_if_elseContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *Stat_if_elseContext) AllIF() []antlr.TerminalNode {
-	return s.GetTokens(RustLikeParserIF)
-}
-
-func (s *Stat_if_elseContext) IF(i int) antlr.TerminalNode {
-	return s.GetToken(RustLikeParserIF, i)
-}
-
-func (s *Stat_if_elseContext) AllExpr() []IExprContext {
-	children := s.GetChildren()
-	len := 0
-	for _, ctx := range children {
-		if _, ok := ctx.(IExprContext); ok {
-			len++
-		}
-	}
-
-	tst := make([]IExprContext, len)
-	i := 0
-	for _, ctx := range children {
-		if t, ok := ctx.(IExprContext); ok {
-			tst[i] = t.(IExprContext)
-			i++
-		}
-	}
-
-	return tst
-}
-
-func (s *Stat_if_elseContext) Expr(i int) IExprContext {
-	var t antlr.RuleContext
-	j := 0
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IExprContext); ok {
-			if j == i {
-				t = ctx.(antlr.RuleContext)
-				break
-			}
-			j++
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IExprContext)
-}
-
-func (s *Stat_if_elseContext) AllBlock() []IBlockContext {
-	children := s.GetChildren()
-	len := 0
-	for _, ctx := range children {
-		if _, ok := ctx.(IBlockContext); ok {
-			len++
-		}
-	}
-
-	tst := make([]IBlockContext, len)
-	i := 0
-	for _, ctx := range children {
-		if t, ok := ctx.(IBlockContext); ok {
-			tst[i] = t.(IBlockContext)
-			i++
-		}
-	}
-
-	return tst
-}
-
-func (s *Stat_if_elseContext) Block(i int) IBlockContext {
-	var t antlr.RuleContext
-	j := 0
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IBlockContext); ok {
-			if j == i {
-				t = ctx.(antlr.RuleContext)
-				break
-			}
-			j++
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IBlockContext)
-}
-
-func (s *Stat_if_elseContext) AllELSE() []antlr.TerminalNode {
-	return s.GetTokens(RustLikeParserELSE)
-}
-
-func (s *Stat_if_elseContext) ELSE(i int) antlr.TerminalNode {
-	return s.GetToken(RustLikeParserELSE, i)
-}
-
-func (s *Stat_if_elseContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *Stat_if_elseContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *Stat_if_elseContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.EnterStat_if_else(s)
-	}
-}
-
-func (s *Stat_if_elseContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.ExitStat_if_else(s)
-	}
-}
-
-func (p *RustLikeParser) Stat_if_else() (localctx IStat_if_elseContext) {
-	localctx = NewStat_if_elseContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 40, RustLikeParserRULE_stat_if_else)
-	var _la int
-
-	var _alt int
-
-	p.EnterOuterAlt(localctx, 1)
-	{
-		p.SetState(186)
-		p.Match(RustLikeParserIF)
-		if p.HasError() {
-			// Recognition error - abort rule
-			goto errorExit
-		}
-	}
-	{
-		p.SetState(187)
-		p.expr(0)
-	}
-	{
-		p.SetState(188)
-		p.Block()
-	}
-	p.SetState(196)
-	p.GetErrorHandler().Sync(p)
-	if p.HasError() {
-		goto errorExit
-	}
-	_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 16, p.GetParserRuleContext())
-	if p.HasError() {
-		goto errorExit
-	}
-	for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
-		if _alt == 1 {
-			{
-				p.SetState(189)
-				p.Match(RustLikeParserELSE)
-				if p.HasError() {
-					// Recognition error - abort rule
-					goto errorExit
-				}
-			}
-			{
-				p.SetState(190)
-				p.Match(RustLikeParserIF)
-				if p.HasError() {
-					// Recognition error - abort rule
-					goto errorExit
-				}
-			}
-			{
-				p.SetState(191)
-				p.expr(0)
-			}
-			{
-				p.SetState(192)
-				p.Block()
-			}
-
-		}
-		p.SetState(198)
-		p.GetErrorHandler().Sync(p)
-		if p.HasError() {
-			goto errorExit
-		}
-		_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 16, p.GetParserRuleContext())
-		if p.HasError() {
-			goto errorExit
-		}
-	}
-	p.SetState(201)
-	p.GetErrorHandler().Sync(p)
-	if p.HasError() {
-		goto errorExit
-	}
-	_la = p.GetTokenStream().LA(1)
-
-	if _la == RustLikeParserELSE {
-		{
-			p.SetState(199)
-			p.Match(RustLikeParserELSE)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-		{
-			p.SetState(200)
-			p.Block()
-		}
-
-	}
-
-errorExit:
-	if p.HasError() {
-		v := p.GetError()
-		localctx.SetException(v)
-		p.GetErrorHandler().ReportError(p, v)
-		p.GetErrorHandler().Recover(p, v)
-		p.SetError(nil)
-	}
-	p.ExitRule()
-	return localctx
-	goto errorExit // Trick to prevent compiler error if the label is not used
-}
-
-// IStat_whileContext is an interface to support dynamic dispatch.
-type IStat_whileContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	WHILE() antlr.TerminalNode
-	Expr() IExprContext
-	Block() IBlockContext
-
-	// IsStat_whileContext differentiates from other interfaces.
-	IsStat_whileContext()
-}
-
-type Stat_whileContext struct {
-	antlr.BaseParserRuleContext
-	parser antlr.Parser
-}
-
-func NewEmptyStat_whileContext() *Stat_whileContext {
-	var p = new(Stat_whileContext)
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_stat_while
-	return p
-}
-
-func InitEmptyStat_whileContext(p *Stat_whileContext) {
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_stat_while
-}
-
-func (*Stat_whileContext) IsStat_whileContext() {}
-
-func NewStat_whileContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *Stat_whileContext {
-	var p = new(Stat_whileContext)
-
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
-
-	p.parser = parser
-	p.RuleIndex = RustLikeParserRULE_stat_while
-
-	return p
-}
-
-func (s *Stat_whileContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *Stat_whileContext) WHILE() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserWHILE, 0)
-}
-
-func (s *Stat_whileContext) Expr() IExprContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IExprContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IExprContext)
-}
-
-func (s *Stat_whileContext) Block() IBlockContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IBlockContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IBlockContext)
-}
-
-func (s *Stat_whileContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *Stat_whileContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *Stat_whileContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.EnterStat_while(s)
-	}
-}
-
-func (s *Stat_whileContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.ExitStat_while(s)
-	}
-}
-
-func (p *RustLikeParser) Stat_while() (localctx IStat_whileContext) {
-	localctx = NewStat_whileContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 42, RustLikeParserRULE_stat_while)
-	p.EnterOuterAlt(localctx, 1)
-	{
-		p.SetState(203)
-		p.Match(RustLikeParserWHILE)
-		if p.HasError() {
-			// Recognition error - abort rule
-			goto errorExit
-		}
-	}
-	{
-		p.SetState(204)
-		p.expr(0)
-	}
-	{
-		p.SetState(205)
-		p.Block()
-	}
-
-errorExit:
-	if p.HasError() {
-		v := p.GetError()
-		localctx.SetException(v)
-		p.GetErrorHandler().ReportError(p, v)
-		p.GetErrorHandler().Recover(p, v)
-		p.SetError(nil)
-	}
-	p.ExitRule()
-	return localctx
-	goto errorExit // Trick to prevent compiler error if the label is not used
-}
-
-// IStat_loopContext is an interface to support dynamic dispatch.
-type IStat_loopContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	LOOP() antlr.TerminalNode
-	Block() IBlockContext
-
-	// IsStat_loopContext differentiates from other interfaces.
-	IsStat_loopContext()
-}
-
-type Stat_loopContext struct {
-	antlr.BaseParserRuleContext
-	parser antlr.Parser
-}
-
-func NewEmptyStat_loopContext() *Stat_loopContext {
-	var p = new(Stat_loopContext)
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_stat_loop
-	return p
-}
-
-func InitEmptyStat_loopContext(p *Stat_loopContext) {
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_stat_loop
-}
-
-func (*Stat_loopContext) IsStat_loopContext() {}
-
-func NewStat_loopContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *Stat_loopContext {
-	var p = new(Stat_loopContext)
-
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
-
-	p.parser = parser
-	p.RuleIndex = RustLikeParserRULE_stat_loop
-
-	return p
-}
-
-func (s *Stat_loopContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *Stat_loopContext) LOOP() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserLOOP, 0)
-}
-
-func (s *Stat_loopContext) Block() IBlockContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IBlockContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IBlockContext)
-}
-
-func (s *Stat_loopContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *Stat_loopContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *Stat_loopContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.EnterStat_loop(s)
-	}
-}
-
-func (s *Stat_loopContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.ExitStat_loop(s)
-	}
-}
-
-func (p *RustLikeParser) Stat_loop() (localctx IStat_loopContext) {
-	localctx = NewStat_loopContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 44, RustLikeParserRULE_stat_loop)
-	p.EnterOuterAlt(localctx, 1)
-	{
-		p.SetState(207)
-		p.Match(RustLikeParserLOOP)
-		if p.HasError() {
-			// Recognition error - abort rule
-			goto errorExit
-		}
-	}
-	{
-		p.SetState(208)
-		p.Block()
 	}
 
 errorExit:

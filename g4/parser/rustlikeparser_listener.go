@@ -14,11 +14,26 @@ type RustLikeParserListener interface {
 	// EnterDeclaration is called when entering the declaration production.
 	EnterDeclaration(c *DeclarationContext)
 
-	// EnterExpr is called when entering the expr production.
-	EnterExpr(c *ExprContext)
+	// EnterExprAddSub is called when entering the ExprAddSub production.
+	EnterExprAddSub(c *ExprAddSubContext)
 
-	// EnterFunc_call is called when entering the func_call production.
-	EnterFunc_call(c *Func_callContext)
+	// EnterExprParen is called when entering the ExprParen production.
+	EnterExprParen(c *ExprParenContext)
+
+	// EnterExprNum is called when entering the ExprNum production.
+	EnterExprNum(c *ExprNumContext)
+
+	// EnterExprMulDiv is called when entering the ExprMulDiv production.
+	EnterExprMulDiv(c *ExprMulDivContext)
+
+	// EnterExprCmp is called when entering the ExprCmp production.
+	EnterExprCmp(c *ExprCmpContext)
+
+	// EnterExprFuncCall is called when entering the ExprFuncCall production.
+	EnterExprFuncCall(c *ExprFuncCallContext)
+
+	// EnterExprID is called when entering the ExprID production.
+	EnterExprID(c *ExprIDContext)
 
 	// EnterFunc_call_list is called when entering the func_call_list production.
 	EnterFunc_call_list(c *Func_call_listContext)
@@ -50,14 +65,32 @@ type RustLikeParserListener interface {
 	// EnterBlock is called when entering the block production.
 	EnterBlock(c *BlockContext)
 
-	// EnterStat is called when entering the stat production.
-	EnterStat(c *StatContext)
+	// EnterStatBlock is called when entering the StatBlock production.
+	EnterStatBlock(c *StatBlockContext)
 
-	// EnterStat_return is called when entering the stat_return production.
-	EnterStat_return(c *Stat_returnContext)
+	// EnterStatFuncReturn is called when entering the StatFuncReturn production.
+	EnterStatFuncReturn(c *StatFuncReturnContext)
 
-	// EnterVar_declare is called when entering the var_declare production.
-	EnterVar_declare(c *Var_declareContext)
+	// EnterStatVarDeclare is called when entering the StatVarDeclare production.
+	EnterStatVarDeclare(c *StatVarDeclareContext)
+
+	// EnterStatVarAssign is called when entering the StatVarAssign production.
+	EnterStatVarAssign(c *StatVarAssignContext)
+
+	// EnterStatExpr is called when entering the StatExpr production.
+	EnterStatExpr(c *StatExprContext)
+
+	// EnterStatIfElse is called when entering the StatIfElse production.
+	EnterStatIfElse(c *StatIfElseContext)
+
+	// EnterStatWhile is called when entering the StatWhile production.
+	EnterStatWhile(c *StatWhileContext)
+
+	// EnterStatLoop is called when entering the StatLoop production.
+	EnterStatLoop(c *StatLoopContext)
+
+	// EnterStatEmpty is called when entering the StatEmpty production.
+	EnterStatEmpty(c *StatEmptyContext)
 
 	// EnterVar_type is called when entering the var_type production.
 	EnterVar_type(c *Var_typeContext)
@@ -65,29 +98,32 @@ type RustLikeParserListener interface {
 	// EnterVar_init is called when entering the var_init production.
 	EnterVar_init(c *Var_initContext)
 
-	// EnterVar_assign is called when entering the var_assign production.
-	EnterVar_assign(c *Var_assignContext)
-
-	// EnterStat_if_else is called when entering the stat_if_else production.
-	EnterStat_if_else(c *Stat_if_elseContext)
-
-	// EnterStat_while is called when entering the stat_while production.
-	EnterStat_while(c *Stat_whileContext)
-
-	// EnterStat_loop is called when entering the stat_loop production.
-	EnterStat_loop(c *Stat_loopContext)
-
 	// ExitProg is called when exiting the prog production.
 	ExitProg(c *ProgContext)
 
 	// ExitDeclaration is called when exiting the declaration production.
 	ExitDeclaration(c *DeclarationContext)
 
-	// ExitExpr is called when exiting the expr production.
-	ExitExpr(c *ExprContext)
+	// ExitExprAddSub is called when exiting the ExprAddSub production.
+	ExitExprAddSub(c *ExprAddSubContext)
 
-	// ExitFunc_call is called when exiting the func_call production.
-	ExitFunc_call(c *Func_callContext)
+	// ExitExprParen is called when exiting the ExprParen production.
+	ExitExprParen(c *ExprParenContext)
+
+	// ExitExprNum is called when exiting the ExprNum production.
+	ExitExprNum(c *ExprNumContext)
+
+	// ExitExprMulDiv is called when exiting the ExprMulDiv production.
+	ExitExprMulDiv(c *ExprMulDivContext)
+
+	// ExitExprCmp is called when exiting the ExprCmp production.
+	ExitExprCmp(c *ExprCmpContext)
+
+	// ExitExprFuncCall is called when exiting the ExprFuncCall production.
+	ExitExprFuncCall(c *ExprFuncCallContext)
+
+	// ExitExprID is called when exiting the ExprID production.
+	ExitExprID(c *ExprIDContext)
 
 	// ExitFunc_call_list is called when exiting the func_call_list production.
 	ExitFunc_call_list(c *Func_call_listContext)
@@ -119,30 +155,36 @@ type RustLikeParserListener interface {
 	// ExitBlock is called when exiting the block production.
 	ExitBlock(c *BlockContext)
 
-	// ExitStat is called when exiting the stat production.
-	ExitStat(c *StatContext)
+	// ExitStatBlock is called when exiting the StatBlock production.
+	ExitStatBlock(c *StatBlockContext)
 
-	// ExitStat_return is called when exiting the stat_return production.
-	ExitStat_return(c *Stat_returnContext)
+	// ExitStatFuncReturn is called when exiting the StatFuncReturn production.
+	ExitStatFuncReturn(c *StatFuncReturnContext)
 
-	// ExitVar_declare is called when exiting the var_declare production.
-	ExitVar_declare(c *Var_declareContext)
+	// ExitStatVarDeclare is called when exiting the StatVarDeclare production.
+	ExitStatVarDeclare(c *StatVarDeclareContext)
+
+	// ExitStatVarAssign is called when exiting the StatVarAssign production.
+	ExitStatVarAssign(c *StatVarAssignContext)
+
+	// ExitStatExpr is called when exiting the StatExpr production.
+	ExitStatExpr(c *StatExprContext)
+
+	// ExitStatIfElse is called when exiting the StatIfElse production.
+	ExitStatIfElse(c *StatIfElseContext)
+
+	// ExitStatWhile is called when exiting the StatWhile production.
+	ExitStatWhile(c *StatWhileContext)
+
+	// ExitStatLoop is called when exiting the StatLoop production.
+	ExitStatLoop(c *StatLoopContext)
+
+	// ExitStatEmpty is called when exiting the StatEmpty production.
+	ExitStatEmpty(c *StatEmptyContext)
 
 	// ExitVar_type is called when exiting the var_type production.
 	ExitVar_type(c *Var_typeContext)
 
 	// ExitVar_init is called when exiting the var_init production.
 	ExitVar_init(c *Var_initContext)
-
-	// ExitVar_assign is called when exiting the var_assign production.
-	ExitVar_assign(c *Var_assignContext)
-
-	// ExitStat_if_else is called when exiting the stat_if_else production.
-	ExitStat_if_else(c *Stat_if_elseContext)
-
-	// ExitStat_while is called when exiting the stat_while production.
-	ExitStat_while(c *Stat_whileContext)
-
-	// ExitStat_loop is called when exiting the stat_loop production.
-	ExitStat_loop(c *Stat_loopContext)
 }
