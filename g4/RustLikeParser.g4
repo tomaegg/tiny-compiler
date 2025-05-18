@@ -5,33 +5,33 @@ options {
 
 prog: declaration;
 
-declaration: func_declaration*;
+declaration: funcDeclaration*;
 
 expr:
 	expr (MULT | DIV) expr						# ExprMulDiv
 	| expr (PLUS | MINUS) expr					# ExprAddSub
 	| expr (EQ | NE | LT | GT | LE | GE) expr	# ExprCmp
 	| LPAREN expr RPAREN						# ExprParen
-	| ID func_call_list							# ExprFuncCall
+	| ID funcCallList							# ExprFuncCall
 	| ID										# ExprID
 	| NUMBER									# ExprNum;
 
-func_call_list: LPAREN func_call_param RPAREN;
+funcCallList: LPAREN funcCallParam RPAREN;
 
-func_call_param: expr (COMMA expr)* |;
+funcCallParam: expr (COMMA expr)* |;
 
-func_declaration:
-	func_declaration_header func_declaration_return? block; // 函数声明
+funcDeclaration:
+	funcDeclarationHeader funcDeclarationReturn? block; // 函数声明
 
-func_declaration_header: FN ID fps_list;
+funcDeclarationHeader: FN ID funcParamsList;
 
-func_declaration_return: ARROW type;
+funcDeclarationReturn: ARROW type;
 
-fps_list: LPAREN fps RPAREN;
+funcParamsList: LPAREN funcParams RPAREN;
 
-fps: fp (COMMA fp)* |; // fps可以为空
+funcParams: funcParam (COMMA funcParam)* |; // fps可以为空
 
-fp: MUT? ID COLON type;
+funcParam: MUT? ID COLON type;
 
 type: INT32;
 
@@ -40,7 +40,7 @@ block: LBRACE stat* RBRACE;
 stat:
 	block												# StatBlock
 	| RETURN expr? SEMI									# StatFuncReturn
-	| LET MUT? ID var_type? var_init? SEMI				# StatVarDeclare
+	| LET MUT? ID varType? varInit? SEMI				# StatVarDeclare
 	| ID ASSIGN expr SEMI								# StatVarAssign
 	| expr SEMI											# StatExpr
 	| IF expr block (ELSE IF expr block)* (ELSE block)?	# StatIfElse
@@ -48,6 +48,6 @@ stat:
 	| LOOP block										# StatLoop
 	| SEMI												# StatEmpty;
 
-var_type: COLON type;
+varType: COLON type;
 
-var_init: ASSIGN expr;
+varInit: ASSIGN expr;

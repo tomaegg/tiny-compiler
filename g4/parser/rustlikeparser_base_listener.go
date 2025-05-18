@@ -75,57 +75,53 @@ func (s *BaseRustLikeParserListener) EnterExprID(ctx *ExprIDContext) {}
 // ExitExprID is called when production ExprID is exited.
 func (s *BaseRustLikeParserListener) ExitExprID(ctx *ExprIDContext) {}
 
-// EnterFunc_call_list is called when production func_call_list is entered.
-func (s *BaseRustLikeParserListener) EnterFunc_call_list(ctx *Func_call_listContext) {}
+// EnterFuncCallList is called when production funcCallList is entered.
+func (s *BaseRustLikeParserListener) EnterFuncCallList(ctx *FuncCallListContext) {}
 
-// ExitFunc_call_list is called when production func_call_list is exited.
-func (s *BaseRustLikeParserListener) ExitFunc_call_list(ctx *Func_call_listContext) {}
+// ExitFuncCallList is called when production funcCallList is exited.
+func (s *BaseRustLikeParserListener) ExitFuncCallList(ctx *FuncCallListContext) {}
 
-// EnterFunc_call_param is called when production func_call_param is entered.
-func (s *BaseRustLikeParserListener) EnterFunc_call_param(ctx *Func_call_paramContext) {}
+// EnterFuncCallParam is called when production funcCallParam is entered.
+func (s *BaseRustLikeParserListener) EnterFuncCallParam(ctx *FuncCallParamContext) {}
 
-// ExitFunc_call_param is called when production func_call_param is exited.
-func (s *BaseRustLikeParserListener) ExitFunc_call_param(ctx *Func_call_paramContext) {}
+// ExitFuncCallParam is called when production funcCallParam is exited.
+func (s *BaseRustLikeParserListener) ExitFuncCallParam(ctx *FuncCallParamContext) {}
 
-// EnterFunc_declaration is called when production func_declaration is entered.
-func (s *BaseRustLikeParserListener) EnterFunc_declaration(ctx *Func_declarationContext) {}
+// EnterFuncDeclaration is called when production funcDeclaration is entered.
+func (s *BaseRustLikeParserListener) EnterFuncDeclaration(ctx *FuncDeclarationContext) {}
 
-// ExitFunc_declaration is called when production func_declaration is exited.
-func (s *BaseRustLikeParserListener) ExitFunc_declaration(ctx *Func_declarationContext) {}
+// ExitFuncDeclaration is called when production funcDeclaration is exited.
+func (s *BaseRustLikeParserListener) ExitFuncDeclaration(ctx *FuncDeclarationContext) {}
 
-// EnterFunc_declaration_header is called when production func_declaration_header is entered.
-func (s *BaseRustLikeParserListener) EnterFunc_declaration_header(ctx *Func_declaration_headerContext) {
-}
+// EnterFuncDeclarationHeader is called when production funcDeclarationHeader is entered.
+func (s *BaseRustLikeParserListener) EnterFuncDeclarationHeader(ctx *FuncDeclarationHeaderContext) {}
 
-// ExitFunc_declaration_header is called when production func_declaration_header is exited.
-func (s *BaseRustLikeParserListener) ExitFunc_declaration_header(ctx *Func_declaration_headerContext) {
-}
+// ExitFuncDeclarationHeader is called when production funcDeclarationHeader is exited.
+func (s *BaseRustLikeParserListener) ExitFuncDeclarationHeader(ctx *FuncDeclarationHeaderContext) {}
 
-// EnterFunc_declaration_return is called when production func_declaration_return is entered.
-func (s *BaseRustLikeParserListener) EnterFunc_declaration_return(ctx *Func_declaration_returnContext) {
-}
+// EnterFuncDeclarationReturn is called when production funcDeclarationReturn is entered.
+func (s *BaseRustLikeParserListener) EnterFuncDeclarationReturn(ctx *FuncDeclarationReturnContext) {}
 
-// ExitFunc_declaration_return is called when production func_declaration_return is exited.
-func (s *BaseRustLikeParserListener) ExitFunc_declaration_return(ctx *Func_declaration_returnContext) {
-}
+// ExitFuncDeclarationReturn is called when production funcDeclarationReturn is exited.
+func (s *BaseRustLikeParserListener) ExitFuncDeclarationReturn(ctx *FuncDeclarationReturnContext) {}
 
-// EnterFps_list is called when production fps_list is entered.
-func (s *BaseRustLikeParserListener) EnterFps_list(ctx *Fps_listContext) {}
+// EnterFuncParamsList is called when production funcParamsList is entered.
+func (s *BaseRustLikeParserListener) EnterFuncParamsList(ctx *FuncParamsListContext) {}
 
-// ExitFps_list is called when production fps_list is exited.
-func (s *BaseRustLikeParserListener) ExitFps_list(ctx *Fps_listContext) {}
+// ExitFuncParamsList is called when production funcParamsList is exited.
+func (s *BaseRustLikeParserListener) ExitFuncParamsList(ctx *FuncParamsListContext) {}
 
-// EnterFps is called when production fps is entered.
-func (s *BaseRustLikeParserListener) EnterFps(ctx *FpsContext) {}
+// EnterFuncParams is called when production funcParams is entered.
+func (s *BaseRustLikeParserListener) EnterFuncParams(ctx *FuncParamsContext) {}
 
-// ExitFps is called when production fps is exited.
-func (s *BaseRustLikeParserListener) ExitFps(ctx *FpsContext) {}
+// ExitFuncParams is called when production funcParams is exited.
+func (s *BaseRustLikeParserListener) ExitFuncParams(ctx *FuncParamsContext) {}
 
-// EnterFp is called when production fp is entered.
-func (s *BaseRustLikeParserListener) EnterFp(ctx *FpContext) {}
+// EnterFuncParam is called when production funcParam is entered.
+func (s *BaseRustLikeParserListener) EnterFuncParam(ctx *FuncParamContext) {}
 
-// ExitFp is called when production fp is exited.
-func (s *BaseRustLikeParserListener) ExitFp(ctx *FpContext) {}
+// ExitFuncParam is called when production funcParam is exited.
+func (s *BaseRustLikeParserListener) ExitFuncParam(ctx *FuncParamContext) {}
 
 // EnterType is called when production type is entered.
 func (s *BaseRustLikeParserListener) EnterType(ctx *TypeContext) {}
@@ -193,14 +189,14 @@ func (s *BaseRustLikeParserListener) EnterStatEmpty(ctx *StatEmptyContext) {}
 // ExitStatEmpty is called when production StatEmpty is exited.
 func (s *BaseRustLikeParserListener) ExitStatEmpty(ctx *StatEmptyContext) {}
 
-// EnterVar_type is called when production var_type is entered.
-func (s *BaseRustLikeParserListener) EnterVar_type(ctx *Var_typeContext) {}
+// EnterVarType is called when production varType is entered.
+func (s *BaseRustLikeParserListener) EnterVarType(ctx *VarTypeContext) {}
 
-// ExitVar_type is called when production var_type is exited.
-func (s *BaseRustLikeParserListener) ExitVar_type(ctx *Var_typeContext) {}
+// ExitVarType is called when production varType is exited.
+func (s *BaseRustLikeParserListener) ExitVarType(ctx *VarTypeContext) {}
 
-// EnterVar_init is called when production var_init is entered.
-func (s *BaseRustLikeParserListener) EnterVar_init(ctx *Var_initContext) {}
+// EnterVarInit is called when production varInit is entered.
+func (s *BaseRustLikeParserListener) EnterVarInit(ctx *VarInitContext) {}
 
-// ExitVar_init is called when production var_init is exited.
-func (s *BaseRustLikeParserListener) ExitVar_init(ctx *Var_initContext) {}
+// ExitVarInit is called when production varInit is exited.
+func (s *BaseRustLikeParserListener) ExitVarInit(ctx *VarInitContext) {}

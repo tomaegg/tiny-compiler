@@ -35,29 +35,29 @@ type RustLikeParserListener interface {
 	// EnterExprID is called when entering the ExprID production.
 	EnterExprID(c *ExprIDContext)
 
-	// EnterFunc_call_list is called when entering the func_call_list production.
-	EnterFunc_call_list(c *Func_call_listContext)
+	// EnterFuncCallList is called when entering the funcCallList production.
+	EnterFuncCallList(c *FuncCallListContext)
 
-	// EnterFunc_call_param is called when entering the func_call_param production.
-	EnterFunc_call_param(c *Func_call_paramContext)
+	// EnterFuncCallParam is called when entering the funcCallParam production.
+	EnterFuncCallParam(c *FuncCallParamContext)
 
-	// EnterFunc_declaration is called when entering the func_declaration production.
-	EnterFunc_declaration(c *Func_declarationContext)
+	// EnterFuncDeclaration is called when entering the funcDeclaration production.
+	EnterFuncDeclaration(c *FuncDeclarationContext)
 
-	// EnterFunc_declaration_header is called when entering the func_declaration_header production.
-	EnterFunc_declaration_header(c *Func_declaration_headerContext)
+	// EnterFuncDeclarationHeader is called when entering the funcDeclarationHeader production.
+	EnterFuncDeclarationHeader(c *FuncDeclarationHeaderContext)
 
-	// EnterFunc_declaration_return is called when entering the func_declaration_return production.
-	EnterFunc_declaration_return(c *Func_declaration_returnContext)
+	// EnterFuncDeclarationReturn is called when entering the funcDeclarationReturn production.
+	EnterFuncDeclarationReturn(c *FuncDeclarationReturnContext)
 
-	// EnterFps_list is called when entering the fps_list production.
-	EnterFps_list(c *Fps_listContext)
+	// EnterFuncParamsList is called when entering the funcParamsList production.
+	EnterFuncParamsList(c *FuncParamsListContext)
 
-	// EnterFps is called when entering the fps production.
-	EnterFps(c *FpsContext)
+	// EnterFuncParams is called when entering the funcParams production.
+	EnterFuncParams(c *FuncParamsContext)
 
-	// EnterFp is called when entering the fp production.
-	EnterFp(c *FpContext)
+	// EnterFuncParam is called when entering the funcParam production.
+	EnterFuncParam(c *FuncParamContext)
 
 	// EnterType is called when entering the type production.
 	EnterType(c *TypeContext)
@@ -92,11 +92,11 @@ type RustLikeParserListener interface {
 	// EnterStatEmpty is called when entering the StatEmpty production.
 	EnterStatEmpty(c *StatEmptyContext)
 
-	// EnterVar_type is called when entering the var_type production.
-	EnterVar_type(c *Var_typeContext)
+	// EnterVarType is called when entering the varType production.
+	EnterVarType(c *VarTypeContext)
 
-	// EnterVar_init is called when entering the var_init production.
-	EnterVar_init(c *Var_initContext)
+	// EnterVarInit is called when entering the varInit production.
+	EnterVarInit(c *VarInitContext)
 
 	// ExitProg is called when exiting the prog production.
 	ExitProg(c *ProgContext)
@@ -125,29 +125,29 @@ type RustLikeParserListener interface {
 	// ExitExprID is called when exiting the ExprID production.
 	ExitExprID(c *ExprIDContext)
 
-	// ExitFunc_call_list is called when exiting the func_call_list production.
-	ExitFunc_call_list(c *Func_call_listContext)
+	// ExitFuncCallList is called when exiting the funcCallList production.
+	ExitFuncCallList(c *FuncCallListContext)
 
-	// ExitFunc_call_param is called when exiting the func_call_param production.
-	ExitFunc_call_param(c *Func_call_paramContext)
+	// ExitFuncCallParam is called when exiting the funcCallParam production.
+	ExitFuncCallParam(c *FuncCallParamContext)
 
-	// ExitFunc_declaration is called when exiting the func_declaration production.
-	ExitFunc_declaration(c *Func_declarationContext)
+	// ExitFuncDeclaration is called when exiting the funcDeclaration production.
+	ExitFuncDeclaration(c *FuncDeclarationContext)
 
-	// ExitFunc_declaration_header is called when exiting the func_declaration_header production.
-	ExitFunc_declaration_header(c *Func_declaration_headerContext)
+	// ExitFuncDeclarationHeader is called when exiting the funcDeclarationHeader production.
+	ExitFuncDeclarationHeader(c *FuncDeclarationHeaderContext)
 
-	// ExitFunc_declaration_return is called when exiting the func_declaration_return production.
-	ExitFunc_declaration_return(c *Func_declaration_returnContext)
+	// ExitFuncDeclarationReturn is called when exiting the funcDeclarationReturn production.
+	ExitFuncDeclarationReturn(c *FuncDeclarationReturnContext)
 
-	// ExitFps_list is called when exiting the fps_list production.
-	ExitFps_list(c *Fps_listContext)
+	// ExitFuncParamsList is called when exiting the funcParamsList production.
+	ExitFuncParamsList(c *FuncParamsListContext)
 
-	// ExitFps is called when exiting the fps production.
-	ExitFps(c *FpsContext)
+	// ExitFuncParams is called when exiting the funcParams production.
+	ExitFuncParams(c *FuncParamsContext)
 
-	// ExitFp is called when exiting the fp production.
-	ExitFp(c *FpContext)
+	// ExitFuncParam is called when exiting the funcParam production.
+	ExitFuncParam(c *FuncParamContext)
 
 	// ExitType is called when exiting the type production.
 	ExitType(c *TypeContext)
@@ -182,9 +182,9 @@ type RustLikeParserListener interface {
 	// ExitStatEmpty is called when exiting the StatEmpty production.
 	ExitStatEmpty(c *StatEmptyContext)
 
-	// ExitVar_type is called when exiting the var_type production.
-	ExitVar_type(c *Var_typeContext)
+	// ExitVarType is called when exiting the varType production.
+	ExitVarType(c *VarTypeContext)
 
-	// ExitVar_init is called when exiting the var_init production.
-	ExitVar_init(c *Var_initContext)
+	// ExitVarInit is called when exiting the varInit production.
+	ExitVarInit(c *VarInitContext)
 }
