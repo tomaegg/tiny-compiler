@@ -12,12 +12,19 @@ type Listener struct {
 	parser.BaseRustLikeParserListener
 	globalScope  Scope
 	currentScope Scope
+	graph        *SymTableGraph
 }
 
 var _ parser.RustLikeParserListener = (*Listener)(nil)
 
 func NewListener() *Listener {
-	return &Listener{}
+	return &Listener{
+		graph: NewSymTableGraph(),
+	}
+}
+
+func (l *Listener) GetDotGraph() []byte {
+	return l.graph.ToDot()
 }
 
 // (1) 创建新的scope
@@ -34,6 +41,7 @@ func (l *Listener) EnterBlock(ctx *parser.BlockContext) {
 		return
 	}
 	localScope := NewLocalScope(l.currentScope)
+	l.graph.AddEdge(localScope.Name(), l.currentScope.Name())
 	l.currentScope = localScope
 }
 
@@ -42,6 +50,7 @@ func (l *Listener) EnterBlock(ctx *parser.BlockContext) {
 func (l *Listener) EnterFuncDeclaration(ctx *parser.FuncDeclarationContext) {
 	funcName := ctx.FuncDeclarationHeader().ID().GetText()
 	funcScope := NewFuncScope(l.currentScope, funcName)
+	l.graph.AddEdge(funcScope.Name(), l.currentScope.Name())
 	l.currentScope = funcScope
 
 	funcSymbol := NewFuncSymbol(funcName, l.currentScope)
@@ -54,7 +63,7 @@ func (l *Listener) EnterStatVarDeclare(ctx *parser.StatVarDeclareContext) {
 	varName := ctx.ID().GetText()
 	// NOTE: 声明时可以没有类型, 需要定义为to infer
 	var varType SymType
-	if ctx.VarType().Rtype().IsEmpty() {
+	if ctx.VarType() == nil {
 		varType = SymToInfer // NOTE: 此时标注为待推断
 	} else {
 		varType = typeMap[ctx.VarType().Rtype().GetText()]
@@ -80,6 +89,7 @@ func (l *Listener) EnterExprID(ctx *parser.ExprIDContext) {
 
 // (4) 回到father
 func (l *Listener) ExitProg(ctx *parser.ProgContext) {
+	l.graph.AddNode(string(l.graph.ToScopeDot(l.currentScope)))
 	l.currentScope = l.currentScope.Enclosed()
 }
 
@@ -88,9 +98,11 @@ func (l *Listener) ExitBlock(ctx *parser.BlockContext) {
 	if isFuncScope {
 		return
 	}
+	l.graph.AddNode(string(l.graph.ToScopeDot(l.currentScope)))
 	l.currentScope = l.currentScope.Enclosed()
 }
 
 func (l *Listener) ExitFuncDeclaration(ctx *parser.FuncDeclarationContext) {
+	l.graph.AddNode(string(l.graph.ToScopeDot(l.currentScope)))
 	l.currentScope = l.currentScope.Enclosed()
 }

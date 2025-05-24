@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"tj-compiler/g4/parser"
+	"tj-compiler/symtable"
 
 	"github.com/antlr4-go/antlr/v4"
 )
@@ -27,6 +28,13 @@ func main() {
 	parser := parser.NewRustLikeParser(tokens)
 	tree := parser.Prog() // 假设起始规则是 `expr`
 
-	fmt.Println("Parsing Tree:")
-	fmt.Println(tree.ToStringTree(nil, parser))
+	fmt.Fprintln(os.Stderr, "[Parsing Tree]")
+	fmt.Fprintln(os.Stderr, tree.ToStringTree(nil, parser))
+	fmt.Fprintln(os.Stderr, "")
+
+	symTable := symtable.NewSymTable(tree)
+	dot := symTable.DotGraph()
+
+	fmt.Fprintln(os.Stderr, "[Dot Graph]")
+	fmt.Println(string(dot))
 }

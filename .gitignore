@@ -1,4 +1,6 @@
 .antlr
 *.zip
+*.gv
+*.png
 submit/
 build/

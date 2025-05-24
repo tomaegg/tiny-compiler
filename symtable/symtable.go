@@ -2,12 +2,17 @@ package symtable
 
 import "github.com/antlr4-go/antlr/v4"
 
-type SymTable struct{}
+type SymTable struct {
+	l *Listener
+}
 
-func NewSymTable(tree antlr.Tree) *SymTable {
+func NewSymTable(root antlr.Tree) *SymTable {
 	walker := antlr.NewParseTreeWalker()
-	listner := NewListener()
-	walker.Walk(listner, tree)
-	// TODO:
-	return nil
+	listener := NewListener()
+	walker.Walk(listener, root)
+	return &SymTable{l: listener}
+}
+
+func (s *SymTable) DotGraph() []byte {
+	return s.l.GetDotGraph()
 }

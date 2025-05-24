@@ -1,6 +1,9 @@
 package symtable
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type ScopeSymTable = map[SymName]Symbol
 
@@ -81,10 +84,10 @@ type GlobalScope struct {
 
 func NewGlobalScope(enclosed Scope) *GlobalScope {
 	// 定义global 符号
-	enclosed.Define(NewBasicTypeSymbol(BasicInt32))
 	ret := GlobalScope{
 		BaseScope: NewBaseScope("GlobalScope", enclosed),
 	}
+	ret.Define(NewBasicTypeSymbol(BasicInt32))
 	return &ret
 }
 
@@ -95,7 +98,7 @@ type LocalScope struct {
 var localScopeCounter = 0
 
 func NewLocalScope(enclosed Scope) *LocalScope {
-	name := fmt.Sprintf("LocalScope:%d", localScopeCounter)
+	name := fmt.Sprintf("LocalScope_%d", localScopeCounter)
 	localScopeCounter++
 	ret := LocalScope{
 		BaseScope: NewBaseScope(name, enclosed),
@@ -109,4 +112,9 @@ type FuncScope struct {
 
 func NewFuncScope(enclosed Scope, name string) *FuncScope {
 	return &FuncScope{NewBaseScope(name, enclosed)}
+}
+
+func (s FuncScope) Name() string {
+	n := fmt.Sprintf("FuncScope: %s", s.BaseScope.Name())
+	return strconv.Quote(n)
 }

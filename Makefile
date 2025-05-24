@@ -7,7 +7,7 @@ OUT_DIR=build
 TARGET_FILE=cmd/$(TARGET)/main.go
 
 run: 
-	go run -v cmd/$(TARGET)/main.go $(ARGS)
+	@go run -v cmd/$(TARGET)/main.go $(ARGS)
 
 pack: generate build
 	rm -rf $(SUBMIT_DIR) $(SUBMIT_ZIP) && mkdir -p $(SUBMIT_DIR)
@@ -19,6 +19,10 @@ pack: generate build
 	sed -i '/^$$/d; /^\/\//d' $(SUBMIT_DIR)/$(GEN_DIR)/*.go
 	zip -r $(SUBMIT_ZIP) $(SUBMIT_DIR)
 	rm -rf $(SUBMIT_DIR)
+
+dot: 
+	go run -v cmd/symtable/main.go $(ARGS) > symtable.gv
+	dot -Tpng symtable.gv -o symtable.png
 
 generate: 
 	cd g4 && \
