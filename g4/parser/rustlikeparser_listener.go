@@ -59,8 +59,8 @@ type RustLikeParserListener interface {
 	// EnterFuncParam is called when entering the funcParam production.
 	EnterFuncParam(c *FuncParamContext)
 
-	// EnterType is called when entering the type production.
-	EnterType(c *TypeContext)
+	// EnterRtype is called when entering the rtype production.
+	EnterRtype(c *RtypeContext)
 
 	// EnterBlock is called when entering the block production.
 	EnterBlock(c *BlockContext)
@@ -149,8 +149,8 @@ type RustLikeParserListener interface {
 	// ExitFuncParam is called when exiting the funcParam production.
 	ExitFuncParam(c *FuncParamContext)
 
-	// ExitType is called when exiting the type production.
-	ExitType(c *TypeContext)
+	// ExitRtype is called when exiting the rtype production.
+	ExitRtype(c *RtypeContext)
 
 	// ExitBlock is called when exiting the block production.
 	ExitBlock(c *BlockContext)

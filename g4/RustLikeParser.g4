@@ -25,15 +25,15 @@ funcDeclaration:
 
 funcDeclarationHeader: FN ID funcParamsList;
 
-funcDeclarationReturn: ARROW type;
+funcDeclarationReturn: ARROW rtype;
 
 funcParamsList: LPAREN funcParams RPAREN;
 
 funcParams: funcParam (COMMA funcParam)* |; // fps可以为空
 
-funcParam: MUT? ID COLON type;
+funcParam: MUT? ID COLON rtype;
 
-type: INT32;
+rtype: INT32;
 
 block: LBRACE stat* RBRACE;
 
@@ -48,6 +48,6 @@ stat:
 	| LOOP block										# StatLoop
 	| SEMI												# StatEmpty;
 
-varType: COLON type;
+varType: COLON rtype;
 
 varInit: ASSIGN expr;

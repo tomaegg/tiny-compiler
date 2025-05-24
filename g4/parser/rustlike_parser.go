@@ -49,7 +49,7 @@ func rustlikeparserParserInit() {
 	staticData.RuleNames = []string{
 		"prog", "declaration", "expr", "funcCallList", "funcCallParam", "funcDeclaration",
 		"funcDeclarationHeader", "funcDeclarationReturn", "funcParamsList",
-		"funcParams", "funcParam", "type", "block", "stat", "varType", "varInit",
+		"funcParams", "funcParam", "rtype", "block", "stat", "varType", "varInit",
 	}
 	staticData.PredictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
@@ -225,7 +225,7 @@ const (
 	RustLikeParserRULE_funcParamsList        = 8
 	RustLikeParserRULE_funcParams            = 9
 	RustLikeParserRULE_funcParam             = 10
-	RustLikeParserRULE_type                  = 11
+	RustLikeParserRULE_rtype                 = 11
 	RustLikeParserRULE_block                 = 12
 	RustLikeParserRULE_stat                  = 13
 	RustLikeParserRULE_varType               = 14
@@ -1800,7 +1800,7 @@ type IFuncDeclarationReturnContext interface {
 
 	// Getter signatures
 	ARROW() antlr.TerminalNode
-	Type_() ITypeContext
+	Rtype() IRtypeContext
 
 	// IsFuncDeclarationReturnContext differentiates from other interfaces.
 	IsFuncDeclarationReturnContext()
@@ -1842,10 +1842,10 @@ func (s *FuncDeclarationReturnContext) ARROW() antlr.TerminalNode {
 	return s.GetToken(RustLikeParserARROW, 0)
 }
 
-func (s *FuncDeclarationReturnContext) Type_() ITypeContext {
+func (s *FuncDeclarationReturnContext) Rtype() IRtypeContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ITypeContext); ok {
+		if _, ok := ctx.(IRtypeContext); ok {
 			t = ctx.(antlr.RuleContext)
 			break
 		}
@@ -1855,7 +1855,7 @@ func (s *FuncDeclarationReturnContext) Type_() ITypeContext {
 		return nil
 	}
 
-	return t.(ITypeContext)
+	return t.(IRtypeContext)
 }
 
 func (s *FuncDeclarationReturnContext) GetRuleContext() antlr.RuleContext {
@@ -1892,7 +1892,7 @@ func (p *RustLikeParser) FuncDeclarationReturn() (localctx IFuncDeclarationRetur
 	}
 	{
 		p.SetState(91)
-		p.Type_()
+		p.Rtype()
 	}
 
 errorExit:
@@ -2234,7 +2234,7 @@ type IFuncParamContext interface {
 	// Getter signatures
 	ID() antlr.TerminalNode
 	COLON() antlr.TerminalNode
-	Type_() ITypeContext
+	Rtype() IRtypeContext
 	MUT() antlr.TerminalNode
 
 	// IsFuncParamContext differentiates from other interfaces.
@@ -2281,10 +2281,10 @@ func (s *FuncParamContext) COLON() antlr.TerminalNode {
 	return s.GetToken(RustLikeParserCOLON, 0)
 }
 
-func (s *FuncParamContext) Type_() ITypeContext {
+func (s *FuncParamContext) Rtype() IRtypeContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ITypeContext); ok {
+		if _, ok := ctx.(IRtypeContext); ok {
 			t = ctx.(antlr.RuleContext)
 			break
 		}
@@ -2294,7 +2294,7 @@ func (s *FuncParamContext) Type_() ITypeContext {
 		return nil
 	}
 
-	return t.(ITypeContext)
+	return t.(IRtypeContext)
 }
 
 func (s *FuncParamContext) MUT() antlr.TerminalNode {
@@ -2363,7 +2363,7 @@ func (p *RustLikeParser) FuncParam() (localctx IFuncParamContext) {
 	}
 	{
 		p.SetState(113)
-		p.Type_()
+		p.Rtype()
 	}
 
 errorExit:
@@ -2379,8 +2379,8 @@ errorExit:
 	goto errorExit // Trick to prevent compiler error if the label is not used
 }
 
-// ITypeContext is an interface to support dynamic dispatch.
-type ITypeContext interface {
+// IRtypeContext is an interface to support dynamic dispatch.
+type IRtypeContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -2389,69 +2389,69 @@ type ITypeContext interface {
 	// Getter signatures
 	INT32() antlr.TerminalNode
 
-	// IsTypeContext differentiates from other interfaces.
-	IsTypeContext()
+	// IsRtypeContext differentiates from other interfaces.
+	IsRtypeContext()
 }
 
-type TypeContext struct {
+type RtypeContext struct {
 	antlr.BaseParserRuleContext
 	parser antlr.Parser
 }
 
-func NewEmptyTypeContext() *TypeContext {
-	var p = new(TypeContext)
+func NewEmptyRtypeContext() *RtypeContext {
+	var p = new(RtypeContext)
 	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_type
+	p.RuleIndex = RustLikeParserRULE_rtype
 	return p
 }
 
-func InitEmptyTypeContext(p *TypeContext) {
+func InitEmptyRtypeContext(p *RtypeContext) {
 	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = RustLikeParserRULE_type
+	p.RuleIndex = RustLikeParserRULE_rtype
 }
 
-func (*TypeContext) IsTypeContext() {}
+func (*RtypeContext) IsRtypeContext() {}
 
-func NewTypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TypeContext {
-	var p = new(TypeContext)
+func NewRtypeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *RtypeContext {
+	var p = new(RtypeContext)
 
 	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = RustLikeParserRULE_type
+	p.RuleIndex = RustLikeParserRULE_rtype
 
 	return p
 }
 
-func (s *TypeContext) GetParser() antlr.Parser { return s.parser }
+func (s *RtypeContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *TypeContext) INT32() antlr.TerminalNode {
+func (s *RtypeContext) INT32() antlr.TerminalNode {
 	return s.GetToken(RustLikeParserINT32, 0)
 }
 
-func (s *TypeContext) GetRuleContext() antlr.RuleContext {
+func (s *RtypeContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
 
-func (s *TypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+func (s *RtypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-func (s *TypeContext) EnterRule(listener antlr.ParseTreeListener) {
+func (s *RtypeContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.EnterType(s)
+		listenerT.EnterRtype(s)
 	}
 }
 
-func (s *TypeContext) ExitRule(listener antlr.ParseTreeListener) {
+func (s *RtypeContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(RustLikeParserListener); ok {
-		listenerT.ExitType(s)
+		listenerT.ExitRtype(s)
 	}
 }
 
-func (p *RustLikeParser) Type_() (localctx ITypeContext) {
-	localctx = NewTypeContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 22, RustLikeParserRULE_type)
+func (p *RustLikeParser) Rtype() (localctx IRtypeContext) {
+	localctx = NewRtypeContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 22, RustLikeParserRULE_rtype)
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(115)
@@ -3608,7 +3608,7 @@ type IVarTypeContext interface {
 
 	// Getter signatures
 	COLON() antlr.TerminalNode
-	Type_() ITypeContext
+	Rtype() IRtypeContext
 
 	// IsVarTypeContext differentiates from other interfaces.
 	IsVarTypeContext()
@@ -3650,10 +3650,10 @@ func (s *VarTypeContext) COLON() antlr.TerminalNode {
 	return s.GetToken(RustLikeParserCOLON, 0)
 }
 
-func (s *VarTypeContext) Type_() ITypeContext {
+func (s *VarTypeContext) Rtype() IRtypeContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ITypeContext); ok {
+		if _, ok := ctx.(IRtypeContext); ok {
 			t = ctx.(antlr.RuleContext)
 			break
 		}
@@ -3663,7 +3663,7 @@ func (s *VarTypeContext) Type_() ITypeContext {
 		return nil
 	}
 
-	return t.(ITypeContext)
+	return t.(IRtypeContext)
 }
 
 func (s *VarTypeContext) GetRuleContext() antlr.RuleContext {
@@ -3700,7 +3700,7 @@ func (p *RustLikeParser) VarType() (localctx IVarTypeContext) {
 	}
 	{
 		p.SetState(179)
-		p.Type_()
+		p.Rtype()
 	}
 
 errorExit:
