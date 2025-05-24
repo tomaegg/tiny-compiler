@@ -2,7 +2,7 @@ package symtable
 
 import "fmt"
 
-type SymTable = map[SymName]Symbol
+type ScopeSymTable = map[SymName]Symbol
 
 type ScopeName = string
 
@@ -10,8 +10,9 @@ type Scope interface {
 	Name() ScopeName
 	Define(Symbol)          // 定义符号表
 	Resolve(SymName) Symbol // 解析符号表
-	Symbols() SymTable      // 获得符号
+	Symbols() ScopeSymTable // 获得符号
 	Enclosed() Scope        // 所依附的Scope
+	Exist(Symbol) bool      // 某个符号是否存在
 }
 
 var _ Scope = (*BaseScope)(nil)
@@ -19,14 +20,14 @@ var _ Scope = (*BaseScope)(nil)
 type BaseScope struct {
 	name     ScopeName
 	enclosed Scope
-	table    SymTable
+	table    ScopeSymTable
 }
 
 func NewBaseScope(name ScopeName, enclosed Scope) *BaseScope {
 	return &BaseScope{
 		name:     name,
 		enclosed: enclosed,
-		table:    make(SymTable),
+		table:    make(ScopeSymTable),
 	}
 }
 
@@ -34,7 +35,7 @@ func (s *BaseScope) Name() ScopeName {
 	return s.name
 }
 
-func (s *BaseScope) Symbols() SymTable {
+func (s *BaseScope) Symbols() ScopeSymTable {
 	return s.table
 }
 
@@ -42,9 +43,15 @@ func (s *BaseScope) Enclosed() Scope {
 	return s.enclosed
 }
 
+func (s BaseScope) Exist(sym Symbol) bool {
+	_, ok := s.table[sym.Name()]
+	return ok
+}
+
 func (s *BaseScope) Define(sym Symbol) {
 	if _, ok := s.table[sym.Name()]; ok {
-		panic("must not redefined symbol")
+		msg := fmt.Sprintf("must not redefined symbol: %s", sym.Name())
+		panic(msg)
 	}
 	s.table[sym.Name()] = sym
 }
@@ -74,7 +81,7 @@ type GlobalScope struct {
 
 func NewGlobalScope(enclosed Scope) *GlobalScope {
 	// 定义global 符号
-	enclosed.Define(NewBasicTypeSymbol(SymInt32))
+	enclosed.Define(NewBasicTypeSymbol(BasicInt32))
 	ret := GlobalScope{
 		BaseScope: NewBaseScope("GlobalScope", enclosed),
 	}
@@ -94,4 +101,12 @@ func NewLocalScope(enclosed Scope) *LocalScope {
 		BaseScope: NewBaseScope(name, enclosed),
 	}
 	return &ret
+}
+
+type FuncScope struct {
+	*BaseScope
+}
+
+func NewFuncScope(enclosed Scope, name string) *FuncScope {
+	return &FuncScope{NewBaseScope(name, enclosed)}
 }

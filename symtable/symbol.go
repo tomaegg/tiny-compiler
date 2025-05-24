@@ -5,21 +5,33 @@ type (
 	SymType = int
 )
 
-const SymInt32 SymName = "int32"
+const (
+	SymToInfer SymType = iota
+	SymInt32
+)
+
+const (
+	BasicInt32 SymName = "int32"
+)
 
 type Symbol interface {
 	Name() SymName
 }
 
 type BaseSymbol struct {
-	name  SymName
-	stype SymType
+	name    SymName
+	stype   SymType
+	mutable bool
 }
 
 var _ Symbol = BaseSymbol{}
 
-func NewBaseSymbol(name SymName, stype SymType) BaseSymbol {
-	return BaseSymbol{name: name, stype: stype}
+func NewBaseSymbol(name SymName, stype SymType, mutable bool) BaseSymbol {
+	return BaseSymbol{name: name, stype: stype, mutable: mutable}
+}
+
+func (bs BaseSymbol) Mutable() bool {
+	return bs.mutable
 }
 
 func (bs BaseSymbol) Name() SymName {

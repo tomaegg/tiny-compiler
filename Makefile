@@ -1,11 +1,13 @@
-.PHONY: generate pack
+.PHONY: generate pack build
 
-SUBMIT_DIR=submit
 SUBMIT_ZIP=submit.zip
+SUBMIT_DIR=submit
 GEN_DIR=g4/parser
-PARSER_OUT=parser
-PARSER_TARGET_FILE=cmd/parser/main.go
 OUT_DIR=build
+TARGET_FILE=cmd/$(TARGET)/main.go
+
+run: 
+	go run -v cmd/$(TARGET)/main.go $(ARGS)
 
 pack: generate build
 	rm -rf $(SUBMIT_DIR) $(SUBMIT_ZIP) && mkdir -p $(SUBMIT_DIR)
@@ -23,14 +25,15 @@ generate:
 	antlr4 -Dlanguage=Go -o parser RustLikeLexer.g4 && \
 	antlr4 -Dlanguage=Go -o parser RustLikeParser.g4 
 	rm $(GEN_DIR)/*.tokens $(GEN_DIR)/*.interp
-	go fmt ./...
+	go fmt ./g4/parser/
 
-build-parser:
-	GOOS=darwin GOARCH=amd64 go build -o $(OUT_DIR)/$(PARSER_OUT)-macos-amd64 $(PARSER_TARGET_FILE) 
-	GOOS=darwin GOARCH=arm64 go build -o $(OUT_DIR)/$(PARSER_OUT)-macos-arm64 $(PARSER_TARGET_FILE) 
-	GOOS=linux GOARCH=amd64 go build -o $(OUT_DIR)/$(PARSER_OUT)-linux-amd64 $(PARSER_TARGET_FILE) 
-	GOOS=linux GOARCH=arm64 go build -o $(OUT_DIR)/$(PARSER_OUT)-linux-arm64 $(PARSER_TARGET_FILE) 
-	GOOS=windows GOARCH=amd64 go build -o $(OUT_DIR)/$(PARSER_OUT)-windows-amd64.exe $(PARSER_TARGET_FILE) 
-
-build: build-parser
+build:
 	mkdir -p $(OUT_DIR)
+	GOOS=darwin GOARCH=amd64 go build -o $(OUT_DIR)/$(TARGET)-macos-amd64 $(TARGET_FILE)
+	GOOS=darwin GOARCH=arm64 go build -o $(OUT_DIR)/$(TARGET)-macos-arm64 $(TARGET_FILE)
+	GOOS=linux GOARCH=amd64 go build -o $(OUT_DIR)/$(TARGET)-linux-amd64 $(TARGET_FILE)
+	GOOS=linux GOARCH=arm64 go build -o $(OUT_DIR)/$(TARGET)-linux-arm64 $(TARGET_FILE)
+	GOOS=windows GOARCH=amd64 go build -o $(OUT_DIR)/$(TARGET)-windows-amd64.exe $(TARGET_FILE)
+
+fmt:
+	go fmt ./...
