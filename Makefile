@@ -1,4 +1,4 @@
-.PHONY: generate pack build
+.PHONY: generate pack build run dot fmt
 
 SUBMIT_ZIP=submit.zip
 SUBMIT_DIR=submit
