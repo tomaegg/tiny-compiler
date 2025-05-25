@@ -2,7 +2,7 @@ package symtable
 
 import (
 	"fmt"
-	"strconv"
+	"sync/atomic"
 )
 
 type ScopeSymTable = map[SymName]Symbol
@@ -16,6 +16,7 @@ type Scope interface {
 	Symbols() ScopeSymTable // 获得符号
 	Enclosed() Scope        // 所依附的Scope
 	Exist(Symbol) bool      // 某个符号是否存在
+	fmt.Stringer
 }
 
 var _ Scope = (*BaseScope)(nil)
@@ -76,6 +77,10 @@ func (s *BaseScope) Resolve(name SymName) Symbol {
 	return nil
 }
 
+func (s BaseScope) String() string {
+	return s.Name()
+}
+
 var _ Scope = (*GlobalScope)(nil)
 
 type GlobalScope struct {
@@ -95,11 +100,11 @@ type LocalScope struct {
 	*BaseScope
 }
 
-var localScopeCounter = 0
+var localScopeCounter atomic.Int32
 
 func NewLocalScope(enclosed Scope) *LocalScope {
-	name := fmt.Sprintf("LocalScope_%d", localScopeCounter)
-	localScopeCounter++
+	name := fmt.Sprintf("LocalScope: %d", localScopeCounter.Load())
+	localScopeCounter.Add(1)
 	ret := LocalScope{
 		BaseScope: NewBaseScope(name, enclosed),
 	}
@@ -114,7 +119,7 @@ func NewFuncScope(enclosed Scope, name string) *FuncScope {
 	return &FuncScope{NewBaseScope(name, enclosed)}
 }
 
-func (s FuncScope) Name() string {
-	n := fmt.Sprintf("FuncScope: %s", s.BaseScope.Name())
-	return strconv.Quote(n)
+func (s FuncScope) String() string {
+	n := fmt.Sprintf("FuncScope: %s", s.Name())
+	return n
 }

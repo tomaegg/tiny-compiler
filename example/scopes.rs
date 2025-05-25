@@ -28,7 +28,7 @@ fn program_3_1__1(mut param:i32) {
     param = param - 1;
 }
 
-fn program_3_1__2(mut a:i32) {
+fn program_3_1__2(mut a:i32, b:i32, c:i32,mut d:i32, e:i32) {
     a;
     (a);
     ((a));

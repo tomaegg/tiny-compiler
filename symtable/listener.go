@@ -34,6 +34,11 @@ func (l *Listener) EnterProg(ctx *parser.ProgContext) {
 	l.currentScope = l.globalScope
 }
 
+func (l *Listener) ExitProg(ctx *parser.ProgContext) {
+	l.graph.AddNode(string(l.graph.ToScopeDot(l.currentScope)))
+	l.currentScope = l.currentScope.Enclosed()
+}
+
 func (l *Listener) EnterBlock(ctx *parser.BlockContext) {
 	// 需要判定是否继承父节点的func scope
 	_, isFuncScope := l.currentScope.(FuncScope)
@@ -45,6 +50,15 @@ func (l *Listener) EnterBlock(ctx *parser.BlockContext) {
 	l.currentScope = localScope
 }
 
+func (l *Listener) ExitBlock(ctx *parser.BlockContext) {
+	_, isFuncScope := l.currentScope.(FuncScope)
+	if isFuncScope {
+		return
+	}
+	l.graph.AddNode(string(l.graph.ToScopeDot(l.currentScope)))
+	l.currentScope = l.currentScope.Enclosed()
+}
+
 // func declare的scope应该和func param的scope是同一个, 因此进入func declare的时候
 // 就应当建立scope,
 func (l *Listener) EnterFuncDeclaration(ctx *parser.FuncDeclarationContext) {
@@ -53,31 +67,36 @@ func (l *Listener) EnterFuncDeclaration(ctx *parser.FuncDeclarationContext) {
 	l.graph.AddEdge(funcScope.Name(), l.currentScope.Name())
 	l.currentScope = funcScope
 
-	funcSymbol := NewFuncSymbol(funcName, l.currentScope)
+	fps := ctx.FuncDeclarationHeader().FuncParamsList().FuncParams().AllFuncParam()
+	params := make([]BaseSymbol, 0, len(fps))
+	for _, fp := range fps {
+		tokenType := fp.Rtype().INT32().GetSymbol()
+		varType := typeMap[tokenType.GetText()]
+		varName := fp.ID().GetText()
+		mutable := fp.MUT() != nil
+		varSymbol := NewBaseSymbol(varName, varType, mutable)
+		l.currentScope.Define(varSymbol)
+		params = append(params, varSymbol)
+	}
+	funcSymbol := NewFuncSymbol(funcName, l.currentScope, params)
+
 	l.currentScope.Define(funcSymbol)
 }
 
 // (2) 创建新的Symbol
 
 func (l *Listener) EnterStatVarDeclare(ctx *parser.StatVarDeclareContext) {
-	varName := ctx.ID().GetText()
+	tokenID := ctx.ID().GetSymbol()
 	// NOTE: 声明时可以没有类型, 需要定义为to infer
 	var varType SymType
 	if ctx.VarType() == nil {
 		varType = SymToInfer // NOTE: 此时标注为待推断
 	} else {
-		varType = typeMap[ctx.VarType().Rtype().GetText()]
+		tokenType := ctx.VarType().Rtype().INT32().GetSymbol()
+		varType = typeMap[tokenType.GetText()]
 	}
 	mutable := ctx.MUT() != nil
-	varSymbol := NewBaseSymbol(varName, varType, mutable)
-	l.currentScope.Define(varSymbol)
-}
-
-func (l *Listener) EnterFuncParam(ctx *parser.FuncParamContext) {
-	varName := ctx.ID().GetText()
-	varType := typeMap[ctx.Rtype().GetText()]
-	mutable := ctx.MUT() != nil
-	varSymbol := NewBaseSymbol(varName, varType, mutable)
+	varSymbol := NewBaseSymbol(tokenID.GetText(), varType, mutable)
 	l.currentScope.Define(varSymbol)
 }
 
@@ -85,21 +104,6 @@ func (l *Listener) EnterFuncParam(ctx *parser.FuncParamContext) {
 func (l *Listener) EnterExprID(ctx *parser.ExprIDContext) {
 	varName := ctx.ID().GetText()
 	l.currentScope.Resolve(varName)
-}
-
-// (4) 回到father
-func (l *Listener) ExitProg(ctx *parser.ProgContext) {
-	l.graph.AddNode(string(l.graph.ToScopeDot(l.currentScope)))
-	l.currentScope = l.currentScope.Enclosed()
-}
-
-func (l *Listener) ExitBlock(ctx *parser.BlockContext) {
-	_, isFuncScope := l.currentScope.(FuncScope)
-	if isFuncScope {
-		return
-	}
-	l.graph.AddNode(string(l.graph.ToScopeDot(l.currentScope)))
-	l.currentScope = l.currentScope.Enclosed()
 }
 
 func (l *Listener) ExitFuncDeclaration(ctx *parser.FuncDeclarationContext) {

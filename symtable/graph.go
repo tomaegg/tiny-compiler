@@ -16,28 +16,32 @@ func NewSymTableGraph() *SymTableGraph {
 	}
 }
 
+func Quote(name string) string {
+	return `"` + name + `"`
+}
+
 // ToScopeDot 生成单个作用域的DOT节点（HTML表格格式）
 func (g SymTableGraph) ToScopeDot(scope Scope) []byte {
 	if len(scope.Symbols()) == 0 {
-		return []byte(scope.Name())
+		return []byte(Quote(scope.Name()))
 	}
 
 	var buffer bytes.Buffer
 	buffer.WriteString("<TR>")
-	for k := range scope.Symbols() {
-		elem := fmt.Appendf(nil, "<TD>%s</TD>", k)
+	for _, v := range scope.Symbols() {
+		elem := fmt.Appendf(nil, "<TD>%s</TD>", v)
 		buffer.Write(elem)
 	}
 	buffer.WriteString("</TR>")
 
 	ret := fmt.Appendf(nil,
-		`%s [label = <<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+		`"%s" [label = <<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
 			<TR><TD COLSPAN="%d">%s</TD></TR>
 			%s
 		</TABLE>>]`,
 		scope.Name(),
 		len(scope.Symbols()),
-		scope.Name(),
+		scope,
 		buffer.Bytes(),
 	)
 
@@ -49,7 +53,7 @@ func (g *SymTableGraph) AddNode(node string) {
 }
 
 func (g *SymTableGraph) AddEdge(child, parent string) {
-	g.edges[child] = parent
+	g.edges[Quote(child)] = Quote(parent)
 	// 注意符号表图的结构，child -> parent而不是parent -> child
 }
 
@@ -66,7 +70,7 @@ digraph G {
 	buf.WriteString(declares)
 	buf.WriteString("\t" + `// node define` + "\n")
 	for _, node := range g.nodes {
-		buf.Write(fmt.Appendf(nil, "\t%s;\n", node))
+		buf.Write(fmt.Appendf(nil, "\t%s;\n", (node)))
 	}
 
 	buf.WriteString("\t" + `// edge define` + "\n")
