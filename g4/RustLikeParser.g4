@@ -21,7 +21,7 @@ funcCallList: LPAREN funcCallParam RPAREN;
 funcCallParam: expr (COMMA expr)* |;
 
 funcDeclaration:
-	funcDeclarationHeader funcDeclarationReturn? block; // 函数声明
+	funcDeclarationHeader funcDeclarationReturn? funcBlock; // 函数声明
 
 funcDeclarationHeader: FN ID funcParamsList;
 
@@ -32,6 +32,8 @@ funcParamsList: LPAREN funcParams RPAREN;
 funcParams: funcParam (COMMA funcParam)* |; // fps可以为空
 
 funcParam: MUT? ID COLON rtype;
+
+funcBlock: LBRACE stat* RBRACE;
 
 rtype: INT32;
 

@@ -96,6 +96,8 @@ func NewGlobalScope(enclosed Scope) *GlobalScope {
 	return &ret
 }
 
+var _ Scope = (*LocalScope)(nil)
+
 type LocalScope struct {
 	*BaseScope
 }
@@ -111,15 +113,26 @@ func NewLocalScope(enclosed Scope) *LocalScope {
 	return &ret
 }
 
+var _ Scope = (*FuncScope)(nil)
+
 type FuncScope struct {
 	*BaseScope
+	f FuncSymbol
 }
 
 func NewFuncScope(enclosed Scope, name string) *FuncScope {
-	return &FuncScope{NewBaseScope(name, enclosed)}
+	return &FuncScope{BaseScope: NewBaseScope(name, enclosed)}
 }
 
 func (s FuncScope) String() string {
 	n := fmt.Sprintf("FuncScope: %s", s.Name())
 	return n
+}
+
+func (s *FuncScope) SetSymbol(f FuncSymbol) {
+	s.f = f
+}
+
+func (s *FuncScope) GetSymbol() FuncSymbol {
+	return s.f
 }

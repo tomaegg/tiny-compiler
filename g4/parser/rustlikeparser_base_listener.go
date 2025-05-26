@@ -123,6 +123,12 @@ func (s *BaseRustLikeParserListener) EnterFuncParam(ctx *FuncParamContext) {}
 // ExitFuncParam is called when production funcParam is exited.
 func (s *BaseRustLikeParserListener) ExitFuncParam(ctx *FuncParamContext) {}
 
+// EnterFuncBlock is called when production funcBlock is entered.
+func (s *BaseRustLikeParserListener) EnterFuncBlock(ctx *FuncBlockContext) {}
+
+// ExitFuncBlock is called when production funcBlock is exited.
+func (s *BaseRustLikeParserListener) ExitFuncBlock(ctx *FuncBlockContext) {}
+
 // EnterRtype is called when production rtype is entered.
 func (s *BaseRustLikeParserListener) EnterRtype(ctx *RtypeContext) {}
 
