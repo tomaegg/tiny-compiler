@@ -2,17 +2,21 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"tj-compiler/g4/parser"
 	"tj-compiler/symtable"
 
 	"github.com/antlr4-go/antlr/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
+	log.SetFormatter(&log.TextFormatter{
+		DisableTimestamp: true, // 禁用时间戳
+	})
+
 	if len(os.Args) < 2 {
-		fmt.Printf("usage:\n   %v <source_file>\n", os.Args[0])
+		log.Printf("usage:\n   %v <source_file>\n", os.Args[0])
 		os.Exit(-1)
 	}
 
@@ -28,13 +32,13 @@ func main() {
 	parser := parser.NewRustLikeParser(tokens)
 	tree := parser.Prog() // 假设起始规则是 `expr`
 
-	fmt.Fprintln(os.Stderr, "[Parsing Tree]")
-	fmt.Fprintln(os.Stderr, tree.ToStringTree(nil, parser))
-	fmt.Fprintln(os.Stderr, "")
+	log.Println("[Parsing Tree]")
+	log.Println(tree.ToStringTree(nil, parser))
+	log.Println("")
 
 	symTable := symtable.NewSymTable(tree)
 	dot := symTable.DotGraph()
 
-	fmt.Fprintln(os.Stderr, "[Dot Graph]")
+	log.Println("[Dot Graph]")
 	fmt.Println(string(dot))
 }
