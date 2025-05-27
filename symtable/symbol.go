@@ -32,6 +32,7 @@ func (t SymType) String() string {
 
 type Symbol interface {
 	Name() SymName
+	Token() antlr.Token
 	fmt.Stringer
 }
 
@@ -83,10 +84,21 @@ type FuncSymbol struct {
 	enclosed Scope
 	params   []BaseSymbol
 	retType  SymType
+	token    antlr.Token
 }
 
-func NewFuncSymbol(name SymName, enclosed Scope, params []BaseSymbol, retType SymType) FuncSymbol {
-	return FuncSymbol{name: name, enclosed: enclosed, params: params, retType: retType}
+func NewFuncSymbol(name SymName, enclosed Scope, params []BaseSymbol, retType SymType, atToken antlr.Token) FuncSymbol {
+	return FuncSymbol{
+		name:     name,
+		enclosed: enclosed,
+		params:   params,
+		retType:  retType,
+		token:    atToken,
+	}
+}
+
+func (f FuncSymbol) Token() antlr.Token {
+	return f.token
 }
 
 func (f FuncSymbol) Name() SymName {
@@ -116,6 +128,10 @@ type BasicTypeSymbol struct {
 
 func NewBasicTypeSymbol(name SymName) BasicTypeSymbol {
 	return BasicTypeSymbol{name: name}
+}
+
+func (b BasicTypeSymbol) Token() antlr.Token {
+	return nil
 }
 
 func (b BasicTypeSymbol) Name() SymName {

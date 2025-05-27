@@ -1,6 +1,8 @@
 package symtable
 
-import "github.com/antlr4-go/antlr/v4"
+import (
+	"github.com/antlr4-go/antlr/v4"
+)
 
 type SymTable struct {
 	v *Visitor

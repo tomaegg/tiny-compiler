@@ -1,7 +1,6 @@
 package symtable
 
 import (
-	"fmt"
 	"tj-compiler/g4/parser"
 
 	"github.com/antlr4-go/antlr/v4"
@@ -32,12 +31,14 @@ func (v *Visitor) GetDotGraph() []byte {
 	return v.graph.ToDot()
 }
 
-func (v *Visitor) LogDefine(s Symbol, token antlr.Token) {
+func (v *Visitor) LogDefine(s Symbol) {
+	token := s.Token()
 	line, col := token.GetLine(), token.GetColumn()
 	log.Infof("[%02d:%02d] define: %s", line, col, s.String())
 }
 
-func (v *Visitor) LogResolve(res Symbol, s antlr.Token) {
+func (v *Visitor) LogResolve(res Symbol) {
+	s := res.Token()
 	line, col := s.GetLine(), s.GetColumn()
 	if res == nil {
 		log.Fatalf("unresolved symbol at token[%d:%d]: <%s>", line, col, s.GetText())
@@ -45,9 +46,9 @@ func (v *Visitor) LogResolve(res Symbol, s antlr.Token) {
 	log.Infof("[%02d:%02d] resolve: %s", line, col, res.String())
 }
 
-func (v *Visitor) LogError(err SemanticErr, token antlr.Token) {
-	line, col := token.GetLine(), token.GetColumn()
-	log.Errorf("[%02d:%02d] %s: %s", line, col, err.Err, err.Msg)
+func (v *Visitor) LogError(err SemanticErr, atToken antlr.Token) {
+	line, col := atToken.GetLine(), atToken.GetColumn()
+	log.Errorf("[%02d:%02d] %s", line, col, err)
 }
 
 func (v *Visitor) Visit(tree antlr.ParseTree) any {
@@ -124,14 +125,20 @@ func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
 	}
 
 	funcScope := NewFuncScope(v.currentScope, funcName)
-	funcSymbol := NewFuncSymbol(funcName, funcScope, params, retType)
+	funcSymbol := NewFuncSymbol(
+		funcName,
+		funcScope,
+		params,
+		retType,
+		funcToken,
+	)
 
 	funcScope.SetSymbol(funcSymbol)
 	funcScope.Define(funcSymbol)
-	v.LogDefine(funcSymbol, funcToken)
+	v.LogDefine(funcSymbol)
 	for _, s := range params {
 		funcScope.Define(s)
-		v.LogDefine(s, s.Token())
+		v.LogDefine(s)
 	}
 
 	return funcScope
@@ -164,10 +171,10 @@ func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
 	wantType := funcSymbol.RetType()
 
 	if wantType != getType {
-		msg := fmt.Sprintf("function return type dismatch: want %s, get %s",
+		err := NewSematicErr(TypeErr).Message(
+			"function return type dismatch: want %s, get %s",
 			wantType, getType,
 		)
-		err := NewTypeError(msg)
 		v.LogError(err, tokenRet)
 	}
 
@@ -186,7 +193,7 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	mutable := ctx.MUT() != nil
 	varSymbol := NewBaseSymbol(tokenID.GetText(), varType, mutable, tokenID)
 	v.currentScope.Define(varSymbol)
-	v.LogDefine(varSymbol, tokenID)
+	v.LogDefine(varSymbol)
 	return nil
 }
 
@@ -248,7 +255,7 @@ func (v *Visitor) VisitStatIfElse(ctx *parser.StatIfElseContext) any {
 func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 	tokenID := ctx.ID().GetSymbol()
 	res := v.currentScope.Resolve(tokenID.GetText())
-	v.LogResolve(res, tokenID)
+	v.LogResolve(res)
 
 	v.Visit(ctx.Expr())
 	return nil
