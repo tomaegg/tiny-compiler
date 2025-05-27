@@ -4,6 +4,7 @@ fn program_3_1__1(mut param:i32) {
     (1);
     ((2));
     (((3)));
+    ;;;;
 
     let mut a;
     let b;
@@ -11,17 +12,27 @@ fn program_3_1__1(mut param:i32) {
     b = 9;
     a = a + b;
     b = b * a - 1 / 90;
+    
+    {
+        a;
+        b;
+        a;
+        {
+            
+        }
+    }
 
     while 1{
-        let mut d = 10;
+        let mut d ;
+        d = 10;
     }
 
     if 1 {
-        let mut e = 10;
+        let mut e:i32;
         e = 20 * 3;
-
     }else{
         let f = 10;
+        let mut e; 
         e = b * 3;
     }
 
@@ -34,7 +45,9 @@ fn program_3_1__2(mut a:i32, b:i32, c:i32,mut d:i32, e:i32) -> i32{
     ((a));
     (((a)));
     while 1{
+        let varInWhile;
         loop {
+            let varInLoop;
 
         }
         if a{

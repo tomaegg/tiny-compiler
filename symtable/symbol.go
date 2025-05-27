@@ -3,6 +3,8 @@ package symtable
 import (
 	"fmt"
 	"strings"
+
+	"github.com/antlr4-go/antlr/v4"
 )
 
 type (
@@ -41,12 +43,17 @@ type BaseSymbol struct {
 	name    SymName
 	stype   SymType
 	mutable bool
+	token   antlr.Token
 }
 
 var _ Symbol = BaseSymbol{}
 
-func NewBaseSymbol(name SymName, stype SymType, mutable bool) BaseSymbol {
-	return BaseSymbol{name: name, stype: stype, mutable: mutable}
+func NewBaseSymbol(name SymName, stype SymType, mutable bool, token antlr.Token) BaseSymbol {
+	return BaseSymbol{name: name, stype: stype, mutable: mutable, token: token}
+}
+
+func (bs BaseSymbol) Token() antlr.Token {
+	return bs.token
 }
 
 func (bs BaseSymbol) Mutable() bool {

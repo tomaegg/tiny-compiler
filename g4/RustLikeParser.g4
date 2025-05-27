@@ -8,9 +8,9 @@ prog: declaration;
 declaration: funcDeclaration*;
 
 expr:
-	expr (MULT | DIV) expr						# ExprMulDiv
-	| expr (PLUS | MINUS) expr					# ExprAddSub
-	| expr (EQ | NE | LT | GT | LE | GE) expr	# ExprCmp
+	lhs = expr (MULT | DIV) rhs = expr						# ExprMulDiv
+	| lhs = expr (PLUS | MINUS) rhs = expr					# ExprAddSub
+	| lhs = expr (EQ | NE | LT | GT | LE | GE) rhs = expr	# ExprCmp
 	| LPAREN expr RPAREN						# ExprParen
 	| ID funcCallList							# ExprFuncCall
 	| ID										# ExprID
@@ -21,9 +21,9 @@ funcCallList: LPAREN funcCallParam RPAREN;
 funcCallParam: expr (COMMA expr)* |;
 
 funcDeclaration:
-	funcDeclarationHeader funcDeclarationReturn? funcBlock; // 函数声明
+	funcSignature funcBlock; // 函数声明
 
-funcDeclarationHeader: FN ID funcParamsList;
+funcSignature: FN ID funcParamsList funcDeclarationReturn?;
 
 funcDeclarationReturn: ARROW rtype;
 

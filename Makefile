@@ -27,7 +27,7 @@ dot:
 generate: 
 	cd g4 && \
 	antlr4 -Dlanguage=Go -o parser RustLikeLexer.g4 && \
-	antlr4 -Dlanguage=Go -o parser RustLikeParser.g4 
+	antlr4 -Dlanguage=Go -visitor -no-listener -o parser RustLikeParser.g4 
 	rm $(GEN_DIR)/*.tokens $(GEN_DIR)/*.interp
 	go fmt ./g4/parser/
 
