@@ -18,14 +18,10 @@ const (
 	SymVoid
 )
 
-const (
-	BasicInt32 SymName = "int32"
-)
-
 func (t SymType) String() string {
 	switch t {
 	case SymInt32:
-		return "int32"
+		return "i32"
 	case SymToInfer:
 		return "toInfer"
 	case SymVoid:
@@ -70,7 +66,7 @@ func (bs BaseSymbol) String() string {
 		mut = "(mut)"
 	}
 	s := fmt.Sprintf(
-		"%s%s:%s",
+		"<%s%s,%s>",
 		bs.name, mut, bs.stype,
 	)
 	return s

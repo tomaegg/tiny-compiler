@@ -3,6 +3,7 @@ package symtable
 import (
 	"bytes"
 	"fmt"
+	"html"
 )
 
 type SymTableGraph struct {
@@ -29,7 +30,7 @@ func (g SymTableGraph) ToScopeDot(scope Scope) []byte {
 	var buffer bytes.Buffer
 	buffer.WriteString("<TR>")
 	for _, v := range scope.Symbols() {
-		elem := fmt.Appendf(nil, "<TD>%s</TD>", v)
+		elem := fmt.Appendf(nil, "<TD>%s</TD>", html.EscapeString(v.String()))
 		buffer.Write(elem)
 	}
 	buffer.WriteString("</TR>")

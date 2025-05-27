@@ -92,7 +92,7 @@ func NewGlobalScope(enclosed Scope) *GlobalScope {
 	ret := GlobalScope{
 		BaseScope: NewBaseScope("GlobalScope", enclosed),
 	}
-	ret.Define(NewBasicTypeSymbol(BasicInt32))
+	ret.Define(NewBasicTypeSymbol(SymInt32.String()))
 	return &ret
 }
 
