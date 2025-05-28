@@ -5,11 +5,9 @@ golang: 1.24.2
 ## Run
 
 ```shell
-build/<your_platform_target> example/1.1.rs
+make run TARGET=symtable ARGS=example/scopes.rs 
 ```
 
-## build
-
 ```shell
-go build -o parser.out cmd/parser/main.go
+make dot ARGS=example/scopes.rs 
 ```
