@@ -542,6 +542,7 @@ func (s *ExprContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) s
 type ExprAddSubContext struct {
 	ExprContext
 	lhs IExprContext
+	op  antlr.Token
 	rhs IExprContext
 }
 
@@ -554,6 +555,10 @@ func NewExprAddSubContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *Exp
 
 	return p
 }
+
+func (s *ExprAddSubContext) GetOp() antlr.Token { return s.op }
+
+func (s *ExprAddSubContext) SetOp(v antlr.Token) { s.op = v }
 
 func (s *ExprAddSubContext) GetLhs() IExprContext { return s.lhs }
 
@@ -713,6 +718,7 @@ func (s *ExprNumContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 type ExprMulDivContext struct {
 	ExprContext
 	lhs IExprContext
+	op  antlr.Token
 	rhs IExprContext
 }
 
@@ -725,6 +731,10 @@ func NewExprMulDivContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *Exp
 
 	return p
 }
+
+func (s *ExprMulDivContext) GetOp() antlr.Token { return s.op }
+
+func (s *ExprMulDivContext) SetOp(v antlr.Token) { s.op = v }
 
 func (s *ExprMulDivContext) GetLhs() IExprContext { return s.lhs }
 
@@ -800,6 +810,7 @@ func (s *ExprMulDivContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 type ExprCmpContext struct {
 	ExprContext
 	lhs IExprContext
+	op  antlr.Token
 	rhs IExprContext
 }
 
@@ -812,6 +823,10 @@ func NewExprCmpContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ExprCm
 
 	return p
 }
+
+func (s *ExprCmpContext) GetOp() antlr.Token { return s.op }
+
+func (s *ExprCmpContext) SetOp(v antlr.Token) { s.op = v }
 
 func (s *ExprCmpContext) GetLhs() IExprContext { return s.lhs }
 
@@ -1113,10 +1128,17 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 				}
 				{
 					p.SetState(54)
+
+					var _lt = p.GetTokenStream().LT(1)
+
+					localctx.(*ExprMulDivContext).op = _lt
+
 					_la = p.GetTokenStream().LA(1)
 
 					if !(_la == RustLikeParserMULT || _la == RustLikeParserDIV) {
-						p.GetErrorHandler().RecoverInline(p)
+						var _ri = p.GetErrorHandler().RecoverInline(p)
+
+						localctx.(*ExprMulDivContext).op = _ri
 					} else {
 						p.GetErrorHandler().ReportMatch(p)
 						p.Consume()
@@ -1143,10 +1165,17 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 				}
 				{
 					p.SetState(57)
+
+					var _lt = p.GetTokenStream().LT(1)
+
+					localctx.(*ExprAddSubContext).op = _lt
+
 					_la = p.GetTokenStream().LA(1)
 
 					if !(_la == RustLikeParserPLUS || _la == RustLikeParserMINUS) {
-						p.GetErrorHandler().RecoverInline(p)
+						var _ri = p.GetErrorHandler().RecoverInline(p)
+
+						localctx.(*ExprAddSubContext).op = _ri
 					} else {
 						p.GetErrorHandler().ReportMatch(p)
 						p.Consume()
@@ -1173,10 +1202,17 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 				}
 				{
 					p.SetState(60)
+
+					var _lt = p.GetTokenStream().LT(1)
+
+					localctx.(*ExprCmpContext).op = _lt
+
 					_la = p.GetTokenStream().LA(1)
 
 					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&132120576) != 0) {
-						p.GetErrorHandler().RecoverInline(p)
+						var _ri = p.GetErrorHandler().RecoverInline(p)
+
+						localctx.(*ExprCmpContext).op = _ri
 					} else {
 						p.GetErrorHandler().ReportMatch(p)
 						p.Consume()

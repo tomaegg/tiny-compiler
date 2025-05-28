@@ -14,6 +14,7 @@ type (
 
 const (
 	SymToInfer SymType = iota
+	SymFunc            // 泛指function
 	SymInt32
 	SymVoid
 )
@@ -26,6 +27,8 @@ func (t SymType) String() string {
 		return "toInfer"
 	case SymVoid:
 		return "void"
+	case SymFunc:
+		return "func"
 	}
 	panic("invalid type")
 }
@@ -33,6 +36,7 @@ func (t SymType) String() string {
 type Symbol interface {
 	Name() SymName
 	Token() antlr.Token
+	Type() SymType
 	fmt.Stringer
 }
 
@@ -97,6 +101,10 @@ func NewFuncSymbol(name SymName, enclosed Scope, params []BaseSymbol, retType Sy
 	}
 }
 
+func (f FuncSymbol) Type() SymType {
+	return SymFunc
+}
+
 func (f FuncSymbol) Token() antlr.Token {
 	return f.token
 }
@@ -109,12 +117,16 @@ func (f FuncSymbol) RetType() SymType {
 	return f.retType
 }
 
+func (f FuncSymbol) Params() []BaseSymbol {
+	return f.params
+}
+
 func (f FuncSymbol) String() string {
 	p := make([]string, len(f.params))
 	for i, s := range f.params {
 		p[i] = s.String()
 	}
-	s := fmt.Sprintf("%s:func(%s) %s",
+	s := fmt.Sprintf("%s: func(%s) %s",
 		f.Name(), strings.Join(p, ", "), f.retType,
 	)
 	return s
@@ -123,15 +135,20 @@ func (f FuncSymbol) String() string {
 var _ Symbol = BasicTypeSymbol{}
 
 type BasicTypeSymbol struct {
-	name SymName
+	name  SymName
+	stype SymType
 }
 
-func NewBasicTypeSymbol(name SymName) BasicTypeSymbol {
-	return BasicTypeSymbol{name: name}
+func NewBasicTypeSymbol(name SymName, stype SymType) BasicTypeSymbol {
+	return BasicTypeSymbol{name: name, stype: stype}
 }
 
 func (b BasicTypeSymbol) Token() antlr.Token {
 	return nil
+}
+
+func (b BasicTypeSymbol) Type() SymType {
+	return b.stype
 }
 
 func (b BasicTypeSymbol) Name() SymName {

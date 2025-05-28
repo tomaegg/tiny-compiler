@@ -8,9 +8,9 @@ prog: declaration;
 declaration: funcDeclaration*;
 
 expr:
-	lhs = expr (MULT | DIV) rhs = expr						# ExprMulDiv
-	| lhs = expr (PLUS | MINUS) rhs = expr					# ExprAddSub
-	| lhs = expr (EQ | NE | LT | GT | LE | GE) rhs = expr	# ExprCmp
+	lhs = expr op = (MULT | DIV) rhs = expr						# ExprMulDiv
+	| lhs = expr op = (PLUS | MINUS) rhs = expr					# ExprAddSub
+	| lhs = expr op = (EQ | NE | LT | GT | LE | GE) rhs = expr	# ExprCmp
 	| LPAREN expr RPAREN						# ExprParen
 	| ID funcCallList							# ExprFuncCall
 	| ID										# ExprID

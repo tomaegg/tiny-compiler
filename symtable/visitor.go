@@ -43,11 +43,10 @@ func (v *Visitor) LogDefine(s Symbol) {
 	log.Infof("[%02d:%02d] define: %s", line, col, s.String())
 }
 
-func (v *Visitor) LogResolve(res Symbol) {
-	s := res.Token()
-	line, col := s.GetLine(), s.GetColumn()
+func (v *Visitor) LogResolve(res Symbol, atToken antlr.Token) {
+	line, col := atToken.GetLine(), atToken.GetColumn()
 	if res == nil {
-		log.Fatalf("unresolved symbol at token[%d:%d]: <%s>", line, col, s.GetText())
+		log.Fatalf("unresolved symbol at token[%d:%d]: <%s>", line, col, atToken.GetText())
 	}
 	log.Infof("[%02d:%02d] resolve: %s", line, col, res.String())
 }
@@ -165,22 +164,36 @@ func (v *Visitor) VisitFuncDeclaration(ctx *parser.FuncDeclarationContext) any {
 }
 
 func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
-	tokenRet := ctx.RETURN().GetSymbol()
-	getType := SymVoid
-	if ctx.Expr() != nil {
-		// TODO: type checking
-		v.Visit(ctx)
+	// NOTE: 获取func scope, 通过scope链条向上查找
+	var funcScope *FuncScope
+	s := v.currentScope
+	for s != nil {
+		if _, ok := s.(*FuncScope); ok {
+			funcScope = s.(*FuncScope)
+			break
+		}
+		s = s.Enclosed()
+	}
+	if funcScope == nil {
+		err := NewSematicErr(RetErr).Message("return statement not in function scope")
+		v.LogError(err, ctx.RETURN().GetSymbol())
+		return nil
 	}
 
-	funcScope := v.currentScope.(*FuncScope)
 	funcSymbol := funcScope.GetSymbol()
 	wantType := funcSymbol.RetType()
+	getType := SymVoid
+	if ctx.Expr() != nil {
+		attr := v.Visit(ctx.Expr()).(ExprAttribute)
+		getType = attr.Type
+	}
 
 	if wantType != getType {
 		err := NewSematicErr(TypeErr).Message(
-			"function return type dismatch: want %s, get %s",
+			"function return type dismatch: want <%s>, get <%s>",
 			wantType, getType,
 		)
+		tokenRet := ctx.RETURN().GetSymbol()
 		v.LogError(err, tokenRet)
 	}
 
@@ -207,45 +220,90 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 
 func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
 	s := v.currentScope.Resolve(ctx.ID().GetSymbol().GetText())
-	// TODO: type
-	_ = s
-	return ExprAttribute{}
+	var t SymType
+	switch s := s.(type) {
+	case BaseSymbol:
+		t = s.Type()
+	case FuncSymbol:
+		t = SymFunc
+	default:
+		log.Panicf("unknown symbol: %v", s)
+	}
+	return ExprAttribute{Type: t}
 }
 
 func (v *Visitor) VisitExprFuncCall(ctx *parser.ExprFuncCallContext) any {
 	funcName := ctx.ID().GetSymbol().GetText()
-	funcSymbol := v.currentScope.Resolve(funcName)
-	v.LogResolve(funcSymbol)
-	// TODO: type
-	_ = funcSymbol
-	return ExprAttribute{}
+	funcSymbol := v.currentScope.Resolve(funcName).(FuncSymbol)
+	paramsRequired := funcSymbol.Params()
+
+	// 检查参数数量
+	funcParamCtx := ctx.FuncCallList().FuncCallParam()
+	if len(paramsRequired) != len(funcParamCtx.AllExpr()) {
+		err := NewSematicErr(ArgsErr).Message("function <%s> requires %d arguments, but %d are provided",
+			funcName, len(paramsRequired), len(funcParamCtx.AllExpr()),
+		)
+		v.LogError(err, funcSymbol.Token())
+	}
+
+	// 检查参数类型
+	for i := range min(len(funcParamCtx.AllExpr()), len(paramsRequired)) {
+		fp := funcParamCtx.AllExpr()[i]
+		attr := v.Visit(fp).(ExprAttribute)
+		if attr.Type != paramsRequired[i].Type() {
+			err := NewSematicErr(ArgsErr).Message("function <%s> args at %d requires %s, but get type <%s>",
+				funcName, i, paramsRequired[i], attr.Type,
+			)
+			v.LogError(err, funcSymbol.Token())
+		}
+	}
+
+	v.LogResolve(funcSymbol, ctx.ID().GetSymbol())
+	v.Visit(ctx.FuncCallList())
+	return ExprAttribute{Type: funcSymbol.RetType()}
 }
 
 func (v *Visitor) VisitExprCmp(ctx *parser.ExprCmpContext) any {
 	attrLhs := v.Visit(ctx.GetLhs()).(ExprAttribute)
 	attrRhs := v.Visit(ctx.GetRhs()).(ExprAttribute)
+	op := ctx.GetOp()
 	if attrLhs.Type != attrRhs.Type {
-		// TODO:
+		err := NewSematicErr(TypeErr).Message("type mismatch with: <%s> %s <%s>",
+			attrLhs.Type, op.GetText(), attrRhs.Type,
+		)
+		v.LogError(err, op)
+		// NOTE: 如果类型不符合，默认按照int32处理
 	}
-	return ExprAttribute{}
+	// NOTE: 由于暂时不支持bool类型，因此返回Int32
+	return ExprAttribute{Type: SymInt32}
 }
 
 func (v *Visitor) VisitExprMulDiv(ctx *parser.ExprMulDivContext) any {
 	attrLhs := v.Visit(ctx.GetLhs()).(ExprAttribute)
 	attrRhs := v.Visit(ctx.GetRhs()).(ExprAttribute)
+	op := ctx.GetOp()
 	if attrLhs.Type != attrRhs.Type {
-		// TODO:
+		err := NewSematicErr(TypeErr).Message("type mismatch: <%s> %s <%s>",
+			attrLhs.Type, op.GetText(), attrRhs.Type,
+		)
+		v.LogError(err, op)
+		// NOTE: 如果类型不符合，默认按照int32处理
 	}
-	return ExprAttribute{}
+	return ExprAttribute{Type: SymInt32}
 }
 
 func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
 	attrLhs := v.Visit(ctx.GetLhs()).(ExprAttribute)
 	attrRhs := v.Visit(ctx.GetRhs()).(ExprAttribute)
+	op := ctx.GetOp()
 	if attrLhs.Type != attrRhs.Type {
-		// TODO:
+		err := NewSematicErr(TypeErr).Message("type mismatch: <%s> %s <%s>",
+			attrLhs.Type, op.GetText(), attrRhs.Type,
+		)
+		v.LogError(err, op)
+		// NOTE: 如果类型不符合，默认按照int32处理
 	}
-	return ExprAttribute{}
+	return ExprAttribute{Type: SymInt32}
 }
 
 func (v *Visitor) VisitExprParen(ctx *parser.ExprParenContext) any {
@@ -293,9 +351,13 @@ func (v *Visitor) VisitStatIfElse(ctx *parser.StatIfElseContext) any {
 func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 	tokenID := ctx.ID().GetSymbol()
 	res := v.currentScope.Resolve(tokenID.GetText())
-	v.LogResolve(res)
+	v.LogResolve(res, ctx.ID().GetSymbol())
 
-	v.Visit(ctx.Expr())
+	attr := v.Visit(ctx.Expr()).(ExprAttribute)
+	if attr.Type != res.Type() {
+		err := NewSematicErr(TypeErr).Message("dismatch type assignment: <%s> != <%s>", attr.Type, res.Type())
+		v.LogError(err, tokenID)
+	}
 	return nil
 }
 

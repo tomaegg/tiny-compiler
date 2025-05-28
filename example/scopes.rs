@@ -1,5 +1,30 @@
 
+fn foo1(mut p1:i32, p2:i32, p3:i32) {
+    return 1;
+}
+
+fn foo2() -> i32{
+    return;
+}
+
 fn program_3_1__1(mut param:i32) {
+    {
+        foo1(1,1,1);
+        foo1(1,1,1,1);
+        foo1(1);
+        foo1(foo1(1,1,1), 1, 1);
+        param = foo2();
+        param = foo2(4,1,2,param);
+        param = foo1(1,2,3);
+    }
+    
+    {
+        let mut t:i32;
+        t = 1 * 1 + 10 / 3 - 5 * 9 + param * foo1(t, t, t);
+        param = t;
+        return param;
+    }
+
     0;
     (1);
     ((2));
