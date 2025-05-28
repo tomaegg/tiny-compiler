@@ -1,6 +1,7 @@
 package symtable
 
 import (
+	"strconv"
 	"tj-compiler/g4/parser"
 
 	"github.com/antlr4-go/antlr/v4"
@@ -9,6 +10,11 @@ import (
 
 var typeMap = map[string]SymType{
 	"i32": SymInt32,
+}
+
+type ExprAttribute struct {
+	Type  SymType
+	Value any
 }
 
 var _ parser.RustLikeParserVisitor = (*Visitor)(nil)
@@ -200,20 +206,46 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 // different expression
 
 func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
-	v.currentScope.Resolve(ctx.ID().GetSymbol().GetText())
-	return nil
+	s := v.currentScope.Resolve(ctx.ID().GetSymbol().GetText())
+	// TODO: type
+	_ = s
+	return ExprAttribute{}
+}
+
+func (v *Visitor) VisitExprFuncCall(ctx *parser.ExprFuncCallContext) any {
+	funcName := ctx.ID().GetSymbol().GetText()
+	funcSymbol := v.currentScope.Resolve(funcName)
+	v.LogResolve(funcSymbol)
+	// TODO: type
+	_ = funcSymbol
+	return ExprAttribute{}
+}
+
+func (v *Visitor) VisitExprCmp(ctx *parser.ExprCmpContext) any {
+	attrLhs := v.Visit(ctx.GetLhs()).(ExprAttribute)
+	attrRhs := v.Visit(ctx.GetRhs()).(ExprAttribute)
+	if attrLhs.Type != attrRhs.Type {
+		// TODO:
+	}
+	return ExprAttribute{}
 }
 
 func (v *Visitor) VisitExprMulDiv(ctx *parser.ExprMulDivContext) any {
-	v.Visit(ctx.GetLhs())
-	v.Visit(ctx.GetRhs())
-	return nil
+	attrLhs := v.Visit(ctx.GetLhs()).(ExprAttribute)
+	attrRhs := v.Visit(ctx.GetRhs()).(ExprAttribute)
+	if attrLhs.Type != attrRhs.Type {
+		// TODO:
+	}
+	return ExprAttribute{}
 }
 
 func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
-	v.Visit(ctx.GetLhs())
-	v.Visit(ctx.GetRhs())
-	return nil
+	attrLhs := v.Visit(ctx.GetLhs()).(ExprAttribute)
+	attrRhs := v.Visit(ctx.GetRhs()).(ExprAttribute)
+	if attrLhs.Type != attrRhs.Type {
+		// TODO:
+	}
+	return ExprAttribute{}
 }
 
 func (v *Visitor) VisitExprParen(ctx *parser.ExprParenContext) any {
@@ -222,7 +254,13 @@ func (v *Visitor) VisitExprParen(ctx *parser.ExprParenContext) any {
 
 func (v *Visitor) VisitExprNum(ctx *parser.ExprNumContext) any {
 	// TODO: check int
-	return nil
+	numToken := ctx.NUMBER().GetSymbol()
+	val, err := strconv.ParseInt(numToken.GetText(), 10, 32)
+	if err != nil {
+		err := NewSematicErr(IntOverflowErr).Message("overflow int32: %s", numToken.GetText())
+		v.LogError(err, numToken)
+	}
+	return ExprAttribute{Type: SymInt32, Value: val}
 }
 
 func (v *Visitor) VisitStatExpr(ctx *parser.StatExprContext) any {
