@@ -35,6 +35,23 @@ func NewBaseScope(name ScopeName, enclosed Scope) *BaseScope {
 	}
 }
 
+func Iter(start Scope) func(func(V Scope) bool) {
+	fn := func(yield func(Scope) bool) {
+		var cur Scope = start
+		for {
+			if !yield(cur) {
+				return
+			}
+			cur = cur.Enclosed()
+			if cur == nil {
+				break
+			}
+		}
+	}
+
+	return fn
+}
+
 func (s *BaseScope) Name() ScopeName {
 	return s.name
 }
