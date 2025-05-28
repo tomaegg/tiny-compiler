@@ -150,7 +150,7 @@ func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
 }
 
 func (v *Visitor) VisitFuncDeclaration(ctx *parser.FuncDeclarationContext) any {
-	funcScope := v.Visit(ctx.FuncSignature()).(*FuncScope)
+	funcScope := v.Visit(ctx.FuncSignature()).(FuncScope)
 	v.graph.AddEdge(funcScope.Name(), v.currentScope.Name())
 	v.currentScope.Define(funcScope.GetSymbol()) // func scope定义在global之中
 	v.currentScope = funcScope
@@ -165,10 +165,10 @@ func (v *Visitor) VisitFuncDeclaration(ctx *parser.FuncDeclarationContext) any {
 
 func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
 	// NOTE: 获取func scope, 通过scope链条向上查找
-	var funcScope *FuncScope
+	var funcScope FuncScope
 	for s := range Iter(v.currentScope) {
-		if _, ok := s.(*FuncScope); ok {
-			funcScope = s.(*FuncScope)
+		if _, ok := s.(FuncScope); ok {
+			funcScope = s.(FuncScope)
 			break
 		}
 	}

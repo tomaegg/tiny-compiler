@@ -19,16 +19,16 @@ type Scope interface {
 	fmt.Stringer
 }
 
-var _ Scope = (*BaseScope)(nil)
+var _ Scope = (*baseScope)(nil)
 
-type BaseScope struct {
+type baseScope struct {
 	name     ScopeName
 	enclosed Scope
 	table    ScopeSymTable
 }
 
-func NewBaseScope(name ScopeName, enclosed Scope) *BaseScope {
-	return &BaseScope{
+func newBaseScope(name ScopeName, enclosed Scope) *baseScope {
+	return &baseScope{
 		name:     name,
 		enclosed: enclosed,
 		table:    make(ScopeSymTable),
@@ -52,24 +52,24 @@ func Iter(start Scope) func(func(V Scope) bool) {
 	return fn
 }
 
-func (s *BaseScope) Name() ScopeName {
+func (s *baseScope) Name() ScopeName {
 	return s.name
 }
 
-func (s *BaseScope) Symbols() ScopeSymTable {
+func (s *baseScope) Symbols() ScopeSymTable {
 	return s.table
 }
 
-func (s *BaseScope) Enclosed() Scope {
+func (s *baseScope) Enclosed() Scope {
 	return s.enclosed
 }
 
-func (s BaseScope) Exist(sym Symbol) bool {
+func (s baseScope) Exist(sym Symbol) bool {
 	_, ok := s.table[sym.Name()]
 	return ok
 }
 
-func (s *BaseScope) Define(sym Symbol) {
+func (s *baseScope) Define(sym Symbol) {
 	if _, ok := s.table[sym.Name()]; ok {
 		msg := fmt.Sprintf("must not redefined symbol: %s", sym.Name())
 		panic(msg)
@@ -77,7 +77,7 @@ func (s *BaseScope) Define(sym Symbol) {
 	s.table[sym.Name()] = sym
 }
 
-func (s *BaseScope) Resolve(name SymName) Symbol {
+func (s *baseScope) Resolve(name SymName) Symbol {
 	if ans, ok := s.table[name]; ok {
 		return ans
 	}
@@ -94,62 +94,68 @@ func (s *BaseScope) Resolve(name SymName) Symbol {
 	return nil
 }
 
-func (s BaseScope) String() string {
+func (s baseScope) String() string {
 	return s.Name()
 }
 
-var _ Scope = (*GlobalScope)(nil)
+type GlobalScope = *globalScopeImpl
 
-type GlobalScope struct {
-	*BaseScope
+var _ Scope = (GlobalScope)(nil)
+
+type globalScopeImpl struct {
+	*baseScope
 }
 
-func NewGlobalScope(enclosed Scope) *GlobalScope {
+func NewGlobalScope(enclosed Scope) GlobalScope {
 	// 定义global 符号
-	ret := GlobalScope{
-		BaseScope: NewBaseScope("GlobalScope", enclosed),
+	ret := globalScopeImpl{
+		baseScope: newBaseScope("GlobalScope", enclosed),
 	}
 	ret.Define(NewBasicTypeSymbol(SymInt32.String(), SymInt32))
 	return &ret
 }
 
-var _ Scope = (*LocalScope)(nil)
+var _ Scope = (LocalScope)(nil)
 
-type LocalScope struct {
-	*BaseScope
+type LocalScope = (*localScopeImpl)
+
+type localScopeImpl struct {
+	*baseScope
 }
 
 var localScopeCounter atomic.Int32
 
-func NewLocalScope(enclosed Scope) *LocalScope {
+func NewLocalScope(enclosed Scope) LocalScope {
 	name := fmt.Sprintf("LocalScope: %d", localScopeCounter.Load())
 	localScopeCounter.Add(1)
-	ret := LocalScope{
-		BaseScope: NewBaseScope(name, enclosed),
+	ret := localScopeImpl{
+		baseScope: newBaseScope(name, enclosed),
 	}
 	return &ret
 }
 
-var _ Scope = (*FuncScope)(nil)
+type FuncScope = *funcScopeImpl
 
-type FuncScope struct {
-	*BaseScope
+var _ Scope = (FuncScope)(nil)
+
+type funcScopeImpl struct {
+	*baseScope
 	f FuncSymbol
 }
 
-func NewFuncScope(enclosed Scope, name string) *FuncScope {
-	return &FuncScope{BaseScope: NewBaseScope(name, enclosed)}
+func NewFuncScope(enclosed Scope, name string) FuncScope {
+	return &funcScopeImpl{baseScope: newBaseScope(name, enclosed)}
 }
 
-func (s FuncScope) String() string {
+func (s funcScopeImpl) String() string {
 	n := fmt.Sprintf("FuncScope: %s", s.Name())
 	return n
 }
 
-func (s *FuncScope) SetSymbol(f FuncSymbol) {
+func (s *funcScopeImpl) SetSymbol(f FuncSymbol) {
 	s.f = f
 }
 
-func (s *FuncScope) GetSymbol() FuncSymbol {
+func (s *funcScopeImpl) GetSymbol() FuncSymbol {
 	return s.f
 }
