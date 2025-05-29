@@ -2,6 +2,10 @@
 *.zip
 *.gv
 *.png
+*.svg
+*.jpeg
+*.jpg
+*.pdf
 submit/
 build/
 .vscode/

@@ -27,13 +27,21 @@ func (g SymTableGraph) ToScopeDot(scope Scope) []byte {
 		return []byte(Quote(scope.Name()))
 	}
 
+	const attrEachLine = 2
 	var buffer bytes.Buffer
-	buffer.WriteString("<TR>")
+	i := 0
+	count := len(scope.Symbols())
 	for _, v := range scope.Symbols() {
+		if i%attrEachLine == 0 { // 每行开始
+			buffer.WriteString("<TR>")
+		}
 		elem := fmt.Appendf(nil, "<TD>%s</TD>", html.EscapeString(v.String()))
 		buffer.Write(elem)
+		if i%attrEachLine == attrEachLine-1 || i == count-1 {
+			buffer.WriteString("</TR>") // 每行结束或遍历完成时闭合
+		}
+		i++
 	}
-	buffer.WriteString("</TR>")
 
 	ret := fmt.Appendf(nil,
 		`"%s" [label = <<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
@@ -64,7 +72,7 @@ func (g *SymTableGraph) ToDot() []byte {
 	const declares = `
 digraph G {
 	rankdir = BT
-	ranksep = 0.25
+	ranksep = 0.5
 	edge [arrowsize = 0.5]
 	node [shape = none]
 `

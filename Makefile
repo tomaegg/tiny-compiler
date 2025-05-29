@@ -30,7 +30,9 @@ pack: generate build
 
 dot: 
 	go run -v cmd/symtable/main.go $(ARGS) > symtable.gv
+	dot -Tsvg symtable.gv -o symtable.svg
 	dot -Tpng symtable.gv -o symtable.png
+	dot -Tpdf symtable.gv -o symtable.pdf
 
 generate: 
 	cd g4 && \
