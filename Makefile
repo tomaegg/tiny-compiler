@@ -9,7 +9,17 @@ TARGET_FILE=cmd/$(TARGET)/main.go
 ANTLR4_LINK=https://www.antlr.org/download/antlr-4.13.2-complete.jar
 ANTLR4=java -jar $(TOOL_DIR)/antlr-4.13.2-complete.jar
 TOOL_DIR=$(PWD)/build_tools
-	
+
+define build-target
+    mkdir -p $(OUT_DIR)
+    GOOS=darwin GOARCH=amd64 go build -o $(OUT_DIR)/$(1)-macos-amd64 cmd/$(1)/main.go
+    GOOS=darwin GOARCH=arm64 go build -o $(OUT_DIR)/$(1)-macos-arm64 cmd/$(1)/main.go
+    GOOS=linux GOARCH=amd64 go build -o $(OUT_DIR)/$(1)-linux-amd64 cmd/$(1)/main.go
+    GOOS=linux GOARCH=arm64 go build -o $(OUT_DIR)/$(1)-linux-arm64 cmd/$(1)/main.go
+    GOOS=windows GOARCH=amd64 go build -o $(OUT_DIR)/$(1)-windows-amd64.exe cmd/$(1)/main.go
+endef
+
+
 antlr4:
 	mkdir -p $(TOOL_DIR)
 	wget  $(ANTLR4_LINK) -O $(TOOL_DIR)/antlr-4.13.2-complete.jar
@@ -42,12 +52,8 @@ generate:
 	go fmt ./g4/parser/
 
 build:
-	mkdir -p $(OUT_DIR)
-	GOOS=darwin GOARCH=amd64 go build -o $(OUT_DIR)/$(TARGET)-macos-amd64 $(TARGET_FILE)
-	GOOS=darwin GOARCH=arm64 go build -o $(OUT_DIR)/$(TARGET)-macos-arm64 $(TARGET_FILE)
-	GOOS=linux GOARCH=amd64 go build -o $(OUT_DIR)/$(TARGET)-linux-amd64 $(TARGET_FILE)
-	GOOS=linux GOARCH=arm64 go build -o $(OUT_DIR)/$(TARGET)-linux-arm64 $(TARGET_FILE)
-	GOOS=windows GOARCH=amd64 go build -o $(OUT_DIR)/$(TARGET)-windows-amd64.exe $(TARGET_FILE)
+	$(call build-target,symtable)
+	$(call build-target,parser)
 
 fmt:
 	go fmt ./...
