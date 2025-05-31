@@ -56,6 +56,16 @@ func (v *Visitor) LogError(err SemanticErr, atToken antlr.Token) {
 	log.Errorf("[%02d:%02d] %s", line, col, err)
 }
 
+func (v *Visitor) checkUninferredSym(scope Scope) {
+	for _, sym := range scope.Symbols() {
+		if sym.Type() == SymToInfer {
+			err := NewSematicErr(TypeErr).
+				Message("Symbol <%s> is uninferred", sym.Name())
+			v.LogError(err, sym.Token())
+		}
+	}
+}
+
 func (v *Visitor) Visit(tree antlr.ParseTree) any {
 	return tree.Accept(v)
 }
@@ -77,6 +87,8 @@ func (v *Visitor) VisitBlock(ctx *parser.BlockContext) any {
 		v.Visit(stat)
 	}
 	v.graph.AddNode(string(v.graph.ToScopeDot(v.currentScope)))
+	// 退出块作用域前检查未推断类型
+	v.checkUninferredSym(v.currentScope)
 	v.currentScope = v.currentScope.Enclosed()
 	return nil
 }
@@ -142,8 +154,8 @@ func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
 	funcScope.Define(funcSymbol)
 	v.LogDefine(funcSymbol)
 	for _, s := range params {
-		funcScope.Define(s)
-		v.LogDefine(s)
+		funcScope.Define(&s)
+		v.LogDefine(&s)
 	}
 
 	return funcScope
@@ -158,6 +170,8 @@ func (v *Visitor) VisitFuncDeclaration(ctx *parser.FuncDeclarationContext) any {
 	ret := v.Visit(ctx.FuncBlock())
 
 	v.graph.AddNode(string(v.graph.ToScopeDot(v.currentScope)))
+
+	v.checkUninferredSym(v.currentScope)
 	v.currentScope = v.currentScope.Enclosed()
 
 	return ret
@@ -209,8 +223,8 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	}
 	mutable := ctx.MUT() != nil
 	varSymbol := NewBaseSymbol(tokenID.GetText(), varType, mutable, tokenID)
-	v.currentScope.Define(varSymbol)
-	v.LogDefine(varSymbol)
+	v.currentScope.Define(&varSymbol)
+	v.LogDefine(&varSymbol)
 	return nil
 }
 
@@ -220,7 +234,7 @@ func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
 	s := v.currentScope.Resolve(ctx.ID().GetSymbol().GetText())
 	var t SymType
 	switch s := s.(type) {
-	case BaseSymbol:
+	case *BaseSymbol:
 		t = s.Type()
 	case FuncSymbol:
 		t = SymFunc
@@ -273,7 +287,7 @@ func (v *Visitor) VisitExprCmp(ctx *parser.ExprCmpContext) any {
 		// NOTE: 如果类型不符合，默认按照int32处理
 	}
 	// NOTE: 由于暂时不支持bool类型，因此返回Int32
-	return ExprAttribute{Type: SymInt32}
+	return ExprAttribute{Type: SymUndefined}
 }
 
 func (v *Visitor) VisitExprMulDiv(ctx *parser.ExprMulDivContext) any {
@@ -287,7 +301,7 @@ func (v *Visitor) VisitExprMulDiv(ctx *parser.ExprMulDivContext) any {
 		v.LogError(err, op)
 		// NOTE: 如果类型不符合，默认按照int32处理
 	}
-	return ExprAttribute{Type: SymInt32}
+	return ExprAttribute{Type: SymUndefined}
 }
 
 func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
@@ -301,7 +315,7 @@ func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
 		v.LogError(err, op)
 		// NOTE: 如果类型不符合，默认按照int32处理
 	}
-	return ExprAttribute{Type: SymInt32}
+	return ExprAttribute{Type: SymUndefined}
 }
 
 func (v *Visitor) VisitExprParen(ctx *parser.ExprParenContext) any {
@@ -352,8 +366,14 @@ func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 	v.LogResolve(res, ctx.ID().GetSymbol())
 
 	attr := v.Visit(ctx.Expr()).(ExprAttribute)
-	if attr.Type != res.Type() {
-		err := NewSematicErr(TypeErr).Message("dismatch type assignment: <%s> != <%s>", attr.Type, res.Type())
+	if res.Type() == SymToInfer {
+		res.Infer(attr.Type)
+		log.Infof("[%02d:%02d] inferred type for symbol <%s> as <%s>",
+			tokenID.GetLine(), tokenID.GetColumn(), res.Name(), attr.Type)
+	} else if res.Type() != attr.Type {
+		// 如果已经推断类型且不匹配，则报错
+		err := NewSematicErr(TypeErr).
+			Message("dismatch type assignment: <%s> != <%s>", res.Type(), attr.Type)
 		v.LogError(err, tokenID)
 	}
 	return nil
