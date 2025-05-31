@@ -225,6 +225,22 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	varSymbol := NewBaseSymbol(tokenID.GetText(), varType, mutable, tokenID)
 	v.currentScope.Define(&varSymbol)
 	v.LogDefine(&varSymbol)
+
+	// varinit exist
+	if ctx.VarInit() != nil {
+		// 访问varinit得到属性
+		attr := v.Visit(ctx.VarInit().Expr()).(ExprAttribute)
+		// 当前为待推断
+		if varSymbol.Type() == SymToInfer {
+			varSymbol.Infer(attr.Type)
+			log.Infof("[%02d:%02d] inferred type for symbol <%s> as <%s>",
+				tokenID.GetLine(), tokenID.GetColumn(), varSymbol.Name(), attr.Type)
+		} else if varSymbol.Type() != attr.Type { // 类型不匹配
+			err := NewSematicErr(TypeErr).
+				Message("dismatch type assignment: <%s> != <%s>", varSymbol.Type(), attr.Type)
+			v.LogError(err, tokenID)
+		}
+	}
 	return nil
 }
 
@@ -285,9 +301,10 @@ func (v *Visitor) VisitExprCmp(ctx *parser.ExprCmpContext) any {
 		)
 		v.LogError(err, op)
 		// NOTE: 如果类型不符合，默认按照int32处理
+		return ExprAttribute{Type: SymUndefined}
 	}
 	// NOTE: 由于暂时不支持bool类型，因此返回Int32
-	return ExprAttribute{Type: SymUndefined}
+	return ExprAttribute{Type: SymInt32}
 }
 
 func (v *Visitor) VisitExprMulDiv(ctx *parser.ExprMulDivContext) any {
@@ -299,9 +316,11 @@ func (v *Visitor) VisitExprMulDiv(ctx *parser.ExprMulDivContext) any {
 			attrLhs.Type, op.GetText(), attrRhs.Type,
 		)
 		v.LogError(err, op)
-		// NOTE: 如果类型不符合，默认按照int32处理
+		// 如果类型不一致返回 undefined 类型
+		return ExprAttribute{Type: SymUndefined}
 	}
-	return ExprAttribute{Type: SymUndefined}
+	// 类型一致返回 int32 类型
+	return ExprAttribute{Type: SymInt32}
 }
 
 func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
@@ -313,9 +332,11 @@ func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
 			attrLhs.Type, op.GetText(), attrRhs.Type,
 		)
 		v.LogError(err, op)
-		// NOTE: 如果类型不符合，默认按照int32处理
+		// 如果类型不一致返回 undefined 类型
+		return ExprAttribute{Type: SymUndefined}
 	}
-	return ExprAttribute{Type: SymUndefined}
+	// 类型一致返回 int32 类型
+	return ExprAttribute{Type: SymInt32}
 }
 
 func (v *Visitor) VisitExprParen(ctx *parser.ExprParenContext) any {

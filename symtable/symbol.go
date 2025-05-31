@@ -137,7 +137,7 @@ func (f FuncSymbol) String() string {
 	for i, s := range f.params {
 		p[i] = s.String()
 	}
-	s := fmt.Sprintf("%s: func(%s) %s",
+	s := fmt.Sprintf("%s: fn(%s) %s",
 		f.Name(), strings.Join(p, ", "), f.retType,
 	)
 	return s
