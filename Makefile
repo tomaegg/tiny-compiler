@@ -1,5 +1,9 @@
 .PHONY: generate pack build run dot fmt antlr4 ir symtable parser
 
+############################################
+# FOR DEV ONLY
+############################################
+
 PWD:=$(shell realpath .)
 SUBMIT_ZIP=submit.zip
 SUBMIT_DIR=submit
@@ -19,11 +23,9 @@ define build-target
     GOOS=windows GOARCH=amd64 go build -o $(OUT_DIR)/$(1)-windows-amd64.exe cmd/$(1)/main.go
 endef
 
-
 antlr4:
 	mkdir -p $(TOOL_DIR)
 	wget  $(ANTLR4_LINK) -O $(TOOL_DIR)/antlr-4.13.2-complete.jar
-
 
 parser:
 	@go run -v cmd/parser/main.go $(ARGS)

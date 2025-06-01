@@ -48,5 +48,5 @@ func main() {
 	defer cancel()
 
 	s := irGenerator.IR()
-	log.Infof("%s", s)
+	fmt.Printf("%s", s)
 }
