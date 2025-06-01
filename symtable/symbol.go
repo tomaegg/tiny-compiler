@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/antlr4-go/antlr/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 type (
@@ -17,7 +18,7 @@ const (
 	SymFunc            // 泛指function
 	SymInt32
 	SymVoid
-	SymUndefined
+	SymError
 )
 
 func (t SymType) String() string {
@@ -30,8 +31,8 @@ func (t SymType) String() string {
 		return "void"
 	case SymFunc:
 		return "func"
-	case SymUndefined:
-		return "undefined"
+	case SymError:
+		return "errType"
 	}
 	panic("invalid type")
 }
@@ -40,36 +41,38 @@ type Symbol interface {
 	Name() SymName
 	Token() antlr.Token
 	Type() SymType
-	Infer(exttype SymType)
+	Infer(SymType)
 	fmt.Stringer
 }
 
-type BaseSymbol struct {
+type BaseSymbol = *baseSymbolImpl
+
+type baseSymbolImpl struct {
 	name    SymName
 	stype   SymType
 	mutable bool
 	token   antlr.Token
 }
 
-var _ Symbol = &BaseSymbol{}
+var _ Symbol = (BaseSymbol)(nil)
 
 func NewBaseSymbol(name SymName, stype SymType, mutable bool, token antlr.Token) BaseSymbol {
-	return BaseSymbol{name: name, stype: stype, mutable: mutable, token: token}
+	return &baseSymbolImpl{name: name, stype: stype, mutable: mutable, token: token}
 }
 
-func (bs BaseSymbol) Token() antlr.Token {
+func (bs baseSymbolImpl) Token() antlr.Token {
 	return bs.token
 }
 
-func (bs BaseSymbol) Mutable() bool {
+func (bs baseSymbolImpl) Mutable() bool {
 	return bs.mutable
 }
 
-func (bs BaseSymbol) Name() SymName {
+func (bs baseSymbolImpl) Name() SymName {
 	return bs.name
 }
 
-func (bs BaseSymbol) String() string {
+func (bs baseSymbolImpl) String() string {
 	var mut string
 	if bs.mutable {
 		mut = "(mut)"
@@ -81,15 +84,15 @@ func (bs BaseSymbol) String() string {
 	return s
 }
 
-func (bs BaseSymbol) Type() SymType {
+func (bs baseSymbolImpl) Type() SymType {
 	return bs.stype
 }
 
-func (bs *BaseSymbol) Infer(extType SymType) {
+func (bs *baseSymbolImpl) Infer(t SymType) {
 	if bs.stype != SymToInfer {
-		panic(fmt.Sprintf("cannot infer type for symbol <%s>: current type is <%s>", bs.name, bs.stype))
+		log.Panicf("cannot infer type for symbol <%s>: current type is <%s>", bs.name, bs.stype)
 	}
-	bs.stype = extType
+	bs.stype = t
 }
 
 var _ Symbol = FuncSymbol{}

@@ -56,6 +56,11 @@ func (v *Visitor) LogError(err SemanticErr, atToken antlr.Token) {
 	log.Errorf("[%02d:%02d] %s", line, col, err)
 }
 
+func (v *Visitor) LogInfer(s Symbol, at antlr.Token) {
+	log.Infof("[%02d:%02d] infer: %s",
+		at.GetLine(), at.GetColumn(), s)
+}
+
 func (v *Visitor) checkUninferredSym(scope Scope) {
 	for _, sym := range scope.Symbols() {
 		if sym.Type() == SymToInfer {
@@ -154,8 +159,8 @@ func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
 	funcScope.Define(funcSymbol)
 	v.LogDefine(funcSymbol)
 	for _, s := range params {
-		funcScope.Define(&s)
-		v.LogDefine(&s)
+		funcScope.Define(s)
+		v.LogDefine(s)
 	}
 
 	return funcScope
@@ -223,19 +228,19 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	}
 	mutable := ctx.MUT() != nil
 	varSymbol := NewBaseSymbol(tokenID.GetText(), varType, mutable, tokenID)
-	v.currentScope.Define(&varSymbol)
-	v.LogDefine(&varSymbol)
+	v.currentScope.Define(varSymbol)
+	v.LogDefine(varSymbol)
 
 	// varinit exist
 	if ctx.VarInit() != nil {
 		// 访问varinit得到属性
 		attr := v.Visit(ctx.VarInit().Expr()).(ExprAttribute)
-		// 当前为待推断
-		if varSymbol.Type() == SymToInfer {
+		switch varSymbol.Type() {
+		case SymToInfer:
+			// 当前为待推断
 			varSymbol.Infer(attr.Type)
-			log.Infof("[%02d:%02d] inferred type for symbol <%s> as <%s>",
-				tokenID.GetLine(), tokenID.GetColumn(), varSymbol.Name(), attr.Type)
-		} else if varSymbol.Type() != attr.Type { // 类型不匹配
+			v.LogInfer(varSymbol, tokenID)
+		default:
 			err := NewSematicErr(TypeErr).
 				Message("dismatch type assignment: <%s> != <%s>", varSymbol.Type(), attr.Type)
 			v.LogError(err, tokenID)
@@ -250,7 +255,7 @@ func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
 	s := v.currentScope.Resolve(ctx.ID().GetSymbol().GetText())
 	var t SymType
 	switch s := s.(type) {
-	case *BaseSymbol:
+	case BaseSymbol:
 		t = s.Type()
 	case FuncSymbol:
 		t = SymFunc
@@ -301,7 +306,7 @@ func (v *Visitor) VisitExprCmp(ctx *parser.ExprCmpContext) any {
 		)
 		v.LogError(err, op)
 		// NOTE: 如果类型不符合，默认按照int32处理
-		return ExprAttribute{Type: SymUndefined}
+		return ExprAttribute{Type: SymError}
 	}
 	// NOTE: 由于暂时不支持bool类型，因此返回Int32
 	return ExprAttribute{Type: SymInt32}
@@ -316,8 +321,8 @@ func (v *Visitor) VisitExprMulDiv(ctx *parser.ExprMulDivContext) any {
 			attrLhs.Type, op.GetText(), attrRhs.Type,
 		)
 		v.LogError(err, op)
-		// 如果类型不一致返回 undefined 类型
-		return ExprAttribute{Type: SymUndefined}
+		// 如果类型不一致返回 error 类型
+		return ExprAttribute{Type: SymError}
 	}
 	// 类型一致返回 int32 类型
 	return ExprAttribute{Type: SymInt32}
@@ -333,7 +338,7 @@ func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
 		)
 		v.LogError(err, op)
 		// 如果类型不一致返回 undefined 类型
-		return ExprAttribute{Type: SymUndefined}
+		return ExprAttribute{Type: SymError}
 	}
 	// 类型一致返回 int32 类型
 	return ExprAttribute{Type: SymInt32}
@@ -389,8 +394,7 @@ func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 	attr := v.Visit(ctx.Expr()).(ExprAttribute)
 	if res.Type() == SymToInfer {
 		res.Infer(attr.Type)
-		log.Infof("[%02d:%02d] inferred type for symbol <%s> as <%s>",
-			tokenID.GetLine(), tokenID.GetColumn(), res.Name(), attr.Type)
+		v.LogInfer(res, tokenID)
 	} else if res.Type() != attr.Type {
 		// 如果已经推断类型且不匹配，则报错
 		err := NewSematicErr(TypeErr).
