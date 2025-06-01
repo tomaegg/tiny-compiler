@@ -17,6 +17,7 @@ const (
 	SymFunc            // 泛指function
 	SymInt32
 	SymVoid
+	SymUndefined
 )
 
 func (t SymType) String() string {
@@ -29,6 +30,8 @@ func (t SymType) String() string {
 		return "void"
 	case SymFunc:
 		return "func"
+	case SymUndefined:
+		return "undefined"
 	}
 	panic("invalid type")
 }
@@ -37,6 +40,7 @@ type Symbol interface {
 	Name() SymName
 	Token() antlr.Token
 	Type() SymType
+	Infer(exttype SymType)
 	fmt.Stringer
 }
 
@@ -47,7 +51,7 @@ type BaseSymbol struct {
 	token   antlr.Token
 }
 
-var _ Symbol = BaseSymbol{}
+var _ Symbol = &BaseSymbol{}
 
 func NewBaseSymbol(name SymName, stype SymType, mutable bool, token antlr.Token) BaseSymbol {
 	return BaseSymbol{name: name, stype: stype, mutable: mutable, token: token}
@@ -79,6 +83,13 @@ func (bs BaseSymbol) String() string {
 
 func (bs BaseSymbol) Type() SymType {
 	return bs.stype
+}
+
+func (bs *BaseSymbol) Infer(extType SymType) {
+	if bs.stype != SymToInfer {
+		panic(fmt.Sprintf("cannot infer type for symbol <%s>: current type is <%s>", bs.name, bs.stype))
+	}
+	bs.stype = extType
 }
 
 var _ Symbol = FuncSymbol{}
@@ -126,10 +137,14 @@ func (f FuncSymbol) String() string {
 	for i, s := range f.params {
 		p[i] = s.String()
 	}
-	s := fmt.Sprintf("%s: func(%s) %s",
+	s := fmt.Sprintf("%s: fn(%s) %s",
 		f.Name(), strings.Join(p, ", "), f.retType,
 	)
 	return s
+}
+
+func (f FuncSymbol) Infer(extType SymType) {
+	panic(fmt.Sprintf("cannot infer type for function symbol <%s>", f.name))
 }
 
 var _ Symbol = BasicTypeSymbol{}
@@ -157,4 +172,8 @@ func (b BasicTypeSymbol) Name() SymName {
 
 func (b BasicTypeSymbol) String() string {
 	return b.Name()
+}
+
+func (b BasicTypeSymbol) Infer(extType SymType) {
+	panic(fmt.Sprintf("cannot infer type for basic type symbol <%s>", b.name))
 }
