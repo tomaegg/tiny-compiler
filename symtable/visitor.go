@@ -404,13 +404,6 @@ func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 	return nil
 }
 
-func (v *Visitor) VisitStatReturn(ctx *parser.StatFuncReturnContext) any {
-	if ctx.Expr() != nil {
-		v.Visit(ctx.Expr())
-	}
-	return nil
-}
-
 func (v *Visitor) VisitStatBlock(ctx *parser.StatBlockContext) any {
 	return v.Visit(ctx.Block())
 }
