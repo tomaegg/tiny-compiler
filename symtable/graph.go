@@ -17,14 +17,14 @@ func NewSymTableGraph() *SymTableGraph {
 	}
 }
 
-func Quote(name string) string {
+func quote(name string) string {
 	return `"` + name + `"`
 }
 
 // ToScopeDot 生成单个作用域的DOT节点（HTML表格格式）
 func (g SymTableGraph) ToScopeDot(scope Scope) []byte {
 	if len(scope.Symbols()) == 0 {
-		return []byte(Quote(scope.Name()))
+		return []byte(quote(scope.Name()))
 	}
 
 	const attrEachLine = 2
@@ -57,12 +57,13 @@ func (g SymTableGraph) ToScopeDot(scope Scope) []byte {
 	return ret
 }
 
-func (g *SymTableGraph) AddNode(node string) {
+func (g *SymTableGraph) AddNode(scope Scope) {
+	node := string(g.ToScopeDot(scope))
 	g.nodes = append(g.nodes, node)
 }
 
-func (g *SymTableGraph) AddEdge(child, parent string) {
-	g.edges[Quote(child)] = Quote(parent)
+func (g *SymTableGraph) AddEdge(child, parent Scope) {
+	g.edges[quote(child.Name())] = quote(parent.Name())
 	// 注意符号表图的结构，child -> parent而不是parent -> child
 }
 

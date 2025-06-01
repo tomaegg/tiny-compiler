@@ -24,17 +24,11 @@ type Visitor struct {
 
 	globalScope  Scope
 	currentScope Scope
-	graph        *SymTableGraph
+	symTable     *SymTable
 }
 
 func NewVisitor() *Visitor {
-	return &Visitor{
-		graph: NewSymTableGraph(),
-	}
-}
-
-func (v *Visitor) GetDotGraph() []byte {
-	return v.graph.ToDot()
+	return &Visitor{}
 }
 
 func (v *Visitor) LogDefine(s Symbol) {
@@ -77,21 +71,21 @@ func (v *Visitor) Visit(tree antlr.ParseTree) any {
 
 func (v *Visitor) VisitProg(ctx *parser.ProgContext) any {
 	v.globalScope = NewGlobalScope(nil)
+	v.symTable = NewSymTable(v.globalScope) // symtable从此开始定义
+
 	v.currentScope = v.globalScope
 	ret := v.Visit(ctx.Declaration())
-	v.graph.AddNode(string(v.graph.ToScopeDot(v.currentScope)))
 	v.currentScope = v.currentScope.Enclosed()
 	return ret
 }
 
 func (v *Visitor) VisitBlock(ctx *parser.BlockContext) any {
 	localScope := NewLocalScope(v.currentScope)
-	v.graph.AddEdge(localScope.Name(), v.currentScope.Name())
+	v.symTable.AddEdge(localScope, v.currentScope)
 	v.currentScope = localScope
 	for _, stat := range ctx.AllStat() {
 		v.Visit(stat)
 	}
-	v.graph.AddNode(string(v.graph.ToScopeDot(v.currentScope)))
 	// 退出块作用域前检查未推断类型
 	v.checkUninferredSym(v.currentScope)
 	v.currentScope = v.currentScope.Enclosed()
@@ -168,13 +162,11 @@ func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
 
 func (v *Visitor) VisitFuncDeclaration(ctx *parser.FuncDeclarationContext) any {
 	funcScope := v.Visit(ctx.FuncSignature()).(FuncScope)
-	v.graph.AddEdge(funcScope.Name(), v.currentScope.Name())
+	v.symTable.AddEdge(funcScope, v.currentScope)
 	v.currentScope.Define(funcScope.GetSymbol()) // func scope定义在global之中
 	v.currentScope = funcScope
 
 	ret := v.Visit(ctx.FuncBlock())
-
-	v.graph.AddNode(string(v.graph.ToScopeDot(v.currentScope)))
 
 	v.checkUninferredSym(v.currentScope)
 	v.currentScope = v.currentScope.Enclosed()

@@ -35,8 +35,9 @@ func main() {
 	log.Println("[Parsing Tree]")
 	log.Println(tree.ToStringTree(nil, parser))
 
-	symTable := symtable.NewSymTable(tree)
-	dot := symTable.DotGraph()
+	checker := symtable.NewSemanticChecker(tree)
+	symTable := checker.SymbolTable()
+	dot := symTable.ToDotGraph()
 
 	log.Println("[Dot Graph]")
 	fmt.Println(string(dot))
