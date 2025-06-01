@@ -11,6 +11,7 @@ type SemanticChecker struct {
 func NewSemanticChecker(root antlr.ParseTree) *SemanticChecker {
 	visitor := NewVisitor()
 	visitor.Visit(root)
+	visitor.symTable.SetTree(root)
 	return &SemanticChecker{Visitor: visitor}
 }
 

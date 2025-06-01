@@ -1,4 +1,4 @@
-.PHONY: generate pack build run dot fmt antlr4
+.PHONY: generate pack build run dot fmt antlr4 ir symtable parser
 
 PWD:=$(shell realpath .)
 SUBMIT_ZIP=submit.zip
@@ -24,8 +24,21 @@ antlr4:
 	mkdir -p $(TOOL_DIR)
 	wget  $(ANTLR4_LINK) -O $(TOOL_DIR)/antlr-4.13.2-complete.jar
 
-run: 
-	@go run -v cmd/$(TARGET)/main.go $(ARGS)
+
+parser:
+	@go run -v cmd/parser/main.go $(ARGS)
+
+symtable:
+	@go run -v cmd/symtable/main.go $(ARGS)
+
+ir: 
+	@go run -tags=llvm19 -v cmd/ir/main.go $(ARGS)
+
+dot: 
+	go run -v cmd/symtable/main.go $(ARGS) > symtable.gv
+	dot -Tsvg symtable.gv -o symtable.svg
+	dot -Tpng symtable.gv -o symtable.png
+	dot -Tpdf symtable.gv -o symtable.pdf
 
 pack: generate build
 	rm -rf $(SUBMIT_DIR) $(SUBMIT_ZIP) && mkdir -p $(SUBMIT_DIR)
@@ -38,12 +51,6 @@ pack: generate build
 	zip -r $(SUBMIT_ZIP) $(SUBMIT_DIR)
 	rm -rf $(SUBMIT_DIR)
 
-dot: 
-	go run -v cmd/symtable/main.go $(ARGS) > symtable.gv
-	dot -Tsvg symtable.gv -o symtable.svg
-	dot -Tpng symtable.gv -o symtable.png
-	dot -Tpdf symtable.gv -o symtable.pdf
-
 generate: 
 	cd g4 && \
 	$(ANTLR4) -Dlanguage=Go -o parser RustLikeLexer.g4 && \
@@ -54,6 +61,7 @@ generate:
 build:
 	$(call build-target,symtable)
 	$(call build-target,parser)
+	go build -tags=llvm19 -o $(OUT_DIR)/ir-linux-amd64 cmd/ir/main.go
 
 fmt:
 	go fmt ./...

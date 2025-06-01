@@ -10,4 +10,5 @@ require (
 require (
 	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
 	golang.org/x/sys v0.33.0 // indirect
+	tinygo.org/x/go-llvm v0.0.0-20250422114502-b8f170971e74 // indirect
 )
