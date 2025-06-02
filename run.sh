@@ -2,7 +2,7 @@
 
 case "$1" in
 "build")
-  docker buildx build -t tiny-compiler:latest -f docker/Dockerfile .
+  docker build -t tiny-compiler:latest -f docker/Dockerfile .
   ;;
 "parser" | "symtable" | "ir" | "dot")
   mkdir -p output
