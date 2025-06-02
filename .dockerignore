@@ -9,6 +9,8 @@
 *.out
 *.exe
 *.gv
+*.tar
+*.zip
 build*/
 tools*/
 .antlr/

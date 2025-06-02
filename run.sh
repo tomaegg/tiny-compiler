@@ -1,8 +1,17 @@
 #!/bin/sh
 
+IMAGE_NAME=tiny-compiler:latest
+EXPORT_IMAGE=tiny-compiler-latest.tar
+
 case "$1" in
+"import")
+  docker load -i "$EXPORT_IMAGE"
+  ;;
+"export")
+  docker save -o "$EXPORT_IMAGE" "$IMAGE_NAME"
+  ;;
 "build")
-  docker build -t tiny-compiler:latest -f docker/Dockerfile .
+  docker build -t "$IMAGE_NAME" -f docker/Dockerfile .
   ;;
 "parser" | "symtable" | "ir" | "dot")
   mkdir -p output
@@ -12,7 +21,7 @@ case "$1" in
     tiny-compiler:latest "$@"
   ;;
 *)
-  echo "Usage: $0 [build|parser|symtable|ir|dot] [args...]"
+  echo "Usage: $0 [export|import|build|parser|symtable|ir|dot] [args...]"
   exit 1
   ;;
 esac
