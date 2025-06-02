@@ -26,9 +26,9 @@ ENV TZ=Asia/Shanghai
 RUN apt-get update && apt-get install -y --no-install-recommends \
   llvm-19 graphviz && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/build/* /runtime
+COPY --from=builder /app/build/* /runtime/
 
-COPY docker/entrypoint.sh /runtime
+COPY docker/entrypoint.sh /runtime/
 
 RUN chmod +x /runtime/entrypoint.sh
 
