@@ -44,7 +44,7 @@ func main() {
 	log.Println("[Dot Graph]")
 	fmt.Println(string(dot))
 
-	irGenerator, cancel := ir.NewIRGenerator(symTable)
+	irGenerator, cancel := ir.NewIRGenerator(filename, symTable)
 	defer cancel()
 
 	s := irGenerator.IR()

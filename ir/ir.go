@@ -7,8 +7,8 @@ type IRGenerator struct {
 	generated bool
 }
 
-func NewIRGenerator(symTable *symtable.SymTable) (*IRGenerator, func()) {
-	v, f := NewVisitor(symTable)
+func NewIRGenerator(module string, symTable *symtable.SymTable) (*IRGenerator, func()) {
+	v, f := NewVisitor(module, symTable)
 	return &IRGenerator{Visitor: v}, f
 }
 
@@ -25,5 +25,5 @@ func (ig *IRGenerator) IR() []byte {
 	ig.generate()
 
 	// Print the module to human-readable IR (stdout)
-	return []byte(ig.mod.String())
+	return []byte(ig.llvmMod.String())
 }

@@ -11,7 +11,7 @@ import (
 )
 
 func (v *Visitor) LLVMType(t symtable.SymType) llvm.Type {
-	ctx := v.ctx
+	ctx := v.llvmCtx
 	switch t {
 	case symtable.SymInt32:
 		return ctx.Int32Type()
@@ -27,30 +27,33 @@ type Visitor struct {
 	parser.BaseRustLikeParserVisitor
 
 	// llvm context
-	ctx     llvm.Context
-	mod     llvm.Module
-	builder llvm.Builder
+	llvmCtx     llvm.Context
+	llvmMod     llvm.Module
+	llvmBuilder llvm.Builder
+
+	// current llvm block
+	currentBB llvm.BasicBlock
 
 	// symbol table prepared
 	symTable     *symtable.SymTable
 	currentScope symtable.Scope
 }
 
-func NewVisitor(symTable *symtable.SymTable) (v *Visitor, cancel func()) {
+func NewVisitor(module string, symTable *symtable.SymTable) (v *Visitor, cancel func()) {
 	ctx := llvm.NewContext()
-	mod := ctx.NewModule("example") // TODO: module name
+	mod := ctx.NewModule(module)
 	builder := ctx.NewBuilder()
 
 	v = &Visitor{
-		symTable: symTable,
-		ctx:      ctx,
-		mod:      mod,
-		builder:  builder,
+		symTable:    symTable,
+		llvmCtx:     ctx,
+		llvmMod:     mod,
+		llvmBuilder: builder,
 	}
 
 	cancel = func() {
-		v.ctx.Dispose()
-		v.builder.Dispose()
+		v.llvmCtx.Dispose()
+		v.llvmBuilder.Dispose()
 	}
 
 	return
@@ -75,9 +78,9 @@ func (v *Visitor) VisitDeclaration(ctx *parser.DeclarationContext) any {
 }
 
 func (v *Visitor) VisitFuncDeclaration(ctx *parser.FuncDeclarationContext) any {
-	ret := v.Visit(ctx.FuncSignature())
-	// TODO:
-	return ret
+	v.Visit(ctx.FuncSignature())
+	v.Visit(ctx.FuncBlock())
+	return nil
 }
 
 func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
@@ -87,18 +90,25 @@ func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
 	funcSymbol := funcScope.GetSymbol()
 	log.Debugf("FuncScope: %s", funcScope.Name())
 
-	// TODO: you know do what
-	for range funcSymbol.Params() {
+	// define function
+	paramTypes := make([]llvm.Type, len(funcSymbol.Params()))
+	for i, p := range funcSymbol.Params() {
+		paramTypes[i] = v.LLVMType(p.Type())
 	}
 
-	// NOTE: 只是demo, 用于适配环境，后续需要修改
 	retType := v.LLVMType(funcSymbol.RetType())
-	fnType := llvm.FunctionType(retType, nil, false)
-	fn := llvm.AddFunction(v.mod, funcName, fnType)
-	block := v.ctx.AddBasicBlock(fn, "entry")
+	fnType := llvm.FunctionType(retType, paramTypes, false)
+	fn := llvm.AddFunction(v.llvmMod, funcName, fnType)
 
-	v.builder.SetInsertPointAtEnd(block)
-	v.builder.CreateRet(llvm.ConstInt(retType, 42, false))
+	// define function basic entry block
+	fnBlock := v.llvmCtx.AddBasicBlock(fn, "entry")
+	v.currentBB = fnBlock
+	return nil
+}
 
-	return funcScope
+func (v *Visitor) VisitFuncBlock(ctx *parser.FuncBlockContext) any {
+	for _, stat := range ctx.AllStat() {
+		v.Visit(stat)
+	}
+	return nil
 }
