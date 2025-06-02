@@ -13,13 +13,14 @@ RUN mkdir -p build && \
   go build -o build/symtable cmd/symtable/main.go && \
   go build -tags=llvm19 -o build/ir cmd/ir/main.go
 
+RUN strip build/*
+
 FROM debian:bookworm-slim AS runtime
 
 WORKDIR /runtime
 
 # timezone
 ENV TZ=Asia/Shanghai
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # llvm19, graphviz
 RUN apt-get update && apt-get install -y --no-install-recommends \
