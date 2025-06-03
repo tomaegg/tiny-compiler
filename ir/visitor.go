@@ -104,6 +104,8 @@ func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
 
 	// define function basic entry block
 	fnBlock := v.llvmCtx.AddBasicBlock(fn, "entry")
+	// TODO: insertpoint
+	v.llvmBuilder.SetInsertPointAtEnd(fnBlock)
 	v.currentBB = fnBlock
 	return nil
 }
@@ -121,6 +123,10 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	val := v.llvmBuilder.CreateAlloca(v.LLVMType(varSymbol.Type()), "var_declare_tmp")
 	SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
 	return nil
+}
+
+func (v *Visitor) VisitStatExpr(ctx *parser.StatExprContext) any {
+	return v.Visit(ctx.Expr())
 }
 
 func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
@@ -223,6 +229,6 @@ func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
 	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
 	llvmType := v.LLVMType(varSymbol.Type())
 	llvmVal := GetValue(varSymbol)
-	v.llvmBuilder.CreateLoad(llvmType, llvmVal, "load_tmp") // TODO: naming
-	return nil
+	ret := v.llvmBuilder.CreateLoad(llvmType, llvmVal, "load_tmp") // TODO: naming
+	return ret
 }
