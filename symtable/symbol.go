@@ -6,6 +6,7 @@ import (
 
 	"github.com/antlr4-go/antlr/v4"
 	log "github.com/sirupsen/logrus"
+	"tinygo.org/x/go-llvm"
 )
 
 type (
@@ -42,6 +43,8 @@ type Symbol interface {
 	Token() antlr.Token
 	Type() SymType
 	Infer(SymType)
+	SetLLVMValue(llvm.Value)
+	LLVMValue() llvm.Value
 	fmt.Stringer
 }
 
@@ -52,12 +55,25 @@ type baseSymbolImpl struct {
 	stype   SymType
 	mutable bool
 	token   antlr.Token
+
+	llvmVal llvm.Value
 }
 
 var _ Symbol = (BaseSymbol)(nil)
 
 func NewBaseSymbol(name SymName, stype SymType, mutable bool, token antlr.Token) BaseSymbol {
 	return &baseSymbolImpl{name: name, stype: stype, mutable: mutable, token: token}
+}
+
+func (bs *baseSymbolImpl) SetLLVMValue(val llvm.Value) {
+	bs.llvmVal = val
+}
+
+func (bs *baseSymbolImpl) LLVMValue() llvm.Value {
+	if bs.llvmVal.IsNil() {
+		panic(fmt.Sprintf("llvm value for symbol <%s> is nil", bs.name))
+	}
+	return bs.llvmVal
 }
 
 func (bs baseSymbolImpl) Token() antlr.Token {
@@ -95,18 +111,22 @@ func (bs *baseSymbolImpl) Infer(t SymType) {
 	bs.stype = t
 }
 
-var _ Symbol = FuncSymbol{}
+type FuncSymbol = *funcSymbolImpl
 
-type FuncSymbol struct {
+var _ Symbol = (FuncSymbol)(nil)
+
+type funcSymbolImpl struct {
 	name     SymName
 	enclosed Scope
 	params   []BaseSymbol
 	retType  SymType
 	token    antlr.Token
+
+	llvmFn llvm.Value
 }
 
 func NewFuncSymbol(name SymName, enclosed Scope, params []BaseSymbol, retType SymType, atToken antlr.Token) FuncSymbol {
-	return FuncSymbol{
+	return &funcSymbolImpl{
 		name:     name,
 		enclosed: enclosed,
 		params:   params,
@@ -115,27 +135,38 @@ func NewFuncSymbol(name SymName, enclosed Scope, params []BaseSymbol, retType Sy
 	}
 }
 
-func (f FuncSymbol) Type() SymType {
+func (f *funcSymbolImpl) SetLLVMValue(val llvm.Value) {
+	f.llvmFn = val
+}
+
+func (f *funcSymbolImpl) LLVMValue() llvm.Value {
+	if f.llvmFn.IsNil() {
+		panic(fmt.Sprintf("llvm value for function symbol <%s> is nil", f.name))
+	}
+	return f.llvmFn
+}
+
+func (f funcSymbolImpl) Type() SymType {
 	return SymFunc
 }
 
-func (f FuncSymbol) Token() antlr.Token {
+func (f funcSymbolImpl) Token() antlr.Token {
 	return f.token
 }
 
-func (f FuncSymbol) Name() SymName {
+func (f funcSymbolImpl) Name() SymName {
 	return f.name
 }
 
-func (f FuncSymbol) RetType() SymType {
+func (f funcSymbolImpl) RetType() SymType {
 	return f.retType
 }
 
-func (f FuncSymbol) Params() []BaseSymbol {
+func (f funcSymbolImpl) Params() []BaseSymbol {
 	return f.params
 }
 
-func (f FuncSymbol) String() string {
+func (f funcSymbolImpl) String() string {
 	p := make([]string, len(f.params))
 	for i, s := range f.params {
 		p[i] = s.String()
@@ -146,7 +177,7 @@ func (f FuncSymbol) String() string {
 	return s
 }
 
-func (f FuncSymbol) Infer(extType SymType) {
+func (f funcSymbolImpl) Infer(extType SymType) {
 	panic(fmt.Sprintf("cannot infer type for function symbol <%s>", f.name))
 }
 
@@ -159,6 +190,14 @@ type BasicTypeSymbol struct {
 
 func NewBasicTypeSymbol(name SymName, stype SymType) BasicTypeSymbol {
 	return BasicTypeSymbol{name: name, stype: stype}
+}
+
+func (b BasicTypeSymbol) LLVMValue() llvm.Value {
+	return llvm.Value{}
+}
+
+func (b BasicTypeSymbol) SetLLVMValue(val llvm.Value) {
+	panic(fmt.Sprintf("cannot set llvm value for basic type symbol <%s>", b.name))
 }
 
 func (b BasicTypeSymbol) Token() antlr.Token {
