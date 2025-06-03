@@ -117,13 +117,14 @@ func (v *Visitor) VisitFuncBlock(ctx *parser.FuncBlockContext) any {
 
 func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
-	val := v.llvmBuilder.CreateAlloca(v.LLVMType(varSymbol.Type()), "var_declare_tmp") // TODO: naming
-	varSymbol.SetLLVMValue(val)                                                        // 在declare时分配空间, 加入到符号表中
+	// TODO: naming
+	val := v.llvmBuilder.CreateAlloca(v.LLVMType(varSymbol.Type()), "var_declare_tmp")
+	SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
 	return nil
 }
 
 func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
-	lhsVal := v.currentScope.Resolve(ctx.ID().GetText()).LLVMValue()
+	lhsVal := GetValue(v.currentScope.Resolve(ctx.ID().GetText()))
 	rhsVal := v.Visit(ctx.Expr()).(llvm.Value)
 	v.llvmBuilder.CreateStore(rhsVal, lhsVal) // val -> value, p -> pointer
 	return nil
@@ -221,7 +222,7 @@ func (v *Visitor) VisitExprParen(ctx *parser.ExprParenContext) any {
 func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
 	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
 	llvmType := v.LLVMType(varSymbol.Type())
-	llvmVal := varSymbol.LLVMValue()
+	llvmVal := GetValue(varSymbol)
 	v.llvmBuilder.CreateLoad(llvmType, llvmVal, "load_tmp") // TODO: naming
 	return nil
 }

@@ -3,10 +3,10 @@ package symtable
 import (
 	"fmt"
 	"strings"
+	"tj-compiler/utils/kv"
 
 	"github.com/antlr4-go/antlr/v4"
 	log "github.com/sirupsen/logrus"
-	"tinygo.org/x/go-llvm"
 )
 
 type (
@@ -39,41 +39,32 @@ func (t SymType) String() string {
 }
 
 type Symbol interface {
+	kv.KeyMapInterface
 	Name() SymName
 	Token() antlr.Token
 	Type() SymType
 	Infer(SymType)
-	SetLLVMValue(llvm.Value)
-	LLVMValue() llvm.Value
 	fmt.Stringer
 }
 
 type BaseSymbol = *baseSymbolImpl
 
 type baseSymbolImpl struct {
+	*kv.KeyMap
 	name    SymName
 	stype   SymType
 	mutable bool
 	token   antlr.Token
 
-	llvmVal llvm.Value
+	extras map[string]any
 }
 
 var _ Symbol = (BaseSymbol)(nil)
 
 func NewBaseSymbol(name SymName, stype SymType, mutable bool, token antlr.Token) BaseSymbol {
-	return &baseSymbolImpl{name: name, stype: stype, mutable: mutable, token: token}
-}
-
-func (bs *baseSymbolImpl) SetLLVMValue(val llvm.Value) {
-	bs.llvmVal = val
-}
-
-func (bs *baseSymbolImpl) LLVMValue() llvm.Value {
-	if bs.llvmVal.IsNil() {
-		panic(fmt.Sprintf("llvm value for symbol <%s> is nil", bs.name))
-	}
-	return bs.llvmVal
+	ret := &baseSymbolImpl{name: name, stype: stype, mutable: mutable, token: token}
+	ret.KeyMap = kv.NewKeyMap()
+	return ret
 }
 
 func (bs baseSymbolImpl) Token() antlr.Token {
@@ -116,34 +107,24 @@ type FuncSymbol = *funcSymbolImpl
 var _ Symbol = (FuncSymbol)(nil)
 
 type funcSymbolImpl struct {
+	*kv.KeyMap
 	name     SymName
 	enclosed Scope
 	params   []BaseSymbol
 	retType  SymType
 	token    antlr.Token
-
-	llvmFn llvm.Value
 }
 
 func NewFuncSymbol(name SymName, enclosed Scope, params []BaseSymbol, retType SymType, atToken antlr.Token) FuncSymbol {
-	return &funcSymbolImpl{
+	ret := &funcSymbolImpl{
 		name:     name,
 		enclosed: enclosed,
 		params:   params,
 		retType:  retType,
 		token:    atToken,
 	}
-}
-
-func (f *funcSymbolImpl) SetLLVMValue(val llvm.Value) {
-	f.llvmFn = val
-}
-
-func (f *funcSymbolImpl) LLVMValue() llvm.Value {
-	if f.llvmFn.IsNil() {
-		panic(fmt.Sprintf("llvm value for function symbol <%s> is nil", f.name))
-	}
-	return f.llvmFn
+	ret.KeyMap = kv.NewKeyMap()
+	return ret
 }
 
 func (f funcSymbolImpl) Type() SymType {
@@ -184,20 +165,15 @@ func (f funcSymbolImpl) Infer(extType SymType) {
 var _ Symbol = BasicTypeSymbol{}
 
 type BasicTypeSymbol struct {
+	*kv.KeyMap
 	name  SymName
 	stype SymType
 }
 
 func NewBasicTypeSymbol(name SymName, stype SymType) BasicTypeSymbol {
-	return BasicTypeSymbol{name: name, stype: stype}
-}
-
-func (b BasicTypeSymbol) LLVMValue() llvm.Value {
-	return llvm.Value{}
-}
-
-func (b BasicTypeSymbol) SetLLVMValue(val llvm.Value) {
-	panic(fmt.Sprintf("cannot set llvm value for basic type symbol <%s>", b.name))
+	ret := BasicTypeSymbol{name: name, stype: stype}
+	ret.KeyMap = kv.NewKeyMap()
+	return ret
 }
 
 func (b BasicTypeSymbol) Token() antlr.Token {
