@@ -118,12 +118,27 @@ func (v *Visitor) VisitFuncBlock(ctx *parser.FuncBlockContext) any {
 	return nil
 }
 
+func (v *Visitor) VisitBlock(ctx *parser.BlockContext) any {
+	for _, stat := range ctx.AllStat() {
+		v.Visit(stat)
+	}
+	return nil
+}
+
 func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
 	// TODO: naming
 	val := v.llvmBuilder.CreateAlloca(v.LLVMType(varSymbol.Type()), "var_"+varSymbol.Name())
 	SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
 	return nil
+}
+
+func (v *Visitor) VisitStatIfElse(ctx *parser.StatIfElseContext) any {
+	return nil
+}
+
+func (v *Visitor) VisitStatBlock(ctx *parser.StatBlockContext) any {
+	return v.Visit(ctx.Block())
 }
 
 func (v *Visitor) VisitStatExpr(ctx *parser.StatExprContext) any {

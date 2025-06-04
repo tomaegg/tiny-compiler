@@ -95,6 +95,15 @@ type RustLikeParserVisitor interface {
 	// Visit a parse tree produced by RustLikeParser#StatEmpty.
 	VisitStatEmpty(ctx *StatEmptyContext) interface{}
 
+	// Visit a parse tree produced by RustLikeParser#ifBranch.
+	VisitIfBranch(ctx *IfBranchContext) interface{}
+
+	// Visit a parse tree produced by RustLikeParser#elifBranch.
+	VisitElifBranch(ctx *ElifBranchContext) interface{}
+
+	// Visit a parse tree produced by RustLikeParser#elseBranch.
+	VisitElseBranch(ctx *ElseBranchContext) interface{}
+
 	// Visit a parse tree produced by RustLikeParser#varType.
 	VisitVarType(ctx *VarTypeContext) interface{}
 

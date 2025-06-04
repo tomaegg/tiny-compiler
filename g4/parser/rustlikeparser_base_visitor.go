@@ -124,6 +124,18 @@ func (v *BaseRustLikeParserVisitor) VisitStatEmpty(ctx *StatEmptyContext) interf
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRustLikeParserVisitor) VisitIfBranch(ctx *IfBranchContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRustLikeParserVisitor) VisitElifBranch(ctx *ElifBranchContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRustLikeParserVisitor) VisitElseBranch(ctx *ElseBranchContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRustLikeParserVisitor) VisitVarType(ctx *VarTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }

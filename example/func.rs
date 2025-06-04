@@ -23,6 +23,17 @@ fn relation() -> i32 {
 }
 
 fn goo() -> i32 {
+    let a;
+    a = 1;
+
+    {
+        a = a + a;
+        a = a * a - 1;
+        {
+            return a;
+        }
+    }
+
     return foo();
 }
 

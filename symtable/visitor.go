@@ -390,14 +390,21 @@ func (v *Visitor) VisitStatLoop(ctx *parser.StatLoopContext) any {
 }
 
 func (v *Visitor) VisitStatIfElse(ctx *parser.StatIfElseContext) any {
-	for i, expr := range ctx.AllExpr() {
-		v.Visit(expr)
-		v.Visit(ctx.Block(i))
+	// if branch
+	v.Visit(ctx.IfBranch().Expr())
+	v.Visit(ctx.IfBranch().Block())
+
+	// else if branch
+	for _, b := range ctx.AllElifBranch() {
+		v.Visit(b.Expr())
+		v.Visit(b.Block())
 	}
 
-	// expr 会比 block 少一个
-	blocks := ctx.AllBlock()
-	v.Visit(blocks[len(blocks)-1])
+	// else branch
+	if ctx.ElseBranch() != nil {
+		v.Visit(ctx.ElseBranch().Block())
+	}
+
 	return nil
 }
 
