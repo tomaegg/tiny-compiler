@@ -1,6 +1,8 @@
 package ir
 
-import "tj-compiler/symtable"
+import (
+	"tj-compiler/symtable"
+)
 
 type IRGenerator struct {
 	*Visitor

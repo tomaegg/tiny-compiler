@@ -32,10 +32,7 @@ func main() {
 	tokens := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 
 	parser := parser.NewRustLikeParser(tokens)
-	tree := parser.Prog() // 假设起始规则是 `expr`
-
-	log.Println("[Parsing Tree]")
-	log.Println(tree.ToStringTree(nil, parser))
+	tree := parser.Prog()
 
 	checker := symtable.NewSemanticChecker(tree)
 	if total := checker.TotalErrors(); total != 0 {
@@ -45,10 +42,6 @@ func main() {
 	log.Info("semantic check passed")
 
 	symTable := checker.SymbolTable()
-	dot := symTable.ToDotGraph()
-
-	log.Println("[Dot Graph]")
-	fmt.Println(string(dot))
 
 	irGenerator, cancel := ir.NewIRGenerator(filename, symTable)
 	defer cancel()

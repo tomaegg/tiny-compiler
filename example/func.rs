@@ -1,3 +1,19 @@
+fn ifelse() {
+    let mut a;
+    a = 1;
+    if a == 0 {
+        a = a + 1;
+        if a {
+            a = a - 1;
+        }
+    }else {
+        a = a * a;
+    }
+
+    a = a * 9;
+    (a);
+}
+
 fn foo() -> i32 {
     let mut a;
     a = 1;

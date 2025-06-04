@@ -1,6 +1,7 @@
 package ir
 
 import (
+	"fmt"
 	"tj-compiler/g4/parser"
 	"tj-compiler/symtable"
 
@@ -32,11 +33,14 @@ type Visitor struct {
 	llvmBuilder llvm.Builder
 
 	// current llvm block
-	currentBB llvm.BasicBlock
+	currentFn llvm.Value
 
 	// symbol table prepared
 	symTable     *symtable.SymTable
 	currentScope symtable.Scope
+
+	// if count
+	counter map[string]int
 }
 
 func NewVisitor(module string, symTable *symtable.SymTable) (v *Visitor, cancel func()) {
@@ -49,6 +53,7 @@ func NewVisitor(module string, symTable *symtable.SymTable) (v *Visitor, cancel 
 		llvmCtx:     ctx,
 		llvmMod:     mod,
 		llvmBuilder: builder,
+		counter:     make(map[string]int),
 	}
 
 	cancel = func() {
@@ -67,6 +72,9 @@ func (v *Visitor) VisitProg(ctx *parser.ProgContext) any {
 	v.currentScope = v.symTable.GlobalScope()
 	ret := v.Visit(ctx.Declaration())
 	v.currentScope = v.currentScope.Enclosed()
+
+	// check module
+	// llvm.VerifyModule(v.llvmMod, llvm.AbortProcessAction)
 	return ret
 }
 
@@ -78,10 +86,15 @@ func (v *Visitor) VisitDeclaration(ctx *parser.DeclarationContext) any {
 }
 
 func (v *Visitor) VisitFuncDeclaration(ctx *parser.FuncDeclarationContext) any {
-	v.currentScope = v.symTable.Scope(ctx.FuncSignature().ID().GetText())
+	funcName := ctx.FuncSignature().ID().GetText()
+	v.currentScope = v.symTable.Scope(funcName)
 	v.Visit(ctx.FuncSignature())
 	v.Visit(ctx.FuncBlock())
 	v.currentScope = v.currentScope.Enclosed()
+
+	// check function
+	fn := v.llvmMod.NamedFunction(funcName)
+	llvm.VerifyFunction(fn, llvm.PrintMessageAction)
 	return nil
 }
 
@@ -107,8 +120,8 @@ func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
 	// define function basic entry block
 	fnBlock := v.llvmCtx.AddBasicBlock(fn, "entry")
 	v.llvmBuilder.SetInsertPointAtEnd(fnBlock)
-	v.currentBB = fnBlock
-	return nil
+	v.currentFn = fn
+	return fnType
 }
 
 func (v *Visitor) VisitFuncBlock(ctx *parser.FuncBlockContext) any {
@@ -127,13 +140,46 @@ func (v *Visitor) VisitBlock(ctx *parser.BlockContext) any {
 
 func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
-	// TODO: naming
 	val := v.llvmBuilder.CreateAlloca(v.LLVMType(varSymbol.Type()), "var_"+varSymbol.Name())
 	SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
 	return nil
 }
 
+// TODO: else if block
 func (v *Visitor) VisitStatIfElse(ctx *parser.StatIfElseContext) any {
+	label := func(l string) string {
+		ret := fmt.Sprintf("if.%s.%d", l, v.counter[l])
+		v.counter[l]++
+		return ret
+	}
+
+	// if condition
+	ifCondi := v.Visit(ctx.IfBranch().Expr()).(llvm.Value)
+
+	// merge block
+	mergeBlock := v.llvmCtx.AddBasicBlock(v.currentFn, label("merge"))
+	// then block
+	thenBlock := v.llvmCtx.AddBasicBlock(v.currentFn, label("then"))
+	// else block, 无论是否存在，创建空的即可
+	elseBlock := v.llvmCtx.AddBasicBlock(v.currentFn, label("else"))
+
+	v.llvmBuilder.CreateCondBr(ifCondi, thenBlock, elseBlock)
+
+	// 填充块
+	// then block
+	v.llvmBuilder.SetInsertPointAtEnd(thenBlock)
+	v.Visit(ctx.IfBranch().Block())
+	v.llvmBuilder.CreateBr(mergeBlock)
+
+	// else block
+	if ctx.ElseBranch() != nil {
+		v.llvmBuilder.SetInsertPointAtEnd(elseBlock)
+		v.Visit(ctx.ElseBranch().Block())
+		v.llvmBuilder.CreateBr(mergeBlock)
+	}
+
+	// go to merge block
+	v.llvmBuilder.SetInsertPointAtEnd(mergeBlock)
 	return nil
 }
 
@@ -153,8 +199,10 @@ func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 }
 
 func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
-	val := v.Visit(ctx.Expr()).(llvm.Value)
-	return v.llvmBuilder.CreateRet(val)
+	_ = v.Visit(ctx.Expr()).(llvm.Value)
+
+	// TODO: how to organize return
+	return nil
 }
 
 func (v *Visitor) VisitExprNum(ctx *parser.ExprNumContext) any {
