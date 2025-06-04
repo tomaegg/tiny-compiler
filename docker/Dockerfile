@@ -24,7 +24,7 @@ ENV TZ=Asia/Shanghai
 
 # llvm19, graphviz
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  llvm-19 graphviz && apt-get clean && rm -rf /var/lib/apt/lists/*
+  llvm-19-runtime graphviz && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/build/* /runtime/
 
