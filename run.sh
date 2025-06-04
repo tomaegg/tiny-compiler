@@ -15,7 +15,7 @@ case "$1" in
   ;;
 "parser" | "symtable" | "ir" | "dot")
   mkdir -p output
-  docker run \
+  docker run --rm \
     -v "$(pwd)/example:/runtime/example" \
     -v "$(pwd)/output:/runtime/output" \
     tiny-compiler:latest "$@"
