@@ -11,7 +11,7 @@ case "$1" in
   docker save -o "$EXPORT_IMAGE" "$IMAGE_NAME"
   ;;
 "build")
-  docker build -t "$IMAGE_NAME" -f docker/Dockerfile .
+  DOCKER_BUILDKIT=1 docker build -t "$IMAGE_NAME" -f docker/Dockerfile .
   ;;
 "parser" | "symtable" | "ir" | "dot")
   mkdir -p output

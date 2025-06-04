@@ -3,7 +3,7 @@ FROM golang:1.24-bookworm AS builder
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  llvm-19 llvm-19-dev && \
+  llvm-19 llvm-19-dev make && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # use go build cache
@@ -11,12 +11,8 @@ COPY go.mod go.sum ./
 RUN  go mod download
 COPY . .
 
-RUN mkdir -p build && \
-  go build -o build/parser cmd/parser/main.go && \
-  go build -o build/symtable cmd/symtable/main.go && \
-  go build -tags=llvm19 -o build/ir cmd/ir/main.go
-
-RUN strip build/*
+# paralle build with make
+RUN make --file docker/Makefile --jobs $(nproc)
 
 FROM debian:bookworm-slim AS runtime
 
