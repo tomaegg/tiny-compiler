@@ -25,10 +25,16 @@ type Visitor struct {
 	globalScope  Scope
 	currentScope Scope
 	symTable     *SymTable
+
+	errorCount int
 }
 
 func NewVisitor() *Visitor {
 	return &Visitor{}
+}
+
+func (v Visitor) TotalError() int {
+	return v.errorCount
 }
 
 func (v *Visitor) LogDefine(s Symbol) {
@@ -46,6 +52,7 @@ func (v *Visitor) LogResolve(res Symbol, atToken antlr.Token) {
 }
 
 func (v *Visitor) LogError(err SemanticErr, atToken antlr.Token) {
+	v.errorCount++
 	line, col := atToken.GetLine(), atToken.GetColumn()
 	log.Errorf("[%02d:%02d] %s", line, col, err)
 }
@@ -55,7 +62,18 @@ func (v *Visitor) LogInfer(s Symbol, at antlr.Token) {
 		at.GetLine(), at.GetColumn(), s)
 }
 
-func (v *Visitor) checkUninferredSym(scope Scope) {
+func (v *Visitor) checkFuncReturn(scope FuncScope) {
+	funcSymbol := scope.GetSymbol()
+	returned := scope.HasReturn()
+	funcHasReturn := funcSymbol.RetType() != SymVoid
+	if funcHasReturn && !returned {
+		err := NewSematicErr(RetErr).
+			Message("FuncScope <%s> should have return statement, but not", funcSymbol.Name())
+		v.LogError(err, funcSymbol.Token())
+	}
+}
+
+func (v *Visitor) checkUninferredSymbol(scope Scope) {
 	for _, sym := range scope.Symbols() {
 		if sym.Type() == SymToInfer {
 			err := NewSematicErr(TypeErr).
@@ -87,7 +105,7 @@ func (v *Visitor) VisitBlock(ctx *parser.BlockContext) any {
 		v.Visit(stat)
 	}
 	// 退出块作用域前检查未推断类型
-	v.checkUninferredSym(v.currentScope)
+	v.checkUninferredSymbol(v.currentScope)
 	v.currentScope = v.currentScope.Enclosed()
 	return nil
 }
@@ -168,9 +186,12 @@ func (v *Visitor) VisitFuncDeclaration(ctx *parser.FuncDeclarationContext) any {
 
 	ret := v.Visit(ctx.FuncBlock())
 
-	v.checkUninferredSym(v.currentScope)
-	v.currentScope = v.currentScope.Enclosed()
+	// check uninferred
+	v.checkUninferredSymbol(v.currentScope)
+	// check func return
+	v.checkFuncReturn(funcScope)
 
+	v.currentScope = v.currentScope.Enclosed()
 	return ret
 }
 
@@ -206,6 +227,8 @@ func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
 		v.LogError(err, tokenRet)
 	}
 
+	// func scope returned
+	funcScope.SetReturn()
 	return nil
 }
 

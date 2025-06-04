@@ -7,6 +7,9 @@ fn foo2() -> i32{
     return;
 }
 
+fn foo3() -> i32{
+}
+
 fn program_3_1__1(mut param:i32) {
     {
         foo1(1,1,1);

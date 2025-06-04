@@ -38,6 +38,12 @@ func main() {
 	log.Println(tree.ToStringTree(nil, parser))
 
 	checker := symtable.NewSemanticChecker(tree)
+	if total := checker.TotalErrors(); total != 0 {
+		log.Fatalf("total %d errors occurs, semantic check done", total)
+		return
+	}
+	log.Info("semantic check passed")
+
 	symTable := checker.SymbolTable()
 	dot := symTable.ToDotGraph()
 

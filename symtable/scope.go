@@ -140,11 +140,20 @@ var _ Scope = (FuncScope)(nil)
 
 type funcScopeImpl struct {
 	*baseScope
-	f FuncSymbol
+	f         FuncSymbol
+	hasReturn bool // scope中是否完成return
 }
 
 func NewFuncScope(enclosed Scope, name string) FuncScope {
 	return &funcScopeImpl{baseScope: newBaseScope(name, enclosed)}
+}
+
+func (s *funcScopeImpl) SetReturn() {
+	s.hasReturn = true
+}
+
+func (s *funcScopeImpl) HasReturn() bool {
+	return s.hasReturn
 }
 
 func (s funcScopeImpl) String() string {
