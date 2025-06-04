@@ -8,6 +8,11 @@ fn foo() -> i32 {
     return 1;
 }
 
+fn goo() -> i32 {
+    return foo();
+}
+
 fn main() -> i32 {
+    foo();
     return 0;
 }

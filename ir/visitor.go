@@ -101,10 +101,11 @@ func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
 	retType := v.LLVMType(funcSymbol.RetType())
 	fnType := llvm.FunctionType(retType, paramTypes, false)
 	fn := llvm.AddFunction(v.llvmMod, funcName, fnType)
+	// bind function type with symbol
+	SetType(funcSymbol, fnType)
 
 	// define function basic entry block
 	fnBlock := v.llvmCtx.AddBasicBlock(fn, "entry")
-	// TODO: insertpoint
 	v.llvmBuilder.SetInsertPointAtEnd(fnBlock)
 	v.currentBB = fnBlock
 	return nil
@@ -120,7 +121,7 @@ func (v *Visitor) VisitFuncBlock(ctx *parser.FuncBlockContext) any {
 func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
 	// TODO: naming
-	val := v.llvmBuilder.CreateAlloca(v.LLVMType(varSymbol.Type()), "var_declare_tmp")
+	val := v.llvmBuilder.CreateAlloca(v.LLVMType(varSymbol.Type()), "var_"+varSymbol.Name())
 	SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
 	return nil
 }
@@ -136,6 +137,11 @@ func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 	return nil
 }
 
+func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
+	val := v.Visit(ctx.Expr()).(llvm.Value)
+	return v.llvmBuilder.CreateRet(val)
+}
+
 func (v *Visitor) VisitExprNum(ctx *parser.ExprNumContext) any {
 	val := llvm.ConstIntFromString(v.llvmCtx.Int32Type(), ctx.GetText(), 10)
 	return val
@@ -148,9 +154,9 @@ func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
 	// NOTE: 目前值只有INT32
 	switch ctx.GetOp().GetTokenType() {
 	case parser.RustLikeLexerPLUS:
-		ret = v.llvmBuilder.CreateAdd(lhs, rhs, "add_tmp") // TODO: naming
+		ret = v.llvmBuilder.CreateAdd(lhs, rhs, "tAdd")
 	case parser.RustLikeLexerMINUS:
-		ret = v.llvmBuilder.CreateSub(lhs, rhs, "sub_tmp") // TODO: naming
+		ret = v.llvmBuilder.CreateSub(lhs, rhs, "tSub")
 	default:
 		panic("should not get token other than +,-")
 	}
@@ -196,9 +202,9 @@ func (v *Visitor) VisitExprMulDiv(ctx *parser.ExprMulDivContext) any {
 	// NOTE: 目前值只有INT32
 	switch ctx.GetOp().GetTokenType() {
 	case parser.RustLikeLexerMULT:
-		ret = v.llvmBuilder.CreateMul(lhs, rhs, "mult_mp") // TODO: naming
+		ret = v.llvmBuilder.CreateMul(lhs, rhs, "tMult")
 	case parser.RustLikeLexerDIV:
-		ret = v.llvmBuilder.CreateSDiv(lhs, rhs, "div_tmp") // TODO: naming
+		ret = v.llvmBuilder.CreateSDiv(lhs, rhs, "tDiv")
 	default:
 		panic("should not get token other than *,/")
 	}
@@ -215,10 +221,19 @@ func (v *Visitor) VisitFuncCallList(ctx *parser.FuncCallListContext) any {
 }
 
 func (v *Visitor) VisitExprFuncCall(ctx *parser.ExprFuncCallContext) any {
+	// get function type
+	funcSymbol := v.currentScope.Resolve(ctx.ID().GetText())
+	fnType := GetType(funcSymbol)
+	if fnType.IsNil() {
+		log.Panicf("should not get nil function type for: %s", ctx.ID().GetText())
+	}
 	fn := v.llvmMod.NamedFunction(ctx.ID().GetText())
-	retType := fn.CalledFunctionType().ReturnType()
+	if fnType.IsNil() {
+		log.Panicf("should not get nil function value for: %s", ctx.ID().GetText())
+	}
+	log.Debugf("LLVM call function: %s", fnType.String())
 	args := v.Visit(ctx.FuncCallList()).([]llvm.Value)
-	return v.llvmBuilder.CreateCall(retType, fn, args, "func_call_tmp") // TODO: naming
+	return v.llvmBuilder.CreateCall(fnType, fn, args, "retCall"+funcSymbol.Name())
 }
 
 func (v *Visitor) VisitExprParen(ctx *parser.ExprParenContext) any {
@@ -229,6 +244,6 @@ func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
 	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
 	llvmType := v.LLVMType(varSymbol.Type())
 	llvmVal := GetValue(varSymbol)
-	ret := v.llvmBuilder.CreateLoad(llvmType, llvmVal, "load_tmp") // TODO: naming
+	ret := v.llvmBuilder.CreateLoad(llvmType, llvmVal, "tLoad")
 	return ret
 }
