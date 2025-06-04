@@ -6,7 +6,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   llvm-19 llvm-19-dev && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY . /app
+# use go build cache
+COPY go.mod go.sum ./
+RUN  go mod download
+COPY . .
 
 RUN mkdir -p build && \
   go build -o build/parser cmd/parser/main.go && \
