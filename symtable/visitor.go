@@ -243,7 +243,13 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	}
 	mutable := ctx.MUT() != nil
 	varSymbol := NewBaseSymbol(tokenID.GetText(), varType, mutable, tokenID)
-	v.currentScope.Define(varSymbol)
+
+	if v.currentScope.Exist(varSymbol) {
+		v.currentScope.Shallow(varSymbol)
+	} else {
+		v.currentScope.Define(varSymbol)
+	}
+
 	v.LogDefine(varSymbol)
 
 	// varinit exist

@@ -15,7 +15,8 @@ type Scope interface {
 	Resolve(SymName) Symbol // 解析符号表
 	Symbols() ScopeSymTable // 获得符号
 	Enclosed() Scope        // 所依附的Scope
-	Exist(Symbol) bool      // 某个符号是否存在
+	Shallow(Symbol)
+	Exist(Symbol) bool // 某个符号是否存在
 	fmt.Stringer
 }
 
@@ -74,6 +75,11 @@ func (s *baseScope) Define(sym Symbol) {
 		msg := fmt.Sprintf("must not redefined symbol: %s", sym.Name())
 		panic(msg)
 	}
+	s.table[sym.Name()] = sym
+}
+
+func (s *baseScope) Shallow(sym Symbol) {
+	// 直接覆盖当前作用域的符号
 	s.table[sym.Name()] = sym
 }
 
