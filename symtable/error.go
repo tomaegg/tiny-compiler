@@ -35,4 +35,5 @@ const (
 	IntOverflowErr SemanticErrType = "IntOverflowError"
 	ArgsErr        SemanticErrType = "ArgsError"
 	RetErr         SemanticErrType = "RetError"
+	BreakErr       SemanticErrType = "BreakErr"
 )

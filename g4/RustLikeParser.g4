@@ -41,6 +41,7 @@ block: LBRACE stat* RBRACE;
 stat:
 	block									# StatBlock
 	| RETURN expr? SEMI						# StatFuncReturn
+	| BREAK SEMI							# StatBreak
 	| LET MUT? ID varType? varInit? SEMI	# StatVarDeclare
 	| ID ASSIGN expr SEMI					# StatVarAssign
 	| expr SEMI								# StatExpr

@@ -275,6 +275,11 @@ func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
 	return nil
 }
 
+func (v *Visitor) VisitStatWhile(ctx *parser.StatWhileContext) any {
+	// TODO
+	return nil
+}
+
 func (v *Visitor) VisitExprNum(ctx *parser.ExprNumContext) any {
 	val := llvm.ConstIntFromString(v.llvmCtx.Int32Type(), ctx.GetText(), 10)
 	return val

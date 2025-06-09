@@ -1,4 +1,4 @@
-package stack
+package dsa
 
 type Stack[T any] struct {
 	keys []T

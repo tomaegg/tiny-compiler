@@ -96,6 +96,10 @@ func (v *BaseRustLikeParserVisitor) VisitStatFuncReturn(ctx *StatFuncReturnConte
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRustLikeParserVisitor) VisitStatBreak(ctx *StatBreakContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRustLikeParserVisitor) VisitStatVarDeclare(ctx *StatVarDeclareContext) interface{} {
 	return v.VisitChildren(ctx)
 }

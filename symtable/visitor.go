@@ -27,6 +27,8 @@ type Visitor struct {
 	symTable     *SymTable
 
 	errorCount int
+
+	loopDepth int // loop 相关的层数
 }
 
 func NewVisitor() *Visitor {
@@ -378,14 +380,26 @@ func (v *Visitor) VisitStatExpr(ctx *parser.StatExprContext) any {
 	return v.Visit(ctx.Expr())
 }
 
+func (v *Visitor) VisitStatBreak(ctx *parser.StatBreakContext) any {
+	if v.loopDepth <= 0 {
+		err := NewSematicErr(BreakErr).Message("break outside loop")
+		v.LogError(err, ctx.BREAK().GetSymbol())
+	}
+	return nil
+}
+
 func (v *Visitor) VisitStatWhile(ctx *parser.StatWhileContext) any {
 	v.Visit(ctx.Expr())
+	v.loopDepth++
 	v.Visit(ctx.Block())
+	v.loopDepth--
 	return nil
 }
 
 func (v *Visitor) VisitStatLoop(ctx *parser.StatLoopContext) any {
+	v.loopDepth++
 	v.Visit(ctx.Block())
+	v.loopDepth--
 	return nil
 }
 
