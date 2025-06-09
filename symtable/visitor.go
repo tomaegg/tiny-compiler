@@ -197,13 +197,7 @@ func (v *Visitor) VisitFuncDeclaration(ctx *parser.FuncDeclarationContext) any {
 
 func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
 	// NOTE: 获取func scope, 通过scope链条向上查找
-	var funcScope FuncScope
-	for s := range Iter(v.currentScope) {
-		if _, ok := s.(FuncScope); ok {
-			funcScope = s.(FuncScope)
-			break
-		}
-	}
+	funcScope := GetFuncScope(v.currentScope)
 	if funcScope == nil {
 		err := NewSematicErr(RetErr).Message("return statement not in function scope")
 		v.LogError(err, ctx.RETURN().GetSymbol())

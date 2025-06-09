@@ -41,6 +41,8 @@ type Visitor struct {
 
 	// if count
 	counter map[string]int
+	// error count
+	errorCount int
 }
 
 func NewVisitor(module string, symTable *symtable.SymTable) (v *Visitor, cancel func()) {
@@ -62,6 +64,12 @@ func NewVisitor(module string, symTable *symtable.SymTable) (v *Visitor, cancel 
 	}
 
 	return
+}
+
+func (v *Visitor) LogError(err symtable.SemanticErr, atToken antlr.Token) {
+	v.errorCount++
+	line, col := atToken.GetLine(), atToken.GetColumn()
+	log.Errorf("[%02d:%02d] %s", line, col, err)
 }
 
 func (v *Visitor) Visit(tree antlr.ParseTree) any {
@@ -87,10 +95,38 @@ func (v *Visitor) VisitDeclaration(ctx *parser.DeclarationContext) any {
 
 func (v *Visitor) VisitFuncDeclaration(ctx *parser.FuncDeclarationContext) any {
 	funcName := ctx.FuncSignature().ID().GetText()
-	v.currentScope = v.symTable.Scope(funcName)
+	funcScope := v.symTable.Scope(funcName).(symtable.FuncScope)
+	funcSymbol := funcScope.GetSymbol()
+	v.currentScope = funcScope
 	v.Visit(ctx.FuncSignature())
 	v.Visit(ctx.FuncBlock())
 	v.currentScope = v.currentScope.Enclosed()
+
+	// 对于return void 为每一个basic block添加return, 针对void函数
+	isVoid := GetType(funcSymbol).ReturnType() == v.llvmCtx.VoidType()
+	for _, bb := range v.currentFn.BasicBlocks() {
+		inst := bb.LastInstruction()
+		if inst.IsNil() {
+			// 意味着空语句，create unreachable
+			v.llvmBuilder.SetInsertPointAtEnd(bb)
+			v.llvmBuilder.CreateUnreachable()
+			log.Debug("found nil inst, created unreachable tag")
+			continue
+		}
+		if IsATerminator(inst) {
+			continue
+		}
+		if !isVoid {
+			err := symtable.NewSematicErr(symtable.RetErr).
+				Message("missing return in function")
+			v.LogError(err, ctx.FuncSignature().ID().GetSymbol())
+			log.Fatal("error detected, aborted")
+		}
+
+		// 修复return
+		v.llvmBuilder.SetInsertPointAtEnd(bb)
+		v.llvmBuilder.CreateRetVoid()
+	}
 
 	// check function
 	fn := v.llvmMod.NamedFunction(funcName)
@@ -125,17 +161,35 @@ func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
 }
 
 func (v *Visitor) VisitFuncBlock(ctx *parser.FuncBlockContext) any {
-	for _, stat := range ctx.AllStat() {
-		v.Visit(stat)
-	}
-	return nil
+	return v.flattenBlock(ctx.AllStat())
 }
 
 func (v *Visitor) VisitBlock(ctx *parser.BlockContext) any {
-	for _, stat := range ctx.AllStat() {
-		v.Visit(stat)
+	return v.flattenBlock(ctx.AllStat())
+}
+
+// true: 发现function return
+// false: 没有发现function return
+func (v *Visitor) flattenBlock(stats []parser.IStatContext) bool {
+	// 去除嵌套作用域, 也就是StatBlock得到的序列
+	for _, stat := range stats {
+		switch stat := stat.(type) {
+		case *parser.StatFuncReturnContext:
+			v.Visit(stat)
+			token := stat.GetStart()
+			log.Debugf("[%d:%d] first return found in block near token <%s>, block ends",
+				token.GetLine(), token.GetColumn(), token.GetText(),
+			)
+			return true // 代表找到了了function return
+		case *parser.StatBlockContext: // block则进行flatten
+			if v.Visit(stat.Block()).(bool) {
+				return true
+			}
+		default:
+			v.Visit(stat)
+		}
 	}
-	return nil
+	return false
 }
 
 func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
@@ -143,6 +197,17 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	val := v.llvmBuilder.CreateAlloca(v.LLVMType(varSymbol.Type()), "var_"+varSymbol.Name())
 	SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
 	return nil
+}
+
+func (v *Visitor) getCondi(value llvm.Value) llvm.Value {
+	width := value.Type().IntTypeWidth()
+	if width > 1 {
+		// 整数 -> i1：通过比较非零实现
+		zero := llvm.ConstInt(value.Type(), 0, false)
+		return v.llvmBuilder.CreateICmp(llvm.IntNE, value, zero, "cmp")
+	}
+	// i1 无需转换
+	return value
 }
 
 // TODO: else if block
@@ -154,7 +219,8 @@ func (v *Visitor) VisitStatIfElse(ctx *parser.StatIfElseContext) any {
 	}
 
 	// if condition
-	ifCondi := v.Visit(ctx.IfBranch().Expr()).(llvm.Value)
+	ifCondiValue := v.Visit(ctx.IfBranch().Expr()).(llvm.Value)
+	ifCondi := v.getCondi(ifCondiValue)
 
 	// merge block
 	mergeBlock := v.llvmCtx.AddBasicBlock(v.currentFn, label("merge"))
@@ -168,14 +234,16 @@ func (v *Visitor) VisitStatIfElse(ctx *parser.StatIfElseContext) any {
 	// 填充块
 	// then block
 	v.llvmBuilder.SetInsertPointAtEnd(thenBlock)
-	v.Visit(ctx.IfBranch().Block())
-	v.llvmBuilder.CreateBr(mergeBlock)
+	if !v.Visit(ctx.IfBranch().Block()).(bool) {
+		v.llvmBuilder.CreateBr(mergeBlock)
+	}
 
 	// else block
 	if ctx.ElseBranch() != nil {
 		v.llvmBuilder.SetInsertPointAtEnd(elseBlock)
-		v.Visit(ctx.ElseBranch().Block())
-		v.llvmBuilder.CreateBr(mergeBlock)
+		if !v.Visit(ctx.ElseBranch().Block()).(bool) {
+			v.llvmBuilder.CreateBr(mergeBlock)
+		}
 	}
 
 	// go to merge block
@@ -199,9 +267,11 @@ func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 }
 
 func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
-	_ = v.Visit(ctx.Expr()).(llvm.Value)
-
-	// TODO: how to organize return
+	if ctx.Expr() == nil {
+		return v.llvmBuilder.CreateRetVoid()
+	}
+	val := v.Visit(ctx.Expr()).(llvm.Value)
+	v.llvmBuilder.CreateRet(val)
 	return nil
 }
 

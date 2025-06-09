@@ -174,3 +174,14 @@ func (s *funcScopeImpl) SetSymbol(f FuncSymbol) {
 func (s *funcScopeImpl) GetSymbol() FuncSymbol {
 	return s.f
 }
+
+func GetFuncScope(start Scope) FuncScope {
+	var funcScope FuncScope
+	for s := range Iter(start) {
+		if _, ok := s.(FuncScope); ok {
+			funcScope = s.(FuncScope)
+			break
+		}
+	}
+	return funcScope
+}

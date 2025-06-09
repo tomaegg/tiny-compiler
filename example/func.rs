@@ -1,3 +1,11 @@
+fn path() -> i32{
+    let mut a = 1;
+    if a {
+        return a;
+    }
+    return a - 1;
+}
+
 fn ifelse() {
     let mut a;
     a = 1;
