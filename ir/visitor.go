@@ -45,7 +45,7 @@ type Visitor struct {
 	// error count
 	errorCount int
 	// loop Basic Block
-	loopBB dsa.Stack[llvm.BasicBlock]
+	loopBB dsa.Stack[[2]llvm.BasicBlock] // (exit, header)
 }
 
 func NewVisitor(module string, symTable *symtable.SymTable) (v *Visitor, cancel func()) {
@@ -109,6 +109,13 @@ func (v *Visitor) VisitFuncDeclaration(ctx *parser.FuncDeclarationContext) any {
 	isVoid := GetType(funcSymbol).ReturnType() == v.llvmCtx.VoidType()
 	for _, bb := range v.currentFn.BasicBlocks() {
 		inst := bb.LastInstruction()
+		if isVoid && !IsATerminator(inst) { // 如果是void, 那么优先加return而不是unreachable
+			// 修复return
+			v.llvmBuilder.SetInsertPointAtEnd(bb)
+			v.llvmBuilder.CreateRetVoid()
+			continue
+		}
+
 		if inst.IsNil() {
 			// 意味着空语句，create unreachable
 			v.llvmBuilder.SetInsertPointAtEnd(bb)
@@ -119,16 +126,10 @@ func (v *Visitor) VisitFuncDeclaration(ctx *parser.FuncDeclarationContext) any {
 		if IsATerminator(inst) {
 			continue
 		}
-		if !isVoid {
-			err := symtable.NewSematicErr(symtable.RetErr).
-				Message("missing return in function, basic block: %s", bb.AsValue().String())
-			v.LogError(err, ctx.FuncSignature().ID().GetSymbol())
-			log.Fatal("unrecoverable error detected, aborted")
-		}
-
-		// 修复return
-		v.llvmBuilder.SetInsertPointAtEnd(bb)
-		v.llvmBuilder.CreateRetVoid()
+		err := symtable.NewSematicErr(symtable.RetErr).
+			Message("missing return in function, basic block: %s", bb.AsValue().String())
+		v.LogError(err, ctx.FuncSignature().ID().GetSymbol())
+		log.Fatal("unrecoverable error detected, aborted")
 	}
 
 	// check function
@@ -191,6 +192,13 @@ func (v *Visitor) flattenBlock(stats []parser.IStatContext) bool {
 				token.GetLine(), token.GetColumn(), token.GetText(),
 			)
 			return true // 代表找到了了break
+		case *parser.StatContinueContext:
+			v.Visit(stat)
+			token := stat.GetStart()
+			log.Debugf("[%d:%d] first continue found in block near token <%s>, block ends",
+				token.GetLine(), token.GetColumn(), token.GetText(),
+			)
+			return true // 代表找到了了continue
 		case *parser.StatBlockContext: // block则进行flatten
 			if v.Visit(stat.Block()).(bool) {
 				return true
@@ -239,8 +247,10 @@ func (v *Visitor) VisitStatIfElse(ctx *parser.StatIfElseContext) any {
 	mergeBlock := v.llvmCtx.AddBasicBlock(v.currentFn, label("merge"))
 	// then block
 	thenBlock := v.llvmCtx.AddBasicBlock(v.currentFn, label("then"))
-	// else block, 无论是否存在，创建空的即可
-	elseBlock := v.llvmCtx.AddBasicBlock(v.currentFn, label("else"))
+	elseBlock := mergeBlock
+	if ctx.ElseBranch() != nil {
+		elseBlock = v.llvmCtx.AddBasicBlock(v.currentFn, label("else"))
+	}
 
 	v.llvmBuilder.CreateCondBr(ifCondi, thenBlock, elseBlock)
 
@@ -290,18 +300,19 @@ func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
 
 func (v *Visitor) VisitStatLoop(ctx *parser.StatLoopContext) any {
 	// create a basic block
-	loopBB := v.llvmCtx.AddBasicBlock(v.currentFn, "loop_body")
+	loopBody := v.llvmCtx.AddBasicBlock(v.currentFn, "loop_body")
+	loopHeader := loopBody
 	// else block, 无论是否存在，创建空的即可
 	exitBlock := v.llvmCtx.AddBasicBlock(v.currentFn, ("loop_exit"))
-	v.llvmBuilder.CreateBr(loopBB) // branch to loop basic block
-	v.llvmBuilder.SetInsertPointAtEnd(loopBB)
+	v.llvmBuilder.CreateBr(loopBody) // branch to loop basic block
+	v.llvmBuilder.SetInsertPointAtEnd(loopBody)
 
 	// push block
-	v.loopBB.Push(exitBlock)
+	v.loopBB.Push([2]llvm.BasicBlock{exitBlock, loopHeader}) // exit, header
 
 	if !v.Visit(ctx.Block()).(bool) {
 		// 加入回边
-		v.llvmBuilder.CreateBr(loopBB) // branch to itself
+		v.llvmBuilder.CreateBr(loopBody) // branch to itself
 	}
 
 	v.loopBB.Pop()
@@ -312,14 +323,47 @@ func (v *Visitor) VisitStatLoop(ctx *parser.StatLoopContext) any {
 	return nil
 }
 
-func (v *Visitor) VisitStatBreak(ctx *parser.StatBreakContext) any {
-	// peek but not pop
-	exitBlock := v.loopBB.Top()
-	v.llvmBuilder.CreateBr(exitBlock)
+func (v *Visitor) VisitStatWhile(ctx *parser.StatWhileContext) any {
+	whileHeader := v.llvmCtx.AddBasicBlock(v.currentFn, "while.header")
+	whileBody := v.llvmCtx.AddBasicBlock(v.currentFn, "while.body")
+	whileExit := v.llvmCtx.AddBasicBlock(v.currentFn, "while.exit")
+
+	v.llvmBuilder.CreateBr(whileHeader)
+
+	v.llvmBuilder.SetInsertPointAtEnd(whileHeader)
+	condi := v.getCondi(v.Visit(ctx.Expr()).(llvm.Value))
+	v.llvmBuilder.CreateCondBr(condi, whileBody, whileExit)
+
+	// 进入while body
+	v.llvmBuilder.SetInsertPointAtEnd(whileBody)
+
+	// push block
+	v.loopBB.Push([2]llvm.BasicBlock{whileExit, whileHeader})
+
+	if !v.Visit(ctx.Block()).(bool) {
+		// 回边, 每一次都需要计算
+		v.llvmBuilder.CreateBr(whileHeader)
+	}
+
+	// pop block
+	v.loopBB.Pop()
+
+	// 生成后续
+	v.llvmBuilder.SetInsertPointAtEnd(whileExit)
+
 	return nil
 }
 
-func (v *Visitor) VisitStatWhile(ctx *parser.StatWhileContext) any {
+func (v *Visitor) VisitStatContinue(ctx *parser.StatContinueContext) any {
+	bodyBlock := v.loopBB.Top()[1]
+	v.llvmBuilder.CreateBr(bodyBlock)
+	return nil
+}
+
+func (v *Visitor) VisitStatBreak(ctx *parser.StatBreakContext) any {
+	// peek but not pop
+	exitBlock := v.loopBB.Top()[0]
+	v.llvmBuilder.CreateBr(exitBlock)
 	return nil
 }
 

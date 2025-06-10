@@ -42,6 +42,7 @@ stat:
 	block									# StatBlock
 	| RETURN expr? SEMI						# StatFuncReturn
 	| BREAK SEMI							# StatBreak
+	| CONTINUE SEMI							# StatContinue
 	| LET MUT? ID varType? varInit? SEMI	# StatVarDeclare
 	| ID ASSIGN expr SEMI					# StatVarAssign
 	| expr SEMI								# StatExpr

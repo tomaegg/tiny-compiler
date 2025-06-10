@@ -77,6 +77,9 @@ type RustLikeParserVisitor interface {
 	// Visit a parse tree produced by RustLikeParser#StatBreak.
 	VisitStatBreak(ctx *StatBreakContext) interface{}
 
+	// Visit a parse tree produced by RustLikeParser#StatContinue.
+	VisitStatContinue(ctx *StatContinueContext) interface{}
+
 	// Visit a parse tree produced by RustLikeParser#StatVarDeclare.
 	VisitStatVarDeclare(ctx *StatVarDeclareContext) interface{}
 

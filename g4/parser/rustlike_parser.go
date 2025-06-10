@@ -54,7 +54,7 @@ func rustlikeparserParserInit() {
 	}
 	staticData.PredictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
-		4, 1, 39, 208, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
+		4, 1, 39, 210, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
 		4, 2, 5, 7, 5, 2, 6, 7, 6, 2, 7, 7, 7, 2, 8, 7, 8, 2, 9, 7, 9, 2, 10, 7,
 		10, 2, 11, 7, 11, 2, 12, 7, 12, 2, 13, 7, 13, 2, 14, 7, 14, 2, 15, 7, 15,
 		2, 16, 7, 16, 2, 17, 7, 17, 2, 18, 7, 18, 2, 19, 7, 19, 1, 0, 1, 0, 1,
@@ -68,81 +68,82 @@ func rustlikeparserParserInit() {
 		117, 8, 10, 1, 10, 1, 10, 1, 10, 1, 10, 1, 11, 1, 11, 5, 11, 125, 8, 11,
 		10, 11, 12, 11, 128, 9, 11, 1, 11, 1, 11, 1, 12, 1, 12, 1, 13, 1, 13, 5,
 		13, 136, 8, 13, 10, 13, 12, 13, 139, 9, 13, 1, 13, 1, 13, 1, 14, 1, 14,
-		1, 14, 3, 14, 146, 8, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 3, 14, 153,
-		8, 14, 1, 14, 1, 14, 3, 14, 157, 8, 14, 1, 14, 3, 14, 160, 8, 14, 1, 14,
-		1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 5,
-		14, 173, 8, 14, 10, 14, 12, 14, 176, 9, 14, 1, 14, 3, 14, 179, 8, 14, 1,
-		14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 3, 14, 188, 8, 14, 1, 15,
-		1, 15, 1, 15, 1, 15, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1, 17, 1, 17, 1,
-		17, 1, 18, 1, 18, 1, 18, 1, 19, 1, 19, 1, 19, 1, 19, 0, 1, 4, 20, 0, 2,
-		4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 0,
-		3, 1, 0, 19, 20, 1, 0, 17, 18, 1, 0, 21, 26, 217, 0, 40, 1, 0, 0, 0, 2,
-		45, 1, 0, 0, 0, 4, 57, 1, 0, 0, 0, 6, 73, 1, 0, 0, 0, 8, 86, 1, 0, 0, 0,
-		10, 88, 1, 0, 0, 0, 12, 91, 1, 0, 0, 0, 14, 97, 1, 0, 0, 0, 16, 100, 1,
-		0, 0, 0, 18, 113, 1, 0, 0, 0, 20, 116, 1, 0, 0, 0, 22, 122, 1, 0, 0, 0,
-		24, 131, 1, 0, 0, 0, 26, 133, 1, 0, 0, 0, 28, 187, 1, 0, 0, 0, 30, 189,
-		1, 0, 0, 0, 32, 193, 1, 0, 0, 0, 34, 198, 1, 0, 0, 0, 36, 201, 1, 0, 0,
-		0, 38, 204, 1, 0, 0, 0, 40, 41, 3, 2, 1, 0, 41, 1, 1, 0, 0, 0, 42, 44,
-		3, 10, 5, 0, 43, 42, 1, 0, 0, 0, 44, 47, 1, 0, 0, 0, 45, 43, 1, 0, 0, 0,
-		45, 46, 1, 0, 0, 0, 46, 3, 1, 0, 0, 0, 47, 45, 1, 0, 0, 0, 48, 49, 6, 2,
-		-1, 0, 49, 50, 5, 31, 0, 0, 50, 51, 3, 4, 2, 0, 51, 52, 5, 32, 0, 0, 52,
-		58, 1, 0, 0, 0, 53, 54, 5, 15, 0, 0, 54, 58, 3, 6, 3, 0, 55, 58, 5, 15,
-		0, 0, 56, 58, 5, 16, 0, 0, 57, 48, 1, 0, 0, 0, 57, 53, 1, 0, 0, 0, 57,
-		55, 1, 0, 0, 0, 57, 56, 1, 0, 0, 0, 58, 70, 1, 0, 0, 0, 59, 60, 10, 7,
-		0, 0, 60, 61, 7, 0, 0, 0, 61, 69, 3, 4, 2, 8, 62, 63, 10, 6, 0, 0, 63,
-		64, 7, 1, 0, 0, 64, 69, 3, 4, 2, 7, 65, 66, 10, 5, 0, 0, 66, 67, 7, 2,
-		0, 0, 67, 69, 3, 4, 2, 6, 68, 59, 1, 0, 0, 0, 68, 62, 1, 0, 0, 0, 68, 65,
-		1, 0, 0, 0, 69, 72, 1, 0, 0, 0, 70, 68, 1, 0, 0, 0, 70, 71, 1, 0, 0, 0,
-		71, 5, 1, 0, 0, 0, 72, 70, 1, 0, 0, 0, 73, 74, 5, 31, 0, 0, 74, 75, 3,
-		8, 4, 0, 75, 76, 5, 32, 0, 0, 76, 7, 1, 0, 0, 0, 77, 82, 3, 4, 2, 0, 78,
-		79, 5, 30, 0, 0, 79, 81, 3, 4, 2, 0, 80, 78, 1, 0, 0, 0, 81, 84, 1, 0,
-		0, 0, 82, 80, 1, 0, 0, 0, 82, 83, 1, 0, 0, 0, 83, 87, 1, 0, 0, 0, 84, 82,
-		1, 0, 0, 0, 85, 87, 1, 0, 0, 0, 86, 77, 1, 0, 0, 0, 86, 85, 1, 0, 0, 0,
-		87, 9, 1, 0, 0, 0, 88, 89, 3, 12, 6, 0, 89, 90, 3, 22, 11, 0, 90, 11, 1,
-		0, 0, 0, 91, 92, 5, 11, 0, 0, 92, 93, 5, 15, 0, 0, 93, 95, 3, 16, 8, 0,
-		94, 96, 3, 14, 7, 0, 95, 94, 1, 0, 0, 0, 95, 96, 1, 0, 0, 0, 96, 13, 1,
-		0, 0, 0, 97, 98, 5, 37, 0, 0, 98, 99, 3, 24, 12, 0, 99, 15, 1, 0, 0, 0,
-		100, 101, 5, 31, 0, 0, 101, 102, 3, 18, 9, 0, 102, 103, 5, 32, 0, 0, 103,
-		17, 1, 0, 0, 0, 104, 109, 3, 20, 10, 0, 105, 106, 5, 30, 0, 0, 106, 108,
-		3, 20, 10, 0, 107, 105, 1, 0, 0, 0, 108, 111, 1, 0, 0, 0, 109, 107, 1,
-		0, 0, 0, 109, 110, 1, 0, 0, 0, 110, 114, 1, 0, 0, 0, 111, 109, 1, 0, 0,
-		0, 112, 114, 1, 0, 0, 0, 113, 104, 1, 0, 0, 0, 113, 112, 1, 0, 0, 0, 114,
-		19, 1, 0, 0, 0, 115, 117, 5, 10, 0, 0, 116, 115, 1, 0, 0, 0, 116, 117,
-		1, 0, 0, 0, 117, 118, 1, 0, 0, 0, 118, 119, 5, 15, 0, 0, 119, 120, 5, 29,
-		0, 0, 120, 121, 3, 24, 12, 0, 121, 21, 1, 0, 0, 0, 122, 126, 5, 35, 0,
-		0, 123, 125, 3, 28, 14, 0, 124, 123, 1, 0, 0, 0, 125, 128, 1, 0, 0, 0,
-		126, 124, 1, 0, 0, 0, 126, 127, 1, 0, 0, 0, 127, 129, 1, 0, 0, 0, 128,
-		126, 1, 0, 0, 0, 129, 130, 5, 36, 0, 0, 130, 23, 1, 0, 0, 0, 131, 132,
-		5, 4, 0, 0, 132, 25, 1, 0, 0, 0, 133, 137, 5, 35, 0, 0, 134, 136, 3, 28,
-		14, 0, 135, 134, 1, 0, 0, 0, 136, 139, 1, 0, 0, 0, 137, 135, 1, 0, 0, 0,
-		137, 138, 1, 0, 0, 0, 138, 140, 1, 0, 0, 0, 139, 137, 1, 0, 0, 0, 140,
-		141, 5, 36, 0, 0, 141, 27, 1, 0, 0, 0, 142, 188, 3, 26, 13, 0, 143, 145,
-		5, 9, 0, 0, 144, 146, 3, 4, 2, 0, 145, 144, 1, 0, 0, 0, 145, 146, 1, 0,
-		0, 0, 146, 147, 1, 0, 0, 0, 147, 188, 5, 28, 0, 0, 148, 149, 5, 13, 0,
-		0, 149, 188, 5, 28, 0, 0, 150, 152, 5, 5, 0, 0, 151, 153, 5, 10, 0, 0,
-		152, 151, 1, 0, 0, 0, 152, 153, 1, 0, 0, 0, 153, 154, 1, 0, 0, 0, 154,
-		156, 5, 15, 0, 0, 155, 157, 3, 36, 18, 0, 156, 155, 1, 0, 0, 0, 156, 157,
-		1, 0, 0, 0, 157, 159, 1, 0, 0, 0, 158, 160, 3, 38, 19, 0, 159, 158, 1,
-		0, 0, 0, 159, 160, 1, 0, 0, 0, 160, 161, 1, 0, 0, 0, 161, 188, 5, 28, 0,
-		0, 162, 163, 5, 15, 0, 0, 163, 164, 5, 27, 0, 0, 164, 165, 3, 4, 2, 0,
-		165, 166, 5, 28, 0, 0, 166, 188, 1, 0, 0, 0, 167, 168, 3, 4, 2, 0, 168,
-		169, 5, 28, 0, 0, 169, 188, 1, 0, 0, 0, 170, 174, 3, 30, 15, 0, 171, 173,
-		3, 32, 16, 0, 172, 171, 1, 0, 0, 0, 173, 176, 1, 0, 0, 0, 174, 172, 1,
-		0, 0, 0, 174, 175, 1, 0, 0, 0, 175, 178, 1, 0, 0, 0, 176, 174, 1, 0, 0,
-		0, 177, 179, 3, 34, 17, 0, 178, 177, 1, 0, 0, 0, 178, 179, 1, 0, 0, 0,
-		179, 188, 1, 0, 0, 0, 180, 181, 5, 8, 0, 0, 181, 182, 3, 4, 2, 0, 182,
-		183, 3, 26, 13, 0, 183, 188, 1, 0, 0, 0, 184, 185, 5, 12, 0, 0, 185, 188,
-		3, 26, 13, 0, 186, 188, 5, 28, 0, 0, 187, 142, 1, 0, 0, 0, 187, 143, 1,
-		0, 0, 0, 187, 148, 1, 0, 0, 0, 187, 150, 1, 0, 0, 0, 187, 162, 1, 0, 0,
-		0, 187, 167, 1, 0, 0, 0, 187, 170, 1, 0, 0, 0, 187, 180, 1, 0, 0, 0, 187,
-		184, 1, 0, 0, 0, 187, 186, 1, 0, 0, 0, 188, 29, 1, 0, 0, 0, 189, 190, 5,
-		6, 0, 0, 190, 191, 3, 4, 2, 0, 191, 192, 3, 26, 13, 0, 192, 31, 1, 0, 0,
-		0, 193, 194, 5, 7, 0, 0, 194, 195, 5, 6, 0, 0, 195, 196, 3, 4, 2, 0, 196,
-		197, 3, 26, 13, 0, 197, 33, 1, 0, 0, 0, 198, 199, 5, 7, 0, 0, 199, 200,
-		3, 26, 13, 0, 200, 35, 1, 0, 0, 0, 201, 202, 5, 29, 0, 0, 202, 203, 3,
-		24, 12, 0, 203, 37, 1, 0, 0, 0, 204, 205, 5, 27, 0, 0, 205, 206, 3, 4,
-		2, 0, 206, 39, 1, 0, 0, 0, 19, 45, 57, 68, 70, 82, 86, 95, 109, 113, 116,
-		126, 137, 145, 152, 156, 159, 174, 178, 187,
+		1, 14, 3, 14, 146, 8, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1,
+		14, 3, 14, 155, 8, 14, 1, 14, 1, 14, 3, 14, 159, 8, 14, 1, 14, 3, 14, 162,
+		8, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1,
+		14, 1, 14, 5, 14, 175, 8, 14, 10, 14, 12, 14, 178, 9, 14, 1, 14, 3, 14,
+		181, 8, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 1, 14, 3, 14, 190,
+		8, 14, 1, 15, 1, 15, 1, 15, 1, 15, 1, 16, 1, 16, 1, 16, 1, 16, 1, 16, 1,
+		17, 1, 17, 1, 17, 1, 18, 1, 18, 1, 18, 1, 19, 1, 19, 1, 19, 1, 19, 0, 1,
+		4, 20, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34,
+		36, 38, 0, 3, 1, 0, 19, 20, 1, 0, 17, 18, 1, 0, 21, 26, 220, 0, 40, 1,
+		0, 0, 0, 2, 45, 1, 0, 0, 0, 4, 57, 1, 0, 0, 0, 6, 73, 1, 0, 0, 0, 8, 86,
+		1, 0, 0, 0, 10, 88, 1, 0, 0, 0, 12, 91, 1, 0, 0, 0, 14, 97, 1, 0, 0, 0,
+		16, 100, 1, 0, 0, 0, 18, 113, 1, 0, 0, 0, 20, 116, 1, 0, 0, 0, 22, 122,
+		1, 0, 0, 0, 24, 131, 1, 0, 0, 0, 26, 133, 1, 0, 0, 0, 28, 189, 1, 0, 0,
+		0, 30, 191, 1, 0, 0, 0, 32, 195, 1, 0, 0, 0, 34, 200, 1, 0, 0, 0, 36, 203,
+		1, 0, 0, 0, 38, 206, 1, 0, 0, 0, 40, 41, 3, 2, 1, 0, 41, 1, 1, 0, 0, 0,
+		42, 44, 3, 10, 5, 0, 43, 42, 1, 0, 0, 0, 44, 47, 1, 0, 0, 0, 45, 43, 1,
+		0, 0, 0, 45, 46, 1, 0, 0, 0, 46, 3, 1, 0, 0, 0, 47, 45, 1, 0, 0, 0, 48,
+		49, 6, 2, -1, 0, 49, 50, 5, 31, 0, 0, 50, 51, 3, 4, 2, 0, 51, 52, 5, 32,
+		0, 0, 52, 58, 1, 0, 0, 0, 53, 54, 5, 15, 0, 0, 54, 58, 3, 6, 3, 0, 55,
+		58, 5, 15, 0, 0, 56, 58, 5, 16, 0, 0, 57, 48, 1, 0, 0, 0, 57, 53, 1, 0,
+		0, 0, 57, 55, 1, 0, 0, 0, 57, 56, 1, 0, 0, 0, 58, 70, 1, 0, 0, 0, 59, 60,
+		10, 7, 0, 0, 60, 61, 7, 0, 0, 0, 61, 69, 3, 4, 2, 8, 62, 63, 10, 6, 0,
+		0, 63, 64, 7, 1, 0, 0, 64, 69, 3, 4, 2, 7, 65, 66, 10, 5, 0, 0, 66, 67,
+		7, 2, 0, 0, 67, 69, 3, 4, 2, 6, 68, 59, 1, 0, 0, 0, 68, 62, 1, 0, 0, 0,
+		68, 65, 1, 0, 0, 0, 69, 72, 1, 0, 0, 0, 70, 68, 1, 0, 0, 0, 70, 71, 1,
+		0, 0, 0, 71, 5, 1, 0, 0, 0, 72, 70, 1, 0, 0, 0, 73, 74, 5, 31, 0, 0, 74,
+		75, 3, 8, 4, 0, 75, 76, 5, 32, 0, 0, 76, 7, 1, 0, 0, 0, 77, 82, 3, 4, 2,
+		0, 78, 79, 5, 30, 0, 0, 79, 81, 3, 4, 2, 0, 80, 78, 1, 0, 0, 0, 81, 84,
+		1, 0, 0, 0, 82, 80, 1, 0, 0, 0, 82, 83, 1, 0, 0, 0, 83, 87, 1, 0, 0, 0,
+		84, 82, 1, 0, 0, 0, 85, 87, 1, 0, 0, 0, 86, 77, 1, 0, 0, 0, 86, 85, 1,
+		0, 0, 0, 87, 9, 1, 0, 0, 0, 88, 89, 3, 12, 6, 0, 89, 90, 3, 22, 11, 0,
+		90, 11, 1, 0, 0, 0, 91, 92, 5, 11, 0, 0, 92, 93, 5, 15, 0, 0, 93, 95, 3,
+		16, 8, 0, 94, 96, 3, 14, 7, 0, 95, 94, 1, 0, 0, 0, 95, 96, 1, 0, 0, 0,
+		96, 13, 1, 0, 0, 0, 97, 98, 5, 37, 0, 0, 98, 99, 3, 24, 12, 0, 99, 15,
+		1, 0, 0, 0, 100, 101, 5, 31, 0, 0, 101, 102, 3, 18, 9, 0, 102, 103, 5,
+		32, 0, 0, 103, 17, 1, 0, 0, 0, 104, 109, 3, 20, 10, 0, 105, 106, 5, 30,
+		0, 0, 106, 108, 3, 20, 10, 0, 107, 105, 1, 0, 0, 0, 108, 111, 1, 0, 0,
+		0, 109, 107, 1, 0, 0, 0, 109, 110, 1, 0, 0, 0, 110, 114, 1, 0, 0, 0, 111,
+		109, 1, 0, 0, 0, 112, 114, 1, 0, 0, 0, 113, 104, 1, 0, 0, 0, 113, 112,
+		1, 0, 0, 0, 114, 19, 1, 0, 0, 0, 115, 117, 5, 10, 0, 0, 116, 115, 1, 0,
+		0, 0, 116, 117, 1, 0, 0, 0, 117, 118, 1, 0, 0, 0, 118, 119, 5, 15, 0, 0,
+		119, 120, 5, 29, 0, 0, 120, 121, 3, 24, 12, 0, 121, 21, 1, 0, 0, 0, 122,
+		126, 5, 35, 0, 0, 123, 125, 3, 28, 14, 0, 124, 123, 1, 0, 0, 0, 125, 128,
+		1, 0, 0, 0, 126, 124, 1, 0, 0, 0, 126, 127, 1, 0, 0, 0, 127, 129, 1, 0,
+		0, 0, 128, 126, 1, 0, 0, 0, 129, 130, 5, 36, 0, 0, 130, 23, 1, 0, 0, 0,
+		131, 132, 5, 4, 0, 0, 132, 25, 1, 0, 0, 0, 133, 137, 5, 35, 0, 0, 134,
+		136, 3, 28, 14, 0, 135, 134, 1, 0, 0, 0, 136, 139, 1, 0, 0, 0, 137, 135,
+		1, 0, 0, 0, 137, 138, 1, 0, 0, 0, 138, 140, 1, 0, 0, 0, 139, 137, 1, 0,
+		0, 0, 140, 141, 5, 36, 0, 0, 141, 27, 1, 0, 0, 0, 142, 190, 3, 26, 13,
+		0, 143, 145, 5, 9, 0, 0, 144, 146, 3, 4, 2, 0, 145, 144, 1, 0, 0, 0, 145,
+		146, 1, 0, 0, 0, 146, 147, 1, 0, 0, 0, 147, 190, 5, 28, 0, 0, 148, 149,
+		5, 13, 0, 0, 149, 190, 5, 28, 0, 0, 150, 151, 5, 14, 0, 0, 151, 190, 5,
+		28, 0, 0, 152, 154, 5, 5, 0, 0, 153, 155, 5, 10, 0, 0, 154, 153, 1, 0,
+		0, 0, 154, 155, 1, 0, 0, 0, 155, 156, 1, 0, 0, 0, 156, 158, 5, 15, 0, 0,
+		157, 159, 3, 36, 18, 0, 158, 157, 1, 0, 0, 0, 158, 159, 1, 0, 0, 0, 159,
+		161, 1, 0, 0, 0, 160, 162, 3, 38, 19, 0, 161, 160, 1, 0, 0, 0, 161, 162,
+		1, 0, 0, 0, 162, 163, 1, 0, 0, 0, 163, 190, 5, 28, 0, 0, 164, 165, 5, 15,
+		0, 0, 165, 166, 5, 27, 0, 0, 166, 167, 3, 4, 2, 0, 167, 168, 5, 28, 0,
+		0, 168, 190, 1, 0, 0, 0, 169, 170, 3, 4, 2, 0, 170, 171, 5, 28, 0, 0, 171,
+		190, 1, 0, 0, 0, 172, 176, 3, 30, 15, 0, 173, 175, 3, 32, 16, 0, 174, 173,
+		1, 0, 0, 0, 175, 178, 1, 0, 0, 0, 176, 174, 1, 0, 0, 0, 176, 177, 1, 0,
+		0, 0, 177, 180, 1, 0, 0, 0, 178, 176, 1, 0, 0, 0, 179, 181, 3, 34, 17,
+		0, 180, 179, 1, 0, 0, 0, 180, 181, 1, 0, 0, 0, 181, 190, 1, 0, 0, 0, 182,
+		183, 5, 8, 0, 0, 183, 184, 3, 4, 2, 0, 184, 185, 3, 26, 13, 0, 185, 190,
+		1, 0, 0, 0, 186, 187, 5, 12, 0, 0, 187, 190, 3, 26, 13, 0, 188, 190, 5,
+		28, 0, 0, 189, 142, 1, 0, 0, 0, 189, 143, 1, 0, 0, 0, 189, 148, 1, 0, 0,
+		0, 189, 150, 1, 0, 0, 0, 189, 152, 1, 0, 0, 0, 189, 164, 1, 0, 0, 0, 189,
+		169, 1, 0, 0, 0, 189, 172, 1, 0, 0, 0, 189, 182, 1, 0, 0, 0, 189, 186,
+		1, 0, 0, 0, 189, 188, 1, 0, 0, 0, 190, 29, 1, 0, 0, 0, 191, 192, 5, 6,
+		0, 0, 192, 193, 3, 4, 2, 0, 193, 194, 3, 26, 13, 0, 194, 31, 1, 0, 0, 0,
+		195, 196, 5, 7, 0, 0, 196, 197, 5, 6, 0, 0, 197, 198, 3, 4, 2, 0, 198,
+		199, 3, 26, 13, 0, 199, 33, 1, 0, 0, 0, 200, 201, 5, 7, 0, 0, 201, 202,
+		3, 26, 13, 0, 202, 35, 1, 0, 0, 0, 203, 204, 5, 29, 0, 0, 204, 205, 3,
+		24, 12, 0, 205, 37, 1, 0, 0, 0, 206, 207, 5, 27, 0, 0, 207, 208, 3, 4,
+		2, 0, 208, 39, 1, 0, 0, 0, 19, 45, 57, 68, 70, 82, 86, 95, 109, 113, 116,
+		126, 137, 145, 154, 158, 161, 176, 180, 189,
 	}
 	deserializer := antlr.NewATNDeserializer(nil)
 	staticData.atn = deserializer.Deserialize(staticData.serializedATN)
@@ -2577,7 +2578,7 @@ func (p *RustLikeParser) FuncBlock() (localctx IFuncBlockContext) {
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	for (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&36775768928) != 0 {
+	for (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&36775785312) != 0 {
 		{
 			p.SetState(123)
 			p.Stat()
@@ -2843,7 +2844,7 @@ func (p *RustLikeParser) Block() (localctx IBlockContext) {
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	for (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&36775768928) != 0 {
+	for (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&36775785312) != 0 {
 		{
 			p.SetState(134)
 			p.Stat()
@@ -2930,6 +2931,42 @@ func (s *StatContext) GetRuleContext() antlr.RuleContext {
 
 func (s *StatContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+type StatContinueContext struct {
+	StatContext
+}
+
+func NewStatContinueContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *StatContinueContext {
+	var p = new(StatContinueContext)
+
+	InitEmptyStatContext(&p.StatContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*StatContext))
+
+	return p
+}
+
+func (s *StatContinueContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *StatContinueContext) CONTINUE() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserCONTINUE, 0)
+}
+
+func (s *StatContinueContext) SEMI() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserSEMI, 0)
+}
+
+func (s *StatContinueContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RustLikeParserVisitor:
+		return t.VisitStatContinue(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
 }
 
 type StatBlockContext struct {
@@ -3496,7 +3533,7 @@ func (p *RustLikeParser) Stat() (localctx IStatContext) {
 
 	var _alt int
 
-	p.SetState(187)
+	p.SetState(189)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -3566,17 +3603,37 @@ func (p *RustLikeParser) Stat() (localctx IStatContext) {
 		}
 
 	case 4:
-		localctx = NewStatVarDeclareContext(p, localctx)
+		localctx = NewStatContinueContext(p, localctx)
 		p.EnterOuterAlt(localctx, 4)
 		{
 			p.SetState(150)
+			p.Match(RustLikeParserCONTINUE)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(151)
+			p.Match(RustLikeParserSEMI)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+
+	case 5:
+		localctx = NewStatVarDeclareContext(p, localctx)
+		p.EnterOuterAlt(localctx, 5)
+		{
+			p.SetState(152)
 			p.Match(RustLikeParserLET)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
-		p.SetState(152)
+		p.SetState(154)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -3585,7 +3642,7 @@ func (p *RustLikeParser) Stat() (localctx IStatContext) {
 
 		if _la == RustLikeParserMUT {
 			{
-				p.SetState(151)
+				p.SetState(153)
 				p.Match(RustLikeParserMUT)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -3595,14 +3652,14 @@ func (p *RustLikeParser) Stat() (localctx IStatContext) {
 
 		}
 		{
-			p.SetState(154)
+			p.SetState(156)
 			p.Match(RustLikeParserID)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
-		p.SetState(156)
+		p.SetState(158)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -3611,12 +3668,12 @@ func (p *RustLikeParser) Stat() (localctx IStatContext) {
 
 		if _la == RustLikeParserCOLON {
 			{
-				p.SetState(155)
+				p.SetState(157)
 				p.VarType()
 			}
 
 		}
-		p.SetState(159)
+		p.SetState(161)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -3625,45 +3682,13 @@ func (p *RustLikeParser) Stat() (localctx IStatContext) {
 
 		if _la == RustLikeParserASSIGN {
 			{
-				p.SetState(158)
+				p.SetState(160)
 				p.VarInit()
 			}
 
 		}
 		{
-			p.SetState(161)
-			p.Match(RustLikeParserSEMI)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-
-	case 5:
-		localctx = NewStatVarAssignContext(p, localctx)
-		p.EnterOuterAlt(localctx, 5)
-		{
-			p.SetState(162)
-			p.Match(RustLikeParserID)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-		{
 			p.SetState(163)
-			p.Match(RustLikeParserASSIGN)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-		{
-			p.SetState(164)
-			p.expr(0)
-		}
-		{
-			p.SetState(165)
 			p.Match(RustLikeParserSEMI)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3672,14 +3697,30 @@ func (p *RustLikeParser) Stat() (localctx IStatContext) {
 		}
 
 	case 6:
-		localctx = NewStatExprContext(p, localctx)
+		localctx = NewStatVarAssignContext(p, localctx)
 		p.EnterOuterAlt(localctx, 6)
 		{
-			p.SetState(167)
+			p.SetState(164)
+			p.Match(RustLikeParserID)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(165)
+			p.Match(RustLikeParserASSIGN)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(166)
 			p.expr(0)
 		}
 		{
-			p.SetState(168)
+			p.SetState(167)
 			p.Match(RustLikeParserSEMI)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3688,13 +3729,29 @@ func (p *RustLikeParser) Stat() (localctx IStatContext) {
 		}
 
 	case 7:
-		localctx = NewStatIfElseContext(p, localctx)
+		localctx = NewStatExprContext(p, localctx)
 		p.EnterOuterAlt(localctx, 7)
 		{
+			p.SetState(169)
+			p.expr(0)
+		}
+		{
 			p.SetState(170)
+			p.Match(RustLikeParserSEMI)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+
+	case 8:
+		localctx = NewStatIfElseContext(p, localctx)
+		p.EnterOuterAlt(localctx, 8)
+		{
+			p.SetState(172)
 			p.IfBranch()
 		}
-		p.SetState(174)
+		p.SetState(176)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -3706,12 +3763,12 @@ func (p *RustLikeParser) Stat() (localctx IStatContext) {
 		for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
 			if _alt == 1 {
 				{
-					p.SetState(171)
+					p.SetState(173)
 					p.ElifBranch()
 				}
 
 			}
-			p.SetState(176)
+			p.SetState(178)
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
@@ -3721,7 +3778,7 @@ func (p *RustLikeParser) Stat() (localctx IStatContext) {
 				goto errorExit
 			}
 		}
-		p.SetState(178)
+		p.SetState(180)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -3730,17 +3787,17 @@ func (p *RustLikeParser) Stat() (localctx IStatContext) {
 
 		if _la == RustLikeParserELSE {
 			{
-				p.SetState(177)
+				p.SetState(179)
 				p.ElseBranch()
 			}
 
 		}
 
-	case 8:
+	case 9:
 		localctx = NewStatWhileContext(p, localctx)
-		p.EnterOuterAlt(localctx, 8)
+		p.EnterOuterAlt(localctx, 9)
 		{
-			p.SetState(180)
+			p.SetState(182)
 			p.Match(RustLikeParserWHILE)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3748,19 +3805,19 @@ func (p *RustLikeParser) Stat() (localctx IStatContext) {
 			}
 		}
 		{
-			p.SetState(181)
+			p.SetState(183)
 			p.expr(0)
 		}
 		{
-			p.SetState(182)
+			p.SetState(184)
 			p.Block()
 		}
 
-	case 9:
+	case 10:
 		localctx = NewStatLoopContext(p, localctx)
-		p.EnterOuterAlt(localctx, 9)
+		p.EnterOuterAlt(localctx, 10)
 		{
-			p.SetState(184)
+			p.SetState(186)
 			p.Match(RustLikeParserLOOP)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3768,15 +3825,15 @@ func (p *RustLikeParser) Stat() (localctx IStatContext) {
 			}
 		}
 		{
-			p.SetState(185)
+			p.SetState(187)
 			p.Block()
 		}
 
-	case 10:
+	case 11:
 		localctx = NewStatEmptyContext(p, localctx)
-		p.EnterOuterAlt(localctx, 10)
+		p.EnterOuterAlt(localctx, 11)
 		{
-			p.SetState(186)
+			p.SetState(188)
 			p.Match(RustLikeParserSEMI)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3908,7 +3965,7 @@ func (p *RustLikeParser) IfBranch() (localctx IIfBranchContext) {
 	p.EnterRule(localctx, 30, RustLikeParserRULE_ifBranch)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(189)
+		p.SetState(191)
 		p.Match(RustLikeParserIF)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -3916,11 +3973,11 @@ func (p *RustLikeParser) IfBranch() (localctx IIfBranchContext) {
 		}
 	}
 	{
-		p.SetState(190)
+		p.SetState(192)
 		p.expr(0)
 	}
 	{
-		p.SetState(191)
+		p.SetState(193)
 		p.Block()
 	}
 
@@ -4049,7 +4106,7 @@ func (p *RustLikeParser) ElifBranch() (localctx IElifBranchContext) {
 	p.EnterRule(localctx, 32, RustLikeParserRULE_elifBranch)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(193)
+		p.SetState(195)
 		p.Match(RustLikeParserELSE)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -4057,7 +4114,7 @@ func (p *RustLikeParser) ElifBranch() (localctx IElifBranchContext) {
 		}
 	}
 	{
-		p.SetState(194)
+		p.SetState(196)
 		p.Match(RustLikeParserIF)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -4065,11 +4122,11 @@ func (p *RustLikeParser) ElifBranch() (localctx IElifBranchContext) {
 		}
 	}
 	{
-		p.SetState(195)
+		p.SetState(197)
 		p.expr(0)
 	}
 	{
-		p.SetState(196)
+		p.SetState(198)
 		p.Block()
 	}
 
@@ -4176,7 +4233,7 @@ func (p *RustLikeParser) ElseBranch() (localctx IElseBranchContext) {
 	p.EnterRule(localctx, 34, RustLikeParserRULE_elseBranch)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(198)
+		p.SetState(200)
 		p.Match(RustLikeParserELSE)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -4184,7 +4241,7 @@ func (p *RustLikeParser) ElseBranch() (localctx IElseBranchContext) {
 		}
 	}
 	{
-		p.SetState(199)
+		p.SetState(201)
 		p.Block()
 	}
 
@@ -4291,7 +4348,7 @@ func (p *RustLikeParser) VarType() (localctx IVarTypeContext) {
 	p.EnterRule(localctx, 36, RustLikeParserRULE_varType)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(201)
+		p.SetState(203)
 		p.Match(RustLikeParserCOLON)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -4299,7 +4356,7 @@ func (p *RustLikeParser) VarType() (localctx IVarTypeContext) {
 		}
 	}
 	{
-		p.SetState(202)
+		p.SetState(204)
 		p.Rtype()
 	}
 
@@ -4406,7 +4463,7 @@ func (p *RustLikeParser) VarInit() (localctx IVarInitContext) {
 	p.EnterRule(localctx, 38, RustLikeParserRULE_varInit)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(204)
+		p.SetState(206)
 		p.Match(RustLikeParserASSIGN)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -4414,7 +4471,7 @@ func (p *RustLikeParser) VarInit() (localctx IVarInitContext) {
 		}
 	}
 	{
-		p.SetState(205)
+		p.SetState(207)
 		p.expr(0)
 	}
 

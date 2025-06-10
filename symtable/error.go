@@ -36,4 +36,5 @@ const (
 	ArgsErr        SemanticErrType = "ArgsError"
 	RetErr         SemanticErrType = "RetError"
 	BreakErr       SemanticErrType = "BreakErr"
+	ContiErr       SemanticErrType = "ContinueErr"
 )

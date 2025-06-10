@@ -277,7 +277,7 @@ func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
 	case FuncSymbol:
 		t = SymFunc
 	default:
-		log.Panicf("unknown symbol: %v", s)
+		log.Fatalf("use unknown symbol: <%v>", ctx.ID().GetText())
 	}
 	return ExprAttribute{Type: t}
 }
@@ -384,6 +384,14 @@ func (v *Visitor) VisitStatBreak(ctx *parser.StatBreakContext) any {
 	if v.loopDepth <= 0 {
 		err := NewSematicErr(BreakErr).Message("break outside loop")
 		v.LogError(err, ctx.BREAK().GetSymbol())
+	}
+	return nil
+}
+
+func (v *Visitor) VisitStatContinue(ctx *parser.StatContinueContext) any {
+	if v.loopDepth <= 0 {
+		err := NewSematicErr(ContiErr).Message("continue outside loop")
+		v.LogError(err, ctx.CONTINUE().GetSymbol())
 	}
 	return nil
 }
