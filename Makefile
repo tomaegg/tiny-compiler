@@ -13,6 +13,7 @@ TARGET_FILE=cmd/$(TARGET)/main.go
 ANTLR4_LINK=https://www.antlr.org/download/antlr-4.13.2-complete.jar
 ANTLR4=java -jar $(TOOL_DIR)/antlr-4.13.2-complete.jar
 TOOL_DIR=$(PWD)/build_tools
+GOBUILDTAGS?=llvm19
 
 antlr4:
 	mkdir -p $(TOOL_DIR)
@@ -25,7 +26,7 @@ symtable:
 	@go run -v cmd/symtable/main.go $(ARGS)
 
 ir: 
-	@go run -tags=llvm19 -v cmd/ir/main.go $(ARGS)
+	@go run -tags=$(GOBUILDTAGS) -v cmd/ir/main.go $(ARGS)
 
 dot: 
 	go run -v cmd/symtable/main.go $(ARGS) > symtable.gv

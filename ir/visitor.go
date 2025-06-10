@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"tj-compiler/g4/parser"
 	"tj-compiler/symtable"
+	"tj-compiler/utils/dsa"
 
 	"github.com/antlr4-go/antlr/v4"
 	log "github.com/sirupsen/logrus"
@@ -43,6 +44,8 @@ type Visitor struct {
 	counter map[string]int
 	// error count
 	errorCount int
+	// loop Basic Block
+	loopBB dsa.Stack[llvm.BasicBlock]
 }
 
 func NewVisitor(module string, symTable *symtable.SymTable) (v *Visitor, cancel func()) {
@@ -118,9 +121,9 @@ func (v *Visitor) VisitFuncDeclaration(ctx *parser.FuncDeclarationContext) any {
 		}
 		if !isVoid {
 			err := symtable.NewSematicErr(symtable.RetErr).
-				Message("missing return in function")
+				Message("missing return in function, basic block: %s", bb.AsValue().String())
 			v.LogError(err, ctx.FuncSignature().ID().GetSymbol())
-			log.Fatal("error detected, aborted")
+			log.Fatal("unrecoverable error detected, aborted")
 		}
 
 		// 修复return
@@ -181,6 +184,13 @@ func (v *Visitor) flattenBlock(stats []parser.IStatContext) bool {
 				token.GetLine(), token.GetColumn(), token.GetText(),
 			)
 			return true // 代表找到了了function return
+		case *parser.StatBreakContext:
+			v.Visit(stat)
+			token := stat.GetStart()
+			log.Debugf("[%d:%d] first break found in block near token <%s>, block ends",
+				token.GetLine(), token.GetColumn(), token.GetText(),
+			)
+			return true // 代表找到了了break
 		case *parser.StatBlockContext: // block则进行flatten
 			if v.Visit(stat.Block()).(bool) {
 				return true
@@ -196,6 +206,9 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
 	val := v.llvmBuilder.CreateAlloca(v.LLVMType(varSymbol.Type()), "var_"+varSymbol.Name())
 	SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
+	if ctx.VarInit() != nil {
+		// TODO:
+	}
 	return nil
 }
 
@@ -275,8 +288,38 @@ func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
 	return nil
 }
 
+func (v *Visitor) VisitStatLoop(ctx *parser.StatLoopContext) any {
+	// create a basic block
+	loopBB := v.llvmCtx.AddBasicBlock(v.currentFn, "loop_body")
+	// else block, 无论是否存在，创建空的即可
+	exitBlock := v.llvmCtx.AddBasicBlock(v.currentFn, ("loop_exit"))
+	v.llvmBuilder.CreateBr(loopBB) // branch to loop basic block
+	v.llvmBuilder.SetInsertPointAtEnd(loopBB)
+
+	// push block
+	v.loopBB.Push(exitBlock)
+
+	if !v.Visit(ctx.Block()).(bool) {
+		// 加入回边
+		v.llvmBuilder.CreateBr(loopBB) // branch to itself
+	}
+
+	v.loopBB.Pop()
+
+	// 生成后续
+	v.llvmBuilder.SetInsertPointAtEnd(exitBlock)
+
+	return nil
+}
+
+func (v *Visitor) VisitStatBreak(ctx *parser.StatBreakContext) any {
+	// peek but not pop
+	exitBlock := v.loopBB.Top()
+	v.llvmBuilder.CreateBr(exitBlock)
+	return nil
+}
+
 func (v *Visitor) VisitStatWhile(ctx *parser.StatWhileContext) any {
-	// TODO
 	return nil
 }
 
