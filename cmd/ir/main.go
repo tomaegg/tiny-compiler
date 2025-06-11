@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"tj-compiler/g4/parser"
+	"tj-compiler/cmd"
 	"tj-compiler/ir"
 	"tj-compiler/symtable"
 
@@ -28,11 +28,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	lexer := parser.NewRustLikeLexer(input)
+	lexer, lexerErrMsg := cmd.NewLexer(input)
 	tokens := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
-
-	parser := parser.NewRustLikeParser(tokens)
+	parser, parserErrMsg := cmd.NewParser(tokens)
 	tree := parser.Prog()
+	if len(lexerErrMsg()) != 0 || len(parserErrMsg()) != 0 {
+		os.Exit(-1)
+	}
+	log.Info("basic check passed")
 
 	checker := symtable.NewSemanticChecker(tree)
 	if total := checker.TotalErrors(); total != 0 {

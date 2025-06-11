@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"tj-compiler/g4/parser"
+	"tj-compiler/cmd"
 
 	"github.com/antlr4-go/antlr/v4"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	lexer := parser.NewRustLikeLexer(input)
+	lexer, lexerErrMsg := cmd.NewLexer(input)
 	tokens := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 
 	fmt.Println("Token Stream:")
@@ -44,8 +45,12 @@ func main() {
 			line, column, tokenName, text)
 	}
 
-	parser := parser.NewRustLikeParser(tokens)
-	tree := parser.Prog() // 假设起始规则是 `expr`
+	parser, parserErrMsg := cmd.NewParser(tokens)
+	tree := parser.Prog()
+	if len(lexerErrMsg()) != 0 || len(parserErrMsg()) != 0 {
+		os.Exit(-1)
+	}
+	logrus.Info("basic check passed")
 
 	fmt.Println("Parsing Tree:")
 	fmt.Println(tree.ToStringTree(nil, parser))

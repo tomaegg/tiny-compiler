@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"tj-compiler/g4/parser"
+	"tj-compiler/cmd"
 	"tj-compiler/symtable"
 
 	"github.com/antlr4-go/antlr/v4"
@@ -26,11 +26,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	lexer := parser.NewRustLikeLexer(input)
+	lexer, lexerErrMsg := cmd.NewLexer(input)
 	tokens := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
-
-	parser := parser.NewRustLikeParser(tokens)
-	tree := parser.Prog() // 假设起始规则是 `expr`
+	parser, parserErrMsg := cmd.NewParser(tokens)
+	tree := parser.Prog()
+	if len(lexerErrMsg()) != 0 || len(parserErrMsg()) != 0 {
+		os.Exit(-1)
+	}
+	log.Info("basic check passed")
 
 	log.Println("[Parsing Tree]")
 	log.Println(tree.ToStringTree(nil, parser))
