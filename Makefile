@@ -37,7 +37,7 @@ dot:
 pack: build
 	rm -rf $(SUBMIT_DIR) $(SUBMIT_ZIP) && mkdir -p $(SUBMIT_DIR)
 	git archive --format=tar --output=src.tar HEAD
-	tar xvf src.tar --directory=$(SUBMIT_DIR) --exclude='*.g4' --exclude='Makefile' && rm src.tar
+	tar xvf src.tar --directory=$(SUBMIT_DIR) --exclude='*.g4' && rm src.tar
 	sed -i '/^$$/d; /^\/\//d' $(SUBMIT_DIR)/$(GEN_DIR)/*.go
 	./run.sh export && mv tiny-compiler-latest.tar $(SUBMIT_DIR)/ # 导出image
 	zip -r $(SUBMIT_ZIP) $(SUBMIT_DIR)
