@@ -55,8 +55,6 @@ type baseSymbolImpl struct {
 	stype   SymType
 	mutable bool
 	token   antlr.Token
-
-	extras map[string]any
 }
 
 var _ Symbol = (BaseSymbol)(nil)

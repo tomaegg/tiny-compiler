@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # use go build cache
 COPY go.mod go.sum ./
-RUN  go mod download
+RUN go env -w GOPROXY=https://goproxy.cn,direct && go mod download
 COPY . .
 
 # paralle build with make
