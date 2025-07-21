@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     working_dir: /workspace
+    environment:
+      - DOT_DIR=/workspace
     volumes:
       - .:/workspace
       - go-mod-cache:/go/pkg

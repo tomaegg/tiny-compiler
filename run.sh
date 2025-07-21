@@ -18,6 +18,7 @@ case "$1" in
   docker run --rm \
     -v "$(pwd)/example:/runtime/example" \
     -v "$(pwd)/output:/runtime/output" \
+    -e "DOT_DIR=/runtime/output" \
     tiny-compiler:latest "${@:2}"
   ;;
 *)

@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
+	"path"
+	"sync"
 	"tj-compiler/cmd"
 	"tj-compiler/g4/parser"
 	"tj-compiler/ir"
@@ -24,10 +27,11 @@ const (
 )
 
 type Config struct {
-	Stage    CompileStage
-	SrcPath  string
-	OutPath  string
-	LogLevel string
+	Visualize bool
+	Stage     CompileStage
+	SrcPath   string
+	OutPath   string
+	LogLevel  string
 }
 
 type UnitCompiler struct {
@@ -40,7 +44,8 @@ type UnitCompiler struct {
 
 	lexerErrCallback, parserErrCallback func() []string
 
-	checker *symtable.SemanticChecker
+	checker  *symtable.SemanticChecker
+	dotGraph bool
 
 	fout io.WriteCloser
 	fin  string
@@ -72,7 +77,7 @@ func NewUnitCompiler(c Config) *UnitCompiler {
 		}
 	}
 
-	ret := &UnitCompiler{stage: c.Stage, fout: fout, fin: c.SrcPath}
+	ret := &UnitCompiler{stage: c.Stage, fout: fout, fin: c.SrcPath, dotGraph: c.Visualize}
 
 	if c.Stage >= Lex {
 		ret.lexer, ret.lexerErrCallback = cmd.NewLexer(input)
@@ -133,6 +138,41 @@ func (uc *UnitCompiler) Semantic() {
 	} else {
 		log.Info("semantic check passed")
 	}
+	if !uc.dotGraph {
+		return
+	}
+
+	// 创建临时 dot 文件
+	tmpFile, err := os.CreateTemp("", "graphviz-*.dot")
+	if err != nil {
+		log.Fatalf("failed to create temp file: %v", err)
+	}
+	tmpFile.Write(uc.checker.SymbolTable().ToDotGraph())
+	defer os.Remove(tmpFile.Name())
+	// dot -Tsvg symtable.gv -o symtable.svg
+	// dot -Tpng symtable.gv -o symtable.png
+	// dot -Tpdf symtable.gv -o symtable.pdf
+	outputName := fmt.Sprintf("%s.gv", path.Base(uc.fin))
+	parent := os.Getenv("DOT_DIR")
+	cmds := []*exec.Cmd{
+		exec.Command("dot", "-Tpng", tmpFile.Name(), "-o", path.Join(parent, outputName+".png")),
+		exec.Command("dot", "-Tsvg", tmpFile.Name(), "-o", path.Join(parent, outputName+".svg")),
+		exec.Command("dot", "-Tpdf", tmpFile.Name(), "-o", path.Join(parent, outputName+".pdf")),
+	}
+	var wg sync.WaitGroup
+	wg.Add(len(cmds))
+	for _, cmd := range cmds {
+		go func() {
+			log.Debug(cmd.String())
+			if err := cmd.Run(); err != nil {
+				log.Error(err)
+			}
+			wg.Done()
+		}()
+	}
+
+	log.Info("dot graph generated")
+	wg.Wait()
 }
 
 func (uc *UnitCompiler) IR() {

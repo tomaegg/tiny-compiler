@@ -42,6 +42,7 @@ func ParseFlag() compiler.Config {
 	out := fs.String("o", "", "output file (default STDOUT)")
 	stage := fs.String("stage", "bin", fmt.Sprintf("stage: %s", strings.Join(validStage, ", ")))
 	loglevel := fs.String("loglevel", "info", fmt.Sprintf("loglevel: %s", strings.Join(validLoglevels, ", ")))
+	visualize := fs.Bool("visualize", false, "enable visualization mode")
 
 	if len(os.Args) < 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s src.rs [-o out] [--stage=ir] [--loglevel=debug]\n", os.Args[0])
@@ -83,10 +84,11 @@ func ParseFlag() compiler.Config {
 	log.Debugf("loglevel: %s\n", *loglevel)
 
 	return compiler.Config{
-		Stage:    stageMap[*stage],
-		SrcPath:  src,
-		OutPath:  *out,
-		LogLevel: *loglevel,
+		Stage:     stageMap[*stage],
+		SrcPath:   src,
+		OutPath:   *out,
+		LogLevel:  *loglevel,
+		Visualize: *visualize,
 	}
 }
 
