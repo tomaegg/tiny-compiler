@@ -2,7 +2,9 @@
 
 ## Dev Toolchain
 
-golang: 1.24.2 with cgo
+- golang: 1.24 with cgo
+- llvm: 19
+- graphviz
 
 ## Run
 
@@ -14,7 +16,6 @@ golang: 1.24.2 with cgo
 
 # 或者构建镜像
 ./run.sh build
-
 ```
 
 ### 运行
