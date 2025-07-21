@@ -20,6 +20,7 @@ const (
 	Parse
 	Symtable
 	IRGen
+	Bin
 )
 
 type Config struct {

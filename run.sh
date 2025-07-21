@@ -11,17 +11,17 @@ case "$1" in
   docker save -o "$EXPORT_IMAGE" "$IMAGE_NAME"
   ;;
 "build")
-  DOCKER_BUILDKIT=1 docker build -t "$IMAGE_NAME" -f docker/Dockerfile .
+  DOCKER_BUILDKIT=1 docker build -t "$IMAGE_NAME" -f Dockerfile.runtime .
   ;;
-"parser" | "symtable" | "ir" | "dot")
+"compile")
   mkdir -p output
   docker run --rm \
     -v "$(pwd)/example:/runtime/example" \
     -v "$(pwd)/output:/runtime/output" \
-    tiny-compiler:latest "$@"
+    tiny-compiler:latest "${@:2}"
   ;;
 *)
-  echo "Usage: $0 [export|import|build|parser|symtable|ir|dot] [args...]"
+  echo "Usage: $0 [export|import|build|compile] [args...]"
   exit 1
   ;;
 esac

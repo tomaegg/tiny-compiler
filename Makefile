@@ -1,4 +1,4 @@
-.PHONY: generate pack build run dot fmt antlr4 ir symtable parser
+.PHONY: generate pack build run dot fmt antlr4 compiler
 
 ############################################
 # FOR DEV ONLY
@@ -19,20 +19,8 @@ antlr4:
 	mkdir -p $(TOOL_DIR)
 	wget  $(ANTLR4_LINK) -O $(TOOL_DIR)/antlr-4.13.2-complete.jar
 
-parser:
-	@go run -v cmd/parser/main.go $(ARGS)
-
-symtable:
-	@go run -v cmd/symtable/main.go $(ARGS)
-
-ir: 
-	@go run -tags=$(GOBUILDTAGS) -v cmd/ir/main.go $(ARGS)
-
-dot: 
-	go run -v cmd/symtable/main.go $(ARGS) > symtable.gv
-	dot -Tsvg symtable.gv -o symtable.svg
-	dot -Tpng symtable.gv -o symtable.png
-	dot -Tpdf symtable.gv -o symtable.pdf
+compiler:
+	@go run -tags=llvm19 -v cmd/run/main.go $(ARGS)
 
 pack: build
 	rm -rf $(SUBMIT_DIR) $(SUBMIT_ZIP) && mkdir -p $(SUBMIT_DIR)

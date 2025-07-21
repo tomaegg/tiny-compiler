@@ -1,0 +1,13 @@
+services:
+  go-llvm-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - go-mod-cache:/go/pkg
+    command: sh -c "${CMD}"
+
+volumes:
+  go-mod-cache:
