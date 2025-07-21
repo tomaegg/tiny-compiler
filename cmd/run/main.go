@@ -12,14 +12,21 @@ import (
 )
 
 var stageMap = map[string]compiler.CompileStage{
-	"ir":    compiler.IRGen,
-	"lex":   compiler.Lex,
-	"parse": compiler.Parse,
-	"bin":   compiler.Bin,
+	"ir":       compiler.IRGen,
+	"lex":      compiler.Lex,
+	"parse":    compiler.Parse,
+	"bin":      compiler.Bin,
+	"semantic": compiler.Semantic,
 }
 var (
-	validLoglevels = []string{log.InfoLevel.String(), log.DebugLevel.String(), log.FatalLevel.String(), log.ErrorLevel.String()}
-	validStage     []string
+	validLoglevels = []string{
+		log.InfoLevel.String(),
+		log.DebugLevel.String(),
+		log.FatalLevel.String(),
+		log.ErrorLevel.String(),
+		log.TraceLevel.String(),
+	}
+	validStage []string
 )
 
 func init() {
@@ -30,37 +37,44 @@ func init() {
 
 func ParseFlag() compiler.Config {
 
+	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	// 定义可选参数
-	out := flag.String("o", "", "output file (default STDOUT)")
-	stage := flag.String("stage", "bin", fmt.Sprintf("stage: %s", strings.Join(validStage, ", ")))
-	loglevel := flag.String("loglevel", "info", fmt.Sprintf("loglevel: %s", strings.Join(validLoglevels, ", ")))
+	out := fs.String("o", "", "output file (default STDOUT)")
+	stage := fs.String("stage", "bin", fmt.Sprintf("stage: %s", strings.Join(validStage, ", ")))
+	loglevel := fs.String("loglevel", "info", fmt.Sprintf("loglevel: %s", strings.Join(validLoglevels, ", ")))
 
-	// 解析参数
-	flag.Parse()
-
-	// 获取位置参数
-	args := flag.Args()
-	if len(args) < 1 {
+	if len(os.Args) < 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s src.rs [-o out] [--stage=ir] [--loglevel=debug]\n", os.Args[0])
-		flag.Usage()
 		os.Exit(1)
 	}
-	src := args[0]
+	src := os.Args[1]
+
+	// 解析参数
+	err := fs.Parse(os.Args[2:])
+	if err != nil {
+		log.Error(err)
+	}
 
 	// 检查 stage 合法性
 	if !slices.Contains(validStage, *stage) {
 		fmt.Printf("Invalid stage: %s\n", *stage)
+		fs.Usage()
 		os.Exit(1)
 	}
 
 	// 检查 loglevel 合法性
 	if !slices.Contains(validLoglevels, *loglevel) {
 		fmt.Printf("Invalid loglevel: %s\n", *loglevel)
+		fs.Usage()
 		os.Exit(1)
 	}
 
-	level, _ := log.ParseLevel(*loglevel)
+	level, err := log.ParseLevel(*loglevel)
+	if err != nil {
+		log.Panicf("should not get invalid log level: %s", *loglevel)
+	}
 	log.SetLevel(level)
+	log.SetFormatter(&log.TextFormatter{DisableTimestamp: true})
 
 	// 打印结果
 	log.Debugf("src: %s\n", src)
@@ -77,5 +91,7 @@ func ParseFlag() compiler.Config {
 }
 
 func main() {
-	ParseFlag()
+	conf := ParseFlag()
+	cl := compiler.NewUnitCompiler(conf)
+	cl.Compile()
 }

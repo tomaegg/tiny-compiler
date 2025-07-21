@@ -18,7 +18,7 @@ type CompileStage int
 const (
 	Lex CompileStage = iota
 	Parse
-	Symtable
+	Semantic
 	IRGen
 	Bin
 )
@@ -33,16 +33,17 @@ type Config struct {
 type UnitCompiler struct {
 	stage CompileStage
 
-	parser                              *parser.RustLikeParser
-	lexer                               *parser.RustLikeLexer
+	parser    *parser.RustLikeParser
+	lexer     *parser.RustLikeLexer
+	tokens    *antlr.CommonTokenStream
+	parseTree antlr.ParseTree
+
 	lexerErrCallback, parserErrCallback func() []string
 
 	checker *symtable.SemanticChecker
 
-	irGen    *ir.IRGenerator
-	irCancel func()
-
 	fout io.WriteCloser
+	fin  string
 }
 
 func NewUnitCompiler(c Config) *UnitCompiler {
@@ -52,94 +53,112 @@ func NewUnitCompiler(c Config) *UnitCompiler {
 	}
 	log.SetLevel(level)
 
+	if _, err := os.Stat(c.SrcPath); err != nil {
+		log.Fatal(err)
+	}
+
 	input, err := antlr.NewFileStream(c.SrcPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fout, err := os.Create(c.OutPath)
-	if err != nil {
-		log.Error(err)
+	var fout io.WriteCloser
+	if len(c.OutPath) == 0 {
 		fout = os.Stdout
+	} else {
+		fout, err = os.Create(c.OutPath)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
-	ret := &UnitCompiler{stage: c.Stage, fout: fout}
+	ret := &UnitCompiler{stage: c.Stage, fout: fout, fin: c.SrcPath}
 
-	switch {
-	case c.Stage >= Lex:
+	if c.Stage >= Lex {
 		ret.lexer, ret.lexerErrCallback = cmd.NewLexer(input)
-		fallthrough
+		ret.tokens = antlr.NewCommonTokenStream(ret.lexer, antlr.TokenDefaultChannel)
+	}
 
-	case c.Stage >= Parse:
-		tokens := antlr.NewCommonTokenStream(ret.lexer, antlr.TokenDefaultChannel)
-		ret.parser, ret.parserErrCallback = cmd.NewParser(tokens)
-		fallthrough
+	if c.Stage >= Parse {
+		ret.parser, ret.parserErrCallback = cmd.NewParser(ret.tokens)
+		ret.parseTree = ret.parser.Prog()
+	}
 
-	case c.Stage >= Symtable:
-		ret.checker = symtable.NewSemanticChecker(ret.parser.Prog())
-		fallthrough
-
-	case c.Stage >= IRGen:
-		ret.irGen, ret.irCancel = ir.NewIRGenerator(c.SrcPath, ret.checker.SymbolTable(), ret.parser.Prog())
-		fallthrough
-
-	default:
+	if c.Stage >= Semantic {
+		ret.checker = symtable.NewSemanticChecker(ret.parseTree)
 	}
 
 	return ret
 }
 
+func (uc *UnitCompiler) Lex() {
+	// uc.tokens.Fill()
+	for _, token := range uc.tokens.GetAllTokens() {
+		tokenType := token.GetTokenType() // Token 类型（数值）
+		if tokenType == antlr.TokenEOF {
+			break
+		}
+		// 获取 Token 信息
+		line := token.GetLine()     // 行号（从 1 开始）
+		column := token.GetColumn() // 列号（从 0 开始）
+		text := token.GetText()     // 文本内容
+		tokenName := uc.lexer.SymbolicNames[tokenType]
+		log.Infof("token(%2d:%2d) type=%7s, text='%s'\n", line, column, tokenName, text)
+	}
+	if errs := uc.lexerErrCallback(); len(errs) != 0 {
+		for _, err := range uc.lexerErrCallback() {
+			log.Error(err)
+		}
+		log.Fatalf("total %d lexer error occurs", len(errs))
+	} else {
+		log.Info("lexer check passed")
+	}
+}
+
+func (uc *UnitCompiler) Parse() {
+	antlr.ParseTreeWalkerDefault.Walk(&antlr.BaseParseTreeListener{}, uc.parseTree)
+	if errs := uc.parserErrCallback(); len(errs) != 0 {
+		for _, err := range uc.parserErrCallback() {
+			log.Error(err)
+		}
+		log.Fatalf("total %d parser error occurs", len(errs))
+	} else {
+		log.Info("parser check passed")
+	}
+}
+
+func (uc *UnitCompiler) Semantic() {
+	if errs := uc.checker.Check(); errs != 0 {
+		log.Fatalf("total %d semantic error occurs", errs)
+	} else {
+		log.Info("semantic check passed")
+	}
+}
+
+func (uc *UnitCompiler) IR() {
+	irGen, irCancel := ir.NewIRGenerator(uc.fin, uc.checker.SymbolTable(), uc.parseTree)
+	defer irCancel()
+	result := irGen.IR()
+	uc.fout.Write(result)
+	if err := uc.fout.Close(); err != nil {
+		log.Fatal(err)
+	}
+	log.Info("ir generated done")
+}
+
 func (uc *UnitCompiler) Compile() {
-	switch {
-	case uc.stage <= Lex:
-		for {
-			token := uc.lexer.NextToken()
-			tokenType := token.GetTokenType() // Token 类型（数值）
-			if tokenType == antlr.TokenEOF {
-				break
-			}
-			// 获取 Token 信息
-			line := token.GetLine()     // 行号（从 1 开始）
-			column := token.GetColumn() // 列号（从 0 开始）
-			text := token.GetText()     // 文本内容
-			tokenName := uc.lexer.SymbolicNames[tokenType]
-			log.Debugf("token(%2d:%2d) type=%7s, text='%s'\n", line, column, tokenName, text)
-		}
-		if errs := uc.lexerErrCallback(); len(errs) != 0 {
-			for _, err := range uc.lexerErrCallback() {
-				log.Error(err)
-			}
-			log.Fatalf("total %d lexer error occurs", len(errs))
-		} else {
-			log.Info("lexer check passed")
-		}
+	if uc.stage <= Lex {
+		uc.Lex()
+	} else if uc.stage >= Parse {
+		uc.Parse()
+	}
 
-	case uc.stage <= Parse:
-		antlr.ParseTreeWalkerDefault.Walk(&antlr.BaseParseTreeListener{}, uc.parser.Prog())
-		if errs := uc.parserErrCallback(); len(errs) != 0 {
-			for _, err := range uc.parserErrCallback() {
-				log.Error(err)
-			}
-			log.Fatalf("total %d parser error occurs", len(errs))
-		} else {
-			log.Info("parser check passed")
-		}
+	if uc.stage >= Semantic {
+		uc.Semantic()
+	}
 
-	case uc.stage <= Symtable:
-		if errs := uc.checker.Check(); errs != 0 {
-			log.Fatalf("total %d semantic error occurs", errs)
-		} else {
-			log.Info("semantic check passed")
-		}
-
-	case uc.stage <= IRGen:
-		defer uc.irCancel()
-		result := uc.irGen.IR()
-		uc.fout.Write(result)
-		if err := uc.fout.Close(); err != nil {
-			log.Fatal(err)
-		}
-
+	if uc.stage >= IRGen {
+		uc.IR()
 	}
 
 }

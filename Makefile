@@ -1,4 +1,4 @@
-.PHONY: generate pack build run dot fmt antlr4 compiler
+.PHONY: generate pack build run dot fmt antlr4 compiler ir
 
 ############################################
 # FOR DEV ONLY
@@ -20,6 +20,7 @@ antlr4:
 	wget  $(ANTLR4_LINK) -O $(TOOL_DIR)/antlr-4.13.2-complete.jar
 
 compiler:
+	@echo "running with ARGS=[$(ARGS)]" >&2
 	@go run -tags=llvm19 -v cmd/run/main.go $(ARGS)
 
 pack: build

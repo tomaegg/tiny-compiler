@@ -4,6 +4,7 @@ import (
 	"tj-compiler/symtable"
 
 	"github.com/antlr4-go/antlr/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 type IRGenerator struct {
@@ -19,6 +20,7 @@ func NewIRGenerator(module string, symTable *symtable.SymTable, tree antlr.Parse
 
 func (ig *IRGenerator) generate() {
 	if ig.generated {
+		log.Debug("skip for generated done")
 		return
 	}
 	ig.generated = true
