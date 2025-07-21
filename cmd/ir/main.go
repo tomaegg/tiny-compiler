@@ -38,7 +38,7 @@ func main() {
 	log.Info("basic check passed")
 
 	checker := symtable.NewSemanticChecker(tree)
-	if total := checker.TotalErrors(); total != 0 {
+	if total := checker.Check(); total != 0 {
 		log.Fatalf("total %d errors occurs, semantic check done", total)
 		return
 	}
@@ -46,7 +46,7 @@ func main() {
 
 	symTable := checker.SymbolTable()
 
-	irGenerator, cancel := ir.NewIRGenerator(filename, symTable)
+	irGenerator, cancel := ir.NewIRGenerator(filename, symTable, tree)
 	defer cancel()
 
 	s := irGenerator.IR()

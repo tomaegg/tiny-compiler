@@ -5,20 +5,20 @@ import (
 )
 
 type SemanticChecker struct {
-	v *Visitor
+	v    *Visitor
+	root antlr.ParseTree
 }
 
 func NewSemanticChecker(root antlr.ParseTree) *SemanticChecker {
 	visitor := NewVisitor()
-	visitor.Visit(root)
-	visitor.symTable.SetTree(root)
-	return &SemanticChecker{v: visitor}
+	return &SemanticChecker{v: visitor, root: root}
+}
+
+func (s *SemanticChecker) Check() (totalError int) {
+	s.v.Visit(s.root)
+	return s.v.TotalError()
 }
 
 func (s *SemanticChecker) SymbolTable() *SymTable {
 	return s.v.symTable
-}
-
-func (s *SemanticChecker) TotalErrors() int {
-	return s.v.TotalError()
 }

@@ -1,7 +1,6 @@
 package symtable
 
 import (
-	"github.com/antlr4-go/antlr/v4"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -35,7 +34,7 @@ func (s *SymNode) AddChild(child *SymNode) {
 }
 
 type SymTable struct {
-	tree   antlr.ParseTree
+	// tree   antlr.ParseTree
 	root   Scope
 	scopes map[string]*SymNode
 }
@@ -47,14 +46,6 @@ func NewSymTable(root Scope) *SymTable {
 	}
 	ret.scopes[root.String()] = NewSymNode(root)
 	return ret
-}
-
-func (s *SymTable) SetTree(tree antlr.ParseTree) {
-	s.tree = tree
-}
-
-func (s *SymTable) Tree() antlr.ParseTree {
-	return s.tree
 }
 
 func (s *SymTable) ToDotGraph() []byte {

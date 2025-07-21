@@ -39,7 +39,7 @@ func main() {
 	log.Println(tree.ToStringTree(nil, parser))
 
 	checker := symtable.NewSemanticChecker(tree)
-	if total := checker.TotalErrors(); total != 0 {
+	if total := checker.Check(); total != 0 {
 		log.Errorf("total %d errors occurs, semantic check done", total)
 	}
 

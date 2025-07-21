@@ -2,16 +2,19 @@ package ir
 
 import (
 	"tj-compiler/symtable"
+
+	"github.com/antlr4-go/antlr/v4"
 )
 
 type IRGenerator struct {
 	*Visitor
 	generated bool
+	tree      antlr.ParseTree
 }
 
-func NewIRGenerator(module string, symTable *symtable.SymTable) (*IRGenerator, func()) {
+func NewIRGenerator(module string, symTable *symtable.SymTable, tree antlr.ParseTree) (*IRGenerator, func()) {
 	v, f := NewVisitor(module, symTable)
-	return &IRGenerator{Visitor: v}, f
+	return &IRGenerator{Visitor: v, tree: tree}, f
 }
 
 func (ig *IRGenerator) generate() {
@@ -19,8 +22,7 @@ func (ig *IRGenerator) generate() {
 		return
 	}
 	ig.generated = true
-	tree := ig.symTable.Tree()
-	ig.Visit(tree)
+	ig.Visit(ig.tree)
 }
 
 func (ig *IRGenerator) IR() []byte {
