@@ -216,6 +216,8 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
 	if ctx.VarInit() != nil {
 		// TODO:
+		rhs := v.Visit(ctx.VarInit().Expr()).(llvm.Value)
+		v.llvmBuilder.CreateStore(rhs, val)
 	}
 	return nil
 }

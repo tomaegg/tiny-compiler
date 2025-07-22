@@ -39,29 +39,33 @@ func (v Visitor) TotalError() int {
 	return v.errorCount
 }
 
+func PosLogger(token antlr.Token) *log.Entry {
+	line, col := token.GetLine(), token.GetColumn()
+	return log.WithFields(log.Fields{
+		"line": line,
+		"col":  col,
+	})
+}
+
 func (v *Visitor) LogDefine(s Symbol) {
 	token := s.Token()
-	line, col := token.GetLine(), token.GetColumn()
-	log.Infof("[%02d:%02d] define: %s", line, col, s.String())
+	PosLogger(token).Infof("define: %s", s.String())
 }
 
 func (v *Visitor) LogResolve(res Symbol, atToken antlr.Token) {
-	line, col := atToken.GetLine(), atToken.GetColumn()
 	if res == nil {
-		log.Fatalf("unresolved symbol at token[%d:%d]: <%s>", line, col, atToken.GetText())
+		PosLogger(atToken).Fatalf("unresolved symbol at token: <%s>", atToken.GetText())
 	}
-	log.Infof("[%02d:%02d] resolve: %s", line, col, res.String())
+	PosLogger(atToken).Infof("resolve: %s", res.String())
 }
 
 func (v *Visitor) LogError(err SemanticErr, atToken antlr.Token) {
 	v.errorCount++
-	line, col := atToken.GetLine(), atToken.GetColumn()
-	log.Errorf("[%02d:%02d] %s", line, col, err)
+	PosLogger(atToken).Errorf("%s", err)
 }
 
 func (v *Visitor) LogInfer(s Symbol, at antlr.Token) {
-	log.Infof("[%02d:%02d] infer: %s",
-		at.GetLine(), at.GetColumn(), s)
+	PosLogger(at).Infof("infer: %s", s)
 }
 
 func (v *Visitor) checkFuncReturn(scope FuncScope) {
@@ -240,14 +244,6 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	mutable := ctx.MUT() != nil
 	varSymbol := NewBaseSymbol(tokenID.GetText(), varType, mutable, tokenID)
 
-	if v.currentScope.Exist(varSymbol) {
-		v.currentScope.Shallow(varSymbol)
-	} else {
-		v.currentScope.Define(varSymbol)
-	}
-
-	v.LogDefine(varSymbol)
-
 	// varinit exist
 	if ctx.VarInit() != nil {
 		// 访问varinit得到属性
@@ -257,19 +253,33 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 			// 当前为待推断
 			varSymbol.Infer(attr.Type)
 			v.LogInfer(varSymbol, tokenID)
+		case varType:
+			// 如果当前symbol存在类型, 与当前类型保持一致，pass
+			// v.LogInfer()
+			PosLogger(tokenID).Debugf("init with assignment: type: %s", varType)
 		default:
 			err := NewSematicErr(TypeErr).
 				Message("dismatch type assignment: <%s> != <%s>", varSymbol.Type(), attr.Type)
 			v.LogError(err, tokenID)
 		}
 	}
+
+	if v.currentScope.Exist(varSymbol) {
+		v.currentScope.Shallow(varSymbol)
+		PosLogger(tokenID).Infof("shallow: %s", varSymbol)
+	} else {
+		v.currentScope.Define(varSymbol)
+	}
+
+	v.LogDefine(varSymbol)
 	return nil
 }
 
 // different expression
 
 func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
-	s := v.currentScope.Resolve(ctx.ID().GetSymbol().GetText())
+	token := ctx.ID().GetSymbol()
+	s := v.currentScope.Resolve(token.GetText())
 	var t SymType
 	switch s := s.(type) {
 	case BaseSymbol:
@@ -277,7 +287,7 @@ func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
 	case FuncSymbol:
 		t = SymFunc
 	default:
-		log.Fatalf("use unknown symbol: <%v>", ctx.ID().GetText())
+		PosLogger(token).Fatalf("use unknown symbol: <%v>", token.GetText())
 	}
 	return ExprAttribute{Type: t}
 }
