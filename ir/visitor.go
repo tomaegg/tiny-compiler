@@ -85,7 +85,7 @@ func (v *Visitor) VisitProg(ctx *parser.ProgContext) any {
 	v.currentScope = v.currentScope.Enclosed()
 
 	// check module
-	// llvm.VerifyModule(v.llvmMod, llvm.AbortProcessAction)
+	llvm.VerifyModule(v.llvmMod, llvm.AbortProcessAction)
 	return ret
 }
 
