@@ -10,7 +10,8 @@ services:
       - .:/workspace
       - go-mod-cache:/go/pkg
       - build-cache:/root/.cache
-    command: sh -c "${CMD}"
+    command: /bin/sh -c "$CMD"
+    network_mode: host
 
 volumes:
   go-mod-cache:
