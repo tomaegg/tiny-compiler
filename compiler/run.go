@@ -58,7 +58,12 @@ func NewUnitCompiler(c Config) *UnitCompiler {
 	}
 	log.SetLevel(level)
 
-	if _, err := os.Stat(c.SrcPath); err != nil {
+	stat, err := os.Stat(c.SrcPath)
+	if stat.IsDir() {
+		log.Fatalf("%s is a directory", c.SrcPath)
+	}
+
+	if err != nil {
 		log.Fatal(err)
 	}
 
