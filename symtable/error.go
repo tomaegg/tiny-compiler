@@ -31,6 +31,7 @@ func NewSematicErr(errType SemanticErrType) SemanticErr {
 }
 
 const (
+	AttrErr        SemanticErrType = "AttrError"
 	TypeErr        SemanticErrType = "TypeError"
 	IntOverflowErr SemanticErrType = "IntOverflowError"
 	ArgsErr        SemanticErrType = "ArgsError"

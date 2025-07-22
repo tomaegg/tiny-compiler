@@ -454,6 +454,10 @@ func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 		err := NewSematicErr(TypeErr).
 			Message("dismatch type assignment: <%s> != <%s>", res.Type(), attr.Type)
 		v.LogError(err, tokenID)
+	} else if !res.(BaseSymbol).Mutable() {
+		// 如果lhs是常量
+		err := NewSematicErr(AttrErr).Message("modify const var: %s", res)
+		v.LogError(err, tokenID)
 	}
 	return nil
 }

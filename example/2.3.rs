@@ -18,5 +18,6 @@ fn p_2_3_3() {
     a = a + 1;
     let a;
     a = 1;
+    a = 100;
     // let mut a:i32 = b;
 }
