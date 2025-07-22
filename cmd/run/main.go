@@ -45,7 +45,8 @@ func ParseFlag() compiler.Config {
 	visualize := fs.Bool("visualize", false, "enable visualization mode")
 
 	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s src.rs [-o out] [--stage=ir] [--loglevel=debug]\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage: %s <src.rs> [-o out] [-stage=ir] [-loglevel=debug]\n", os.Args[0])
+		fs.Usage()
 		os.Exit(1)
 	}
 	src := os.Args[1]
