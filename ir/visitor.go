@@ -381,9 +381,9 @@ func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
 	// NOTE: 目前值只有INT32
 	switch ctx.GetOp().GetTokenType() {
 	case parser.RustLikeLexerPLUS:
-		ret = v.llvmBuilder.CreateAdd(lhs, rhs, "tAdd")
+		ret = v.llvmBuilder.CreateAdd(lhs, rhs, "tadd")
 	case parser.RustLikeLexerMINUS:
-		ret = v.llvmBuilder.CreateSub(lhs, rhs, "tSub")
+		ret = v.llvmBuilder.CreateSub(lhs, rhs, "tsub")
 	default:
 		panic("should not get token other than +,-")
 	}
@@ -471,6 +471,6 @@ func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
 	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
 	llvmType := v.LLVMType(varSymbol.Type())
 	llvmVal := GetValue(varSymbol)
-	ret := v.llvmBuilder.CreateLoad(llvmType, llvmVal, "tLoad")
+	ret := v.llvmBuilder.CreateLoad(llvmType, llvmVal, "tload")
 	return ret
 }
