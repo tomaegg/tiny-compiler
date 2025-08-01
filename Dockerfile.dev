@@ -1,9 +1,42 @@
-FROM golang:1.24-bookworm
+FROM debian:bookworm-slim
 
-WORKDIR /app
+ARG GO_VERSION=1.24.5
+ENV GO_VERSION=${GO_VERSION}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  llvm-19 llvm-19-dev make graphviz && \
-  apt-get clean && rm -rf /var/lib/apt/lists/*
+    ca-certificates \
+    curl \
+    llvm-19 \
+    llvm-19-dev \
+    graphviz \
+    g++ \
+		gcc \
+		libc6-dev \
+		make \
+		pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
+RUN set -eux;\
+  arch="$(dpkg --print-architecture)"; arch="${arch##*-}"; \
+	url=; \
+	case "$arch" in \
+		'amd64') \
+			url="https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz"; \
+			;; \
+		'arm64') \
+			url="https://dl.google.com/go/go${GO_VERSION}.linux-arm64.tar.gz"; \
+			;; \
+    *) echo >&2 "error: unsupported architecture '$arch'"; exit 1 ;;\
+  esac; \
+  curl -fsSL "$url" -o go.tar.gz \
+    && rm -rf /usr/local/go && tar -C /usr/local -xzf go.tar.gz \
+    && rm go.tar.gz
+
+ENV GOTOOLCHAIN=local
+ENV GOPATH /go
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+
+# 设置 GOPROXY
 RUN go env -w GOPROXY=https://goproxy.cn,direct
+
+WORKDIR /app
