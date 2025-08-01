@@ -241,6 +241,9 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	} else {
 		varType = v.Visit(ctx.VarType().Rtype()).(SymType)
 	}
+
+	// cannot be void
+
 	mutable := ctx.MUT() != nil
 	varSymbol := NewBaseSymbol(tokenID.GetText(), varType, mutable, tokenID)
 
@@ -248,6 +251,11 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	if ctx.VarInit() != nil {
 		// 访问varinit得到属性
 		attr := v.Visit(ctx.VarInit().Expr()).(ExprAttribute)
+		PosLogger(tokenID).Debugf("init with assignment: rhs type: %s", varType)
+		if attr.Type == SymVoid {
+			err := NewSematicErr(TypeErr).Message("rhs cannot be void type")
+			v.LogError(err, tokenID)
+		}
 		switch varSymbol.Type() {
 		case SymToInfer:
 			// 当前为待推断
