@@ -1,5 +1,6 @@
 services:
   go-llvm-dev:
+    tty: true
     build:
       context: .
       dockerfile: Dockerfile.dev

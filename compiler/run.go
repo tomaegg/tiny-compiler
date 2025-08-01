@@ -59,12 +59,11 @@ func NewUnitCompiler(c Config) *UnitCompiler {
 	log.SetLevel(level)
 
 	stat, err := os.Stat(c.SrcPath)
+	if err != nil{
+		log.Fatal(err)
+	}
 	if stat.IsDir() {
 		log.Fatalf("%s is a directory", c.SrcPath)
-	}
-
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	input, err := antlr.NewFileStream(c.SrcPath)

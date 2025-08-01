@@ -14,12 +14,11 @@ case "$1" in
   DOCKER_BUILDKIT=1 docker build -t "$IMAGE_NAME" -f Dockerfile.runtime .
   ;;
 "compile")
+  shift 1
   mkdir -p output
-  docker run --rm \
-    -v "$(pwd)/example:/runtime/example" \
-    -v "$(pwd)/output:/runtime/output" \
-    -e "DOT_DIR=/runtime/output" \
-    tiny-compiler:latest "${@:2}"
+  docker run --rm -t \
+    -v "$(pwd):/runtime" \
+    tiny-compiler:latest "$@"
   ;;
 *)
   echo "Usage: $0 [export|import|build|compile] [args...]"
