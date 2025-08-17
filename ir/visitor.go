@@ -15,9 +15,9 @@ import (
 func (v *Visitor) LLVMType(t symtable.SymType) llvm.Type {
 	ctx := v.llvmCtx
 	switch t {
-	case symtable.SymInt32:
+	case symtable.Int32:
 		return ctx.Int32Type()
-	case symtable.SymVoid:
+	case symtable.Void:
 		return ctx.VoidType()
 	default:
 		log.Panicf("unsupported type: %s", t)

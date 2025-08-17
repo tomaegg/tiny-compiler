@@ -9,7 +9,7 @@ import (
 )
 
 var typeMap = map[string]SymType{
-	"i32": SymInt32,
+	"i32": Int32,
 }
 
 type ExprAttribute struct {
@@ -71,7 +71,7 @@ func (v *Visitor) LogInfer(s Symbol, at antlr.Token) {
 func (v *Visitor) checkFuncReturn(scope FuncScope) {
 	funcSymbol := scope.GetSymbol()
 	returned := scope.HasReturn()
-	funcHasReturn := funcSymbol.RetType() != SymVoid
+	funcHasReturn := funcSymbol.RetType() != Void
 	if funcHasReturn && !returned {
 		err := NewSematicErr(RetErr).
 			Message("FuncScope <%s> should have return statement, but not", funcSymbol.Name())
@@ -81,7 +81,7 @@ func (v *Visitor) checkFuncReturn(scope FuncScope) {
 
 func (v *Visitor) checkUninferredSymbol(scope Scope) {
 	for _, sym := range scope.Symbols() {
-		if sym.Type() == SymToInfer {
+		if sym.Type() == ToInfer {
 			err := NewSematicErr(TypeErr).
 				Message("Symbol <%s> is uninferred", sym.Name())
 			v.LogError(err, sym.Token())
@@ -159,7 +159,7 @@ func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
 	funcName := funcToken.GetText()
 
 	params := v.Visit(ctx.FuncParamsList()).([]BaseSymbol)
-	retType := SymVoid
+	retType := Void
 	if funcRet := ctx.FuncDeclarationReturn(); funcRet != nil {
 		retType = v.Visit(funcRet.Rtype()).(SymType)
 	}
@@ -212,7 +212,7 @@ func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
 
 	funcSymbol := funcScope.GetSymbol()
 	wantType := funcSymbol.RetType()
-	getType := SymVoid
+	getType := Void
 	if ctx.Expr() != nil {
 		attr := v.Visit(ctx.Expr()).(ExprAttribute)
 		getType = attr.Type
@@ -237,7 +237,7 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	// NOTE: 声明时可以没有类型, 需要定义为to infer
 	var varType SymType
 	if ctx.VarType() == nil {
-		varType = SymToInfer // NOTE: 此时标注为待推断
+		varType = ToInfer // NOTE: 此时标注为待推断
 	} else {
 		varType = v.Visit(ctx.VarType().Rtype()).(SymType)
 	}
@@ -252,12 +252,12 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 		// 访问varinit得到属性
 		attr := v.Visit(ctx.VarInit().Expr()).(ExprAttribute)
 		PosLogger(tokenID).Debugf("init with assignment: rhs type: %s", varType)
-		if attr.Type == SymVoid {
+		if attr.Type == Void {
 			err := NewSematicErr(TypeErr).Message("rhs cannot be void type")
 			v.LogError(err, tokenID)
 		}
 		switch varSymbol.Type() {
-		case SymToInfer:
+		case ToInfer:
 			// 当前为待推断
 			varSymbol.Infer(attr.Type)
 			v.LogInfer(varSymbol, tokenID)
@@ -293,7 +293,7 @@ func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
 	case BaseSymbol:
 		t = s.Type()
 	case FuncSymbol:
-		t = SymFunc
+		t = Func
 	default:
 		PosLogger(token).Fatalf("use unknown symbol: <%v>", token.GetText())
 	}
@@ -341,10 +341,10 @@ func (v *Visitor) VisitExprCmp(ctx *parser.ExprCmpContext) any {
 		)
 		v.LogError(err, op)
 		// NOTE: 如果类型不符合，默认按照int32处理
-		return ExprAttribute{Type: SymError}
+		return ExprAttribute{Type: Error}
 	}
 	// NOTE: 由于暂时不支持bool类型，因此返回Int32
-	return ExprAttribute{Type: SymInt32}
+	return ExprAttribute{Type: Int32}
 }
 
 func (v *Visitor) VisitExprMulDiv(ctx *parser.ExprMulDivContext) any {
@@ -357,10 +357,10 @@ func (v *Visitor) VisitExprMulDiv(ctx *parser.ExprMulDivContext) any {
 		)
 		v.LogError(err, op)
 		// 如果类型不一致返回 error 类型
-		return ExprAttribute{Type: SymError}
+		return ExprAttribute{Type: Error}
 	}
 	// 类型一致返回 int32 类型
-	return ExprAttribute{Type: SymInt32}
+	return ExprAttribute{Type: Int32}
 }
 
 func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
@@ -373,10 +373,10 @@ func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
 		)
 		v.LogError(err, op)
 		// 如果类型不一致返回 undefined 类型
-		return ExprAttribute{Type: SymError}
+		return ExprAttribute{Type: Error}
 	}
 	// 类型一致返回 int32 类型
-	return ExprAttribute{Type: SymInt32}
+	return ExprAttribute{Type: Int32}
 }
 
 func (v *Visitor) VisitExprParen(ctx *parser.ExprParenContext) any {
@@ -391,7 +391,7 @@ func (v *Visitor) VisitExprNum(ctx *parser.ExprNumContext) any {
 		err := NewSematicErr(IntOverflowErr).Message("overflow int32: %s", numToken.GetText())
 		v.LogError(err, numToken)
 	}
-	return ExprAttribute{Type: SymInt32, Value: val}
+	return ExprAttribute{Type: Int32, Value: val}
 }
 
 func (v *Visitor) VisitStatExpr(ctx *parser.StatExprContext) any {
@@ -454,7 +454,7 @@ func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 	v.LogResolve(res, ctx.ID().GetSymbol())
 
 	attr := v.Visit(ctx.Expr()).(ExprAttribute)
-	if res.Type() == SymToInfer {
+	if res.Type() == ToInfer {
 		res.Infer(attr.Type)
 		v.LogInfer(res, tokenID)
 	} else if res.Type() != attr.Type {

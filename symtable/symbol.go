@@ -9,34 +9,51 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type (
-	SymName = string
-	SymType int
-)
+type SymName = string
 
-const (
-	SymToInfer SymType = iota
-	SymFunc            // 泛指function
-	SymInt32
-	SymVoid
-	SymError
-)
-
-func (t SymType) String() string {
-	switch t {
-	case SymInt32:
-		return "i32"
-	case SymToInfer:
-		return "toInfer"
-	case SymVoid:
-		return "void"
-	case SymFunc:
-		return "func"
-	case SymError:
-		return "errType"
-	}
-	panic("invalid type")
+type SymType interface {
+	String() string
+	isSymType()
 }
+
+// --- 基础类型 ---
+type (
+	SymToInfer struct{} // 待推断类型
+	SymInt32   struct{} // i32
+	SymVoid    struct{} // void
+	SymFunc    struct{} // 函数
+	SymError   struct{} // 错误类型
+)
+
+// --- 复合类型：数组 ---
+type SymArray struct {
+	ElemType SymType // 数组元素类型（如 SymInt32）
+	Length   int     // 数组长度（如 10）
+}
+
+// 实现 SymType 接口
+func (t SymToInfer) String() string { return "toInfer" }
+func (t SymInt32) String() string   { return "i32" }
+func (t SymVoid) String() string    { return "void" }
+func (t SymFunc) String() string    { return "func" }
+func (t SymError) String() string   { return "errType" }
+func (t SymArray) String() string   { return fmt.Sprintf("[%s;%d]", t.ElemType, t.Length) }
+
+// 标记方法（防止外部类型实现 SymType）
+func (t SymToInfer) isSymType() {}
+func (t SymInt32) isSymType()   {}
+func (t SymVoid) isSymType()    {}
+func (t SymFunc) isSymType()    {}
+func (t SymError) isSymType()   {}
+func (t SymArray) isSymType()   {}
+
+var (
+	ToInfer SymType = SymToInfer{}
+	Int32   SymType = SymInt32{}
+	Void    SymType = SymVoid{}
+	Func    SymType = SymFunc{}
+	Error   SymType = SymError{}
+)
 
 type Symbol interface {
 	kv.KeyMapInterface
@@ -94,7 +111,7 @@ func (bs baseSymbolImpl) Type() SymType {
 }
 
 func (bs *baseSymbolImpl) Infer(t SymType) {
-	if bs.stype != SymToInfer {
+	if t == ToInfer{
 		log.Panicf("cannot infer type for symbol <%s>: current type is <%s>", bs.name, bs.stype)
 	}
 	bs.stype = t
@@ -126,7 +143,7 @@ func NewFuncSymbol(name SymName, enclosed Scope, params []BaseSymbol, retType Sy
 }
 
 func (f funcSymbolImpl) Type() SymType {
-	return SymFunc
+	return Func
 }
 
 func (f funcSymbolImpl) Token() antlr.Token {
@@ -192,4 +209,8 @@ func (b BasicTypeSymbol) String() string {
 
 func (b BasicTypeSymbol) Infer(extType SymType) {
 	panic(fmt.Sprintf("cannot infer type for basic type symbol <%s>", b.name))
+}
+
+type ArraySymbol struct {
+	baseSymbolImpl
 }
