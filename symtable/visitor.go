@@ -224,9 +224,9 @@ func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
 		getType = attr.Type
 	}
 
-	if wantType != getType {
+	if !wantType.SameWith(getType) {
 		err := NewSematicErr(TypeErr).Message(
-			"function return type dismatch: want <%s>, get <%s>",
+			"function return type mismatch: want <%s>, get <%s>",
 			wantType, getType,
 		)
 		tokenRet := ctx.RETURN().GetSymbol()
@@ -254,41 +254,36 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	lhsSymbol := NewBaseSymbol(tokenID.GetText(), lhsType, mutable, tokenID)
 
 	v.LogDefine(lhsSymbol)
-	// varinit exist
-	if ctx.VarInit() != nil {
-		// 访问varinit得到属性
-		rhsAttr := v.Visit(ctx.VarInit().Expr()).(ExprAttribute)
-		PosLogger(tokenID).Debugf("init with assignment: rhs type: %s", rhsAttr.Type)
-		if rhsAttr.Type == Void {
-			err := NewSematicErr(TypeErr).Message("rhs cannot be void type")
-			v.LogError(err, tokenID)
-		}
-		switch lhsSymbol.Type() {
-		case ToInfer:
-			// 当前为待推断
-			lhsSymbol.Infer(rhsAttr.Type)
-			v.LogInfer(lhsSymbol, tokenID)
-		case rhsAttr.Type:
-			// 类型一致, 单独处理array类型
-			if lhsArray, ok := lhsType.(SymArray); ok {
-				rhsArray := rhsAttr.Type.(SymArray)
-				if lhsArray.ElemType != rhsArray.ElemType || lhsArray.Length != rhsArray.Length {
-					err := NewSematicErr(TypeErr).Message("array assignment dismatch: lhs: %s, rhs: %s", lhsArray, rhsArray)
-					v.LogError(err, tokenID)
-				}
-			}
-		default:
-			err := NewSematicErr(TypeErr).
-				Message("dismatch type assignment: <%s> != <%s>", lhsSymbol.Type(), rhsAttr.Type)
-			v.LogError(err, tokenID)
-		}
-	}
-
 	if v.currentScope.Exist(lhsSymbol) {
 		v.currentScope.Shallow(lhsSymbol)
 		PosLogger(tokenID).Infof("shallow: %s", lhsSymbol)
 	} else {
 		v.currentScope.Define(lhsSymbol)
+	}
+
+	// varinit exist
+	if ctx.VarInit() != nil {
+		// 访问varinit得到属性
+		rhsAttr := v.Visit(ctx.VarInit().Expr()).(ExprAttribute)
+		PosLogger(tokenID).Debugf("init with assignment: rhs type: %v", rhsAttr.Type)
+		if rhsAttr.Type.SameWith(Void) {
+			err := NewSematicErr(TypeErr).Message("rhs cannot be void type")
+			v.LogError(err, tokenID)
+		}
+
+		switch lhsSymbol.Type().(type) {
+		case SymToInfer:
+			// 当前为待推断
+			lhsSymbol.Infer(rhsAttr.Type)
+			v.LogInfer(lhsSymbol, tokenID)
+
+		default:
+			if !lhsType.SameWith(rhsAttr.Type) {
+				err := NewSematicErr(TypeErr).
+					Message("mismatch type assignment: <%s> != <%v>", lhsSymbol.Type(), rhsAttr.Type)
+				v.LogError(err, tokenID)
+			}
+		}
 	}
 
 	return nil
@@ -329,7 +324,7 @@ func (v *Visitor) VisitExprFuncCall(ctx *parser.ExprFuncCallContext) any {
 	for i := range min(len(funcParamCtx.AllExpr()), len(paramsRequired)) {
 		fp := funcParamCtx.AllExpr()[i]
 		attr := v.Visit(fp).(ExprAttribute)
-		if attr.Type != paramsRequired[i].Type() {
+		if !attr.Type.SameWith(paramsRequired[i].Type()) {
 			err := NewSematicErr(ArgsErr).Message("function <%s> args at %d requires %s, but get type <%s>",
 				funcName, i, paramsRequired[i], attr.Type,
 			)
@@ -346,12 +341,17 @@ func (v *Visitor) VisitExprCmp(ctx *parser.ExprCmpContext) any {
 	attrLhs := v.Visit(ctx.GetLhs()).(ExprAttribute)
 	attrRhs := v.Visit(ctx.GetRhs()).(ExprAttribute)
 	op := ctx.GetOp()
-	if attrLhs.Type != attrRhs.Type {
+	if IsNumberTypes(attrLhs.Type, attrRhs.Type) {
+		err := NewSematicErr(TypeErr).Message("binary op only for numbers")
+		v.LogError(err, op)
+		return ExprAttribute{Type: Error}
+	}
+
+	if !attrLhs.Type.SameWith(attrRhs.Type) {
 		err := NewSematicErr(TypeErr).Message("type mismatch with: <%s> %s <%s>",
 			attrLhs.Type, op.GetText(), attrRhs.Type,
 		)
 		v.LogError(err, op)
-		// NOTE: 如果类型不符合，默认按照int32处理
 		return ExprAttribute{Type: Error}
 	}
 	// NOTE: 由于暂时不支持bool类型，因此返回Int32
@@ -362,7 +362,13 @@ func (v *Visitor) VisitExprMulDiv(ctx *parser.ExprMulDivContext) any {
 	attrLhs := v.Visit(ctx.GetLhs()).(ExprAttribute)
 	attrRhs := v.Visit(ctx.GetRhs()).(ExprAttribute)
 	op := ctx.GetOp()
-	if attrLhs.Type != attrRhs.Type {
+	if IsNumberTypes(attrLhs.Type, attrRhs.Type) {
+		err := NewSematicErr(TypeErr).Message("binary op only for numbers")
+		v.LogError(err, op)
+		return ExprAttribute{Type: Error}
+	}
+
+	if !attrLhs.Type.SameWith(attrRhs.Type) {
 		err := NewSematicErr(TypeErr).Message("type mismatch: <%s> %s <%s>",
 			attrLhs.Type, op.GetText(), attrRhs.Type,
 		)
@@ -378,7 +384,12 @@ func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
 	attrLhs := v.Visit(ctx.GetLhs()).(ExprAttribute)
 	attrRhs := v.Visit(ctx.GetRhs()).(ExprAttribute)
 	op := ctx.GetOp()
-	if attrLhs.Type != attrRhs.Type {
+	if IsNumberTypes(attrLhs.Type, attrRhs.Type) {
+		err := NewSematicErr(TypeErr).Message("binary op only for numbers")
+		v.LogError(err, op)
+		return ExprAttribute{Type: Error}
+	}
+	if !attrLhs.Type.SameWith(attrRhs.Type) {
 		err := NewSematicErr(TypeErr).Message("type mismatch: <%s> %s <%s>",
 			attrLhs.Type, op.GetText(), attrRhs.Type,
 		)
@@ -421,15 +432,15 @@ func (v *Visitor) VisitExprArray(ctx *parser.ExprArrayContext) any {
 			flagType = elem.Type
 		}
 
-		if elem.Type != flagType {
-			// elems dismatch
-			err := NewSematicErr(TypeErr).Message("array elements type dismatch, first: %s, current: %s", flagType, elem.Type)
+		if !elem.Type.SameWith(flagType) {
+			// elems mismatch
+			err := NewSematicErr(TypeErr).Message("array elements type mismatch, first: %s, current: %v", flagType, elem.Type)
 			v.LogError(err, e.GetStart())
 			valid = false
 		}
 	}
 	if !valid {
-		return ExprAttribute{Type: nil, Value: nil} // semantic阶段ignore value
+		return ExprAttribute{Type: Error, Value: nil} // semantic阶段ignore value
 	}
 	arrayType := NewSymArray(flagType, int32(len(exprs)))
 	return ExprAttribute{Type: arrayType, Value: nil} // semantic阶段ignore value
@@ -502,10 +513,10 @@ func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 	if res.Type() == ToInfer {
 		res.Infer(attr.Type)
 		v.LogInfer(res, tokenID)
-	} else if res.Type() != attr.Type {
+	} else if !res.Type().SameWith(attr.Type) {
 		// 如果已经推断类型且不匹配，则报错
 		err := NewSematicErr(TypeErr).
-			Message("dismatch type assignment: <%s> != <%s>", res.Type(), attr.Type)
+			Message("mismatch type assignment: <%s> != <%s>", res.Type(), attr.Type)
 		v.LogError(err, tokenID)
 	} else if !res.(BaseSymbol).Mutable() {
 		// 如果lhs是常量

@@ -14,6 +14,7 @@ type SymName = string
 
 type SymType interface {
 	String() string
+	SameWith(SymType) bool
 	isSymType()
 }
 
@@ -32,6 +33,24 @@ type SymArray struct {
 	Length   int32   // 数组长度（如 10）
 }
 
+func IsNumberTypes(t ...SymType) bool {
+	for _, s := range t {
+		if !IsNumberType(s) {
+			return false
+		}
+	}
+	return true
+}
+
+func IsNumberType(t SymType) bool {
+	switch t.(type) {
+	case SymInt32:
+		return true
+	default:
+		return false
+	}
+}
+
 // 实现 SymType 接口
 func (t SymToInfer) String() string { return "toInfer" }
 func (t SymInt32) String() string   { return "i32" }
@@ -44,6 +63,31 @@ func (t SymArray) String() string {
 		lenStr = strconv.Itoa(int(t.Length))
 	}
 	return fmt.Sprintf("[%s;%s]", t.ElemType, lenStr)
+}
+
+func (t SymToInfer) SameWith(o SymType) bool { return t == o }
+func (t SymVoid) SameWith(o SymType) bool    { return t == o }
+func (t SymInt32) SameWith(o SymType) bool   { return t == o }
+func (t SymError) SameWith(o SymType) bool   { return t == o }
+func (t SymFunc) SameWith(o SymType) bool    { return t == o }
+
+func (t SymArray) SameWith(o SymType) bool {
+	other, ok := o.(SymArray)
+	if !ok {
+		return false
+	}
+	if t.Length != other.Length {
+		return false
+	}
+
+	switch lhs := t.ElemType.(type) {
+	case SymArray:
+		rhs, ok := other.ElemType.(SymArray)
+		return ok && lhs.SameWith(rhs)
+
+	default:
+		return t.ElemType == other.ElemType
+	}
 }
 
 func NewSymArray(etype SymType, length int32) SymArray {
