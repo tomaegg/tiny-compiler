@@ -146,7 +146,7 @@ func (v *Visitor) VisitFuncParamsList(ctx *parser.FuncParamsListContext) any {
 }
 
 func (v *Visitor) VisitRtype(ctx *parser.RtypeContext) any {
-	// NOTE: 目前有两种类型 1. i32 2. array
+	// NOTE: 目前有两种类型 1.i32 ; 2.array
 	switch {
 	case ctx.INT32() != nil:
 		return Int32
@@ -241,51 +241,56 @@ func (v *Visitor) VisitStatFuncReturn(ctx *parser.StatFuncReturnContext) any {
 func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	tokenID := ctx.ID().GetSymbol()
 	// NOTE: 声明时可以没有类型, 需要定义为to infer
-	var varType SymType
+	var lhsType SymType
 	if ctx.VarType() == nil {
-		varType = ToInfer // NOTE: 此时标注为待推断
+		lhsType = ToInfer // NOTE: 此时标注为待推断
 	} else {
-		varType = v.Visit(ctx.VarType().Rtype()).(SymType)
+		lhsType = v.Visit(ctx.VarType().Rtype()).(SymType)
 	}
 
 	// cannot be void
 
 	mutable := ctx.MUT() != nil
-	varSymbol := NewBaseSymbol(tokenID.GetText(), varType, mutable, tokenID)
+	lhsSymbol := NewBaseSymbol(tokenID.GetText(), lhsType, mutable, tokenID)
 
+	v.LogDefine(lhsSymbol)
 	// varinit exist
 	if ctx.VarInit() != nil {
 		// 访问varinit得到属性
-		attr := v.Visit(ctx.VarInit().Expr()).(ExprAttribute)
-		PosLogger(tokenID).Debugf("init with assignment: rhs type: %s", varType)
-		if attr.Type == Void {
+		rhsAttr := v.Visit(ctx.VarInit().Expr()).(ExprAttribute)
+		PosLogger(tokenID).Debugf("init with assignment: rhs type: %s", rhsAttr.Type)
+		if rhsAttr.Type == Void {
 			err := NewSematicErr(TypeErr).Message("rhs cannot be void type")
 			v.LogError(err, tokenID)
 		}
-		switch varSymbol.Type() {
+		switch lhsSymbol.Type() {
 		case ToInfer:
 			// 当前为待推断
-			varSymbol.Infer(attr.Type)
-			v.LogInfer(varSymbol, tokenID)
-		case varType:
-			// 如果当前symbol存在类型, 与当前类型保持一致，pass
-			// v.LogInfer()
-			PosLogger(tokenID).Debugf("init with assignment: type: %s", varType)
+			lhsSymbol.Infer(rhsAttr.Type)
+			v.LogInfer(lhsSymbol, tokenID)
+		case rhsAttr.Type:
+			// 类型一致, 单独处理array类型
+			if lhsArray, ok := lhsType.(SymArray); ok {
+				rhsArray := rhsAttr.Type.(SymArray)
+				if lhsArray.ElemType != rhsArray.ElemType || lhsArray.Length != rhsArray.Length {
+					err := NewSematicErr(TypeErr).Message("array assignment dismatch: lhs: %s, rhs: %s", lhsArray, rhsArray)
+					v.LogError(err, tokenID)
+				}
+			}
 		default:
 			err := NewSematicErr(TypeErr).
-				Message("dismatch type assignment: <%s> != <%s>", varSymbol.Type(), attr.Type)
+				Message("dismatch type assignment: <%s> != <%s>", lhsSymbol.Type(), rhsAttr.Type)
 			v.LogError(err, tokenID)
 		}
 	}
 
-	if v.currentScope.Exist(varSymbol) {
-		v.currentScope.Shallow(varSymbol)
-		PosLogger(tokenID).Infof("shallow: %s", varSymbol)
+	if v.currentScope.Exist(lhsSymbol) {
+		v.currentScope.Shallow(lhsSymbol)
+		PosLogger(tokenID).Infof("shallow: %s", lhsSymbol)
 	} else {
-		v.currentScope.Define(varSymbol)
+		v.currentScope.Define(lhsSymbol)
 	}
 
-	v.LogDefine(varSymbol)
 	return nil
 }
 
@@ -405,7 +410,29 @@ func (v *Visitor) VisitExprNum(ctx *parser.ExprNumContext) any {
 }
 
 func (v *Visitor) VisitExprArray(ctx *parser.ExprArrayContext) any {
-	return nil
+	var (
+		exprs    = ctx.ArrayElems().AllExpr()
+		valid    = true
+		flagType SymType
+	)
+	for _, e := range exprs {
+		elem := v.Visit(e).(ExprAttribute)
+		if flagType == nil {
+			flagType = elem.Type
+		}
+
+		if elem.Type != flagType {
+			// elems dismatch
+			err := NewSematicErr(TypeErr).Message("array elements type dismatch, first: %s, current: %s", flagType, elem.Type)
+			v.LogError(err, e.GetStart())
+			valid = false
+		}
+	}
+	if !valid {
+		return ExprAttribute{Type: nil, Value: nil} // semantic阶段ignore value
+	}
+	arrayType := NewSymArray(flagType, int32(len(exprs)))
+	return ExprAttribute{Type: arrayType, Value: nil} // semantic阶段ignore value
 }
 
 func (v *Visitor) VisitExprArrayAccess(ctx *parser.ExprArrayAccessContext) any {
