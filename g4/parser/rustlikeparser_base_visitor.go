@@ -16,6 +16,10 @@ func (v *BaseRustLikeParserVisitor) VisitDeclaration(ctx *DeclarationContext) in
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRustLikeParserVisitor) VisitExprArrayAccess(ctx *ExprArrayAccessContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRustLikeParserVisitor) VisitExprAddSub(ctx *ExprAddSubContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -37,6 +41,10 @@ func (v *BaseRustLikeParserVisitor) VisitExprCmp(ctx *ExprCmpContext) interface{
 }
 
 func (v *BaseRustLikeParserVisitor) VisitExprFuncCall(ctx *ExprFuncCallContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRustLikeParserVisitor) VisitExprArray(ctx *ExprArrayContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -81,6 +89,14 @@ func (v *BaseRustLikeParserVisitor) VisitFuncBlock(ctx *FuncBlockContext) interf
 }
 
 func (v *BaseRustLikeParserVisitor) VisitRtype(ctx *RtypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRustLikeParserVisitor) VisitArrayType(ctx *ArrayTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRustLikeParserVisitor) VisitArrayElems(ctx *ArrayElemsContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

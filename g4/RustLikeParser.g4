@@ -11,7 +11,9 @@ expr:
 	lhs = expr op = (MULT | DIV) rhs = expr						# ExprMulDiv
 	| lhs = expr op = (PLUS | MINUS) rhs = expr					# ExprAddSub
 	| lhs = expr op = (EQ | NE | LT | GT | LE | GE) rhs = expr	# ExprCmp
+	| LBRAC arrayElems RBRAC									# ExprArray
 	| LPAREN expr RPAREN										# ExprParen
+	| ID LBRAC expr RBRAC										# ExprArrayAccess
 	| ID funcCallList											# ExprFuncCall
 	| ID														# ExprID
 	| NUMBER													# ExprNum;
@@ -34,7 +36,11 @@ funcParam: MUT? ID COLON rtype;
 
 funcBlock: LBRACE stat* RBRACE;
 
-rtype: INT32;
+rtype: INT32 | arrayType;
+
+arrayType: LBRAC rtype SEMI NUMBER RBRAC;
+
+arrayElems: expr (COMMA expr)* |; // can be empty
 
 block: LBRACE stat* RBRACE;
 
