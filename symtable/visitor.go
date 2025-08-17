@@ -248,8 +248,6 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 		lhsType = v.Visit(ctx.VarType().Rtype()).(SymType)
 	}
 
-	// cannot be void
-
 	mutable := ctx.MUT() != nil
 	lhsSymbol := NewBaseSymbol(tokenID.GetText(), lhsType, mutable, tokenID)
 
@@ -266,6 +264,7 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 		// 访问varinit得到属性
 		rhsAttr := v.Visit(ctx.VarInit().Expr()).(ExprAttribute)
 		PosLogger(tokenID).Debugf("init with assignment: rhs type: %v", rhsAttr.Type)
+		// cannot be void
 		if rhsAttr.Type.SameWith(Void) {
 			err := NewSematicErr(TypeErr).Message("rhs cannot be void type")
 			v.LogError(err, tokenID)
@@ -341,8 +340,8 @@ func (v *Visitor) VisitExprCmp(ctx *parser.ExprCmpContext) any {
 	attrLhs := v.Visit(ctx.GetLhs()).(ExprAttribute)
 	attrRhs := v.Visit(ctx.GetRhs()).(ExprAttribute)
 	op := ctx.GetOp()
-	if IsNumberTypes(attrLhs.Type, attrRhs.Type) {
-		err := NewSematicErr(TypeErr).Message("binary op only for numbers")
+	if !IsNumberTypes(attrLhs.Type, attrRhs.Type) {
+		err := NewSematicErr(TypeErr).Message("binary op only for numbers: lhs: %v, rhs: %v", attrLhs.Type, attrRhs.Type)
 		v.LogError(err, op)
 		return ExprAttribute{Type: Error}
 	}
@@ -362,8 +361,8 @@ func (v *Visitor) VisitExprMulDiv(ctx *parser.ExprMulDivContext) any {
 	attrLhs := v.Visit(ctx.GetLhs()).(ExprAttribute)
 	attrRhs := v.Visit(ctx.GetRhs()).(ExprAttribute)
 	op := ctx.GetOp()
-	if IsNumberTypes(attrLhs.Type, attrRhs.Type) {
-		err := NewSematicErr(TypeErr).Message("binary op only for numbers")
+	if !IsNumberTypes(attrLhs.Type, attrRhs.Type) {
+		err := NewSematicErr(TypeErr).Message("binary op only for numbers: lhs: %v, rhs: %v", attrLhs.Type, attrRhs.Type)
 		v.LogError(err, op)
 		return ExprAttribute{Type: Error}
 	}
@@ -384,8 +383,8 @@ func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
 	attrLhs := v.Visit(ctx.GetLhs()).(ExprAttribute)
 	attrRhs := v.Visit(ctx.GetRhs()).(ExprAttribute)
 	op := ctx.GetOp()
-	if IsNumberTypes(attrLhs.Type, attrRhs.Type) {
-		err := NewSematicErr(TypeErr).Message("binary op only for numbers")
+	if !IsNumberTypes(attrLhs.Type, attrRhs.Type) {
+		err := NewSematicErr(TypeErr).Message("binary op only for numbers: lhs: %v, rhs: %v", attrLhs.Type, attrRhs.Type)
 		v.LogError(err, op)
 		return ExprAttribute{Type: Error}
 	}
@@ -447,7 +446,33 @@ func (v *Visitor) VisitExprArray(ctx *parser.ExprArrayContext) any {
 }
 
 func (v *Visitor) VisitExprArrayAccess(ctx *parser.ExprArrayAccessContext) any {
-	return nil
+	var (
+		token = ctx.ID().GetSymbol()
+		s     = v.currentScope.Resolve(token.GetText())
+		ret   = Error
+	)
+	switch s := s.(type) {
+	case BaseSymbol:
+		// check array
+		arrayType, ok := s.Type().(SymArray)
+		if !ok {
+			err := NewSematicErr(TypeErr).Message("array index for non array: %v", s)
+			v.LogError(err, token)
+		}
+		// check idx
+		numberAttr := v.Visit(ctx.Expr()).(ExprAttribute)
+		if !IsNumberType(numberAttr.Type) {
+			err := NewSematicErr(TypeErr).Message("array index is not a number: %v", numberAttr.Type)
+			v.LogError(err, token)
+		}
+
+		if ret != nil {
+			ret = arrayType.ElemType
+		}
+	default:
+		PosLogger(token).Fatalf("use invalid symbol: <%v>", token.GetText())
+	}
+	return ExprAttribute{Type: ret}
 }
 
 func (v *Visitor) VisitStatExpr(ctx *parser.StatExprContext) any {
