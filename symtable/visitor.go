@@ -8,10 +8,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var typeMap = map[string]SymType{
-	"i32": Int32,
-}
-
 type ExprAttribute struct {
 	Type  SymType
 	Value any
@@ -150,8 +146,18 @@ func (v *Visitor) VisitFuncParamsList(ctx *parser.FuncParamsListContext) any {
 }
 
 func (v *Visitor) VisitRtype(ctx *parser.RtypeContext) any {
-	retType := typeMap[ctx.INT32().GetSymbol().GetText()]
-	return retType
+	// NOTE: 目前有两种类型 1. i32 2. array
+	switch {
+	case ctx.INT32() != nil:
+		return Int32
+	case ctx.ArrayType() != nil:
+		etype := v.Visit(ctx.ArrayType().Rtype()).(SymType)
+		number := v.Visit(ctx.ArrayType().ExprNumber()).(ExprAttribute)
+		l := int32(number.Value.(int64))
+		return NewSymArray(etype, l)
+	}
+	log.Panic("rtype cannot be nil type")
+	return nil
 }
 
 func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
@@ -383,15 +389,27 @@ func (v *Visitor) VisitExprParen(ctx *parser.ExprParenContext) any {
 	return v.Visit(ctx.Expr())
 }
 
-func (v *Visitor) VisitExprNum(ctx *parser.ExprNumContext) any {
-	// TODO: check int
+func (v *Visitor) VisitExprNumber(ctx *parser.ExprNumberContext) any {
 	numToken := ctx.NUMBER().GetSymbol()
 	val, err := strconv.ParseInt(numToken.GetText(), 10, 32)
 	if err != nil {
 		err := NewSematicErr(IntOverflowErr).Message("overflow int32: %s", numToken.GetText())
 		v.LogError(err, numToken)
+		val = -1 // invalid
 	}
 	return ExprAttribute{Type: Int32, Value: val}
+}
+
+func (v *Visitor) VisitExprNum(ctx *parser.ExprNumContext) any {
+	return v.Visit(ctx.ExprNumber())
+}
+
+func (v *Visitor) VisitExprArray(ctx *parser.ExprArrayContext) any {
+	return nil
+}
+
+func (v *Visitor) VisitExprArrayAccess(ctx *parser.ExprArrayAccessContext) any {
+	return nil
 }
 
 func (v *Visitor) VisitStatExpr(ctx *parser.StatExprContext) any {

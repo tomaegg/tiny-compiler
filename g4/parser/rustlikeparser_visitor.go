@@ -41,6 +41,9 @@ type RustLikeParserVisitor interface {
 	// Visit a parse tree produced by RustLikeParser#ExprID.
 	VisitExprID(ctx *ExprIDContext) interface{}
 
+	// Visit a parse tree produced by RustLikeParser#exprNumber.
+	VisitExprNumber(ctx *ExprNumberContext) interface{}
+
 	// Visit a parse tree produced by RustLikeParser#funcCallList.
 	VisitFuncCallList(ctx *FuncCallListContext) interface{}
 

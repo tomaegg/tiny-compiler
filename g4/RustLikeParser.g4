@@ -16,7 +16,9 @@ expr:
 	| ID LBRAC expr RBRAC										# ExprArrayAccess
 	| ID funcCallList											# ExprFuncCall
 	| ID														# ExprID
-	| NUMBER													# ExprNum;
+	| exprNumber													# ExprNum;
+
+exprNumber: NUMBER;
 
 funcCallList: LPAREN funcCallParam RPAREN;
 
@@ -38,7 +40,7 @@ funcBlock: LBRACE stat* RBRACE;
 
 rtype: INT32 | arrayType;
 
-arrayType: LBRAC rtype SEMI NUMBER RBRAC;
+arrayType: LBRAC rtype SEMI exprNumber RBRAC;
 
 arrayElems: expr (COMMA expr)* |; // can be empty
 

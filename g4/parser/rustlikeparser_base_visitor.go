@@ -52,6 +52,10 @@ func (v *BaseRustLikeParserVisitor) VisitExprID(ctx *ExprIDContext) interface{} 
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRustLikeParserVisitor) VisitExprNumber(ctx *ExprNumberContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRustLikeParserVisitor) VisitFuncCallList(ctx *FuncCallListContext) interface{} {
 	return v.VisitChildren(ctx)
 }

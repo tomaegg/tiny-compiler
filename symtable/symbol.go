@@ -2,6 +2,7 @@ package symtable
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"tj-compiler/utils/kv"
 
@@ -28,7 +29,7 @@ type (
 // --- 复合类型：数组 ---
 type SymArray struct {
 	ElemType SymType // 数组元素类型（如 SymInt32）
-	Length   int     // 数组长度（如 10）
+	Length   int32   // 数组长度（如 10）
 }
 
 // 实现 SymType 接口
@@ -37,7 +38,17 @@ func (t SymInt32) String() string   { return "i32" }
 func (t SymVoid) String() string    { return "void" }
 func (t SymFunc) String() string    { return "func" }
 func (t SymError) String() string   { return "errType" }
-func (t SymArray) String() string   { return fmt.Sprintf("[%s;%d]", t.ElemType, t.Length) }
+func (t SymArray) String() string {
+	lenStr := "invalid"
+	if t.Length >= 0 {
+		lenStr = strconv.Itoa(int(t.Length))
+	}
+	return fmt.Sprintf("[%s;%s]", t.ElemType, lenStr)
+}
+
+func NewSymArray(etype SymType, length int32) SymArray {
+	return SymArray{ElemType: etype, Length: length}
+}
 
 // 标记方法（防止外部类型实现 SymType）
 func (t SymToInfer) isSymType() {}
@@ -111,7 +122,7 @@ func (bs baseSymbolImpl) Type() SymType {
 }
 
 func (bs *baseSymbolImpl) Infer(t SymType) {
-	if t == ToInfer{
+	if t == ToInfer {
 		log.Panicf("cannot infer type for symbol <%s>: current type is <%s>", bs.name, bs.stype)
 	}
 	bs.stype = t
