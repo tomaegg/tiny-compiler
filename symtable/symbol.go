@@ -65,11 +65,30 @@ func (t SymArray) String() string {
 	return fmt.Sprintf("[%s;%s]", t.ElemType, lenStr)
 }
 
-func (t SymToInfer) SameWith(o SymType) bool { return t == o }
-func (t SymVoid) SameWith(o SymType) bool    { return t == o }
-func (t SymInt32) SameWith(o SymType) bool   { return t == o }
-func (t SymError) SameWith(o SymType) bool   { return t == o }
-func (t SymFunc) SameWith(o SymType) bool    { return t == o }
+func (t SymToInfer) SameWith(o SymType) bool {
+	_, ok := o.(SymToInfer)
+	return ok
+}
+
+func (t SymVoid) SameWith(o SymType) bool {
+	_, ok := o.(SymVoid)
+	return ok
+}
+
+func (t SymInt32) SameWith(o SymType) bool {
+	_, ok := o.(SymInt32)
+	return ok
+}
+
+func (t SymError) SameWith(o SymType) bool {
+	_, ok := o.(SymError)
+	return ok
+}
+
+func (t SymFunc) SameWith(o SymType) bool {
+	_, ok := o.(SymFunc)
+	return ok
+}
 
 func (t SymArray) SameWith(o SymType) bool {
 	other, ok := o.(SymArray)
@@ -86,7 +105,7 @@ func (t SymArray) SameWith(o SymType) bool {
 		return ok && lhs.SameWith(rhs)
 
 	default:
-		return t.ElemType == other.ElemType
+		return t.ElemType.SameWith(other.ElemType)
 	}
 }
 
@@ -116,6 +135,7 @@ type Symbol interface {
 	Token() antlr.Token
 	Type() SymType
 	Infer(SymType)
+	Mutable() bool
 	fmt.Stringer
 }
 
@@ -166,7 +186,7 @@ func (bs baseSymbolImpl) Type() SymType {
 }
 
 func (bs *baseSymbolImpl) Infer(t SymType) {
-	if t == ToInfer {
+	if t.SameWith(ToInfer) {
 		log.Panicf("cannot infer type for symbol <%s>: current type is <%s>", bs.name, bs.stype)
 	}
 	bs.stype = t
@@ -203,6 +223,10 @@ func (f funcSymbolImpl) Type() SymType {
 
 func (f funcSymbolImpl) Token() antlr.Token {
 	return f.token
+}
+
+func (f funcSymbolImpl) Mutable() bool {
+	return false
 }
 
 func (f funcSymbolImpl) Name() SymName {
@@ -260,6 +284,10 @@ func (b BasicTypeSymbol) Name() SymName {
 
 func (b BasicTypeSymbol) String() string {
 	return b.Name()
+}
+
+func (f BasicTypeSymbol) Mutable() bool {
+	return false
 }
 
 func (b BasicTypeSymbol) Infer(extType SymType) {

@@ -67,7 +67,7 @@ func (v *Visitor) LogInfer(s Symbol, at antlr.Token) {
 func (v *Visitor) checkFuncReturn(scope FuncScope) {
 	funcSymbol := scope.GetSymbol()
 	returned := scope.HasReturn()
-	funcHasReturn := funcSymbol.RetType() != Void
+	funcHasReturn := !funcSymbol.RetType().SameWith(Void)
 	if funcHasReturn && !returned {
 		err := NewSematicErr(RetErr).
 			Message("FuncScope <%s> should have return statement, but not", funcSymbol.Name())
@@ -77,7 +77,7 @@ func (v *Visitor) checkFuncReturn(scope FuncScope) {
 
 func (v *Visitor) checkUninferredSymbol(scope Scope) {
 	for _, sym := range scope.Symbols() {
-		if sym.Type() == ToInfer {
+		if sym.Type().SameWith(ToInfer) {
 			err := NewSematicErr(TypeErr).
 				Message("Symbol <%s> is uninferred", sym.Name())
 			v.LogError(err, sym.Token())
@@ -535,7 +535,7 @@ func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 	v.LogResolve(res, ctx.ID().GetSymbol())
 
 	attr := v.Visit(ctx.Expr()).(ExprAttribute)
-	if res.Type() == ToInfer {
+	if res.Type().SameWith(ToInfer) {
 		res.Infer(attr.Type)
 		v.LogInfer(res, tokenID)
 	} else if !res.Type().SameWith(attr.Type) {

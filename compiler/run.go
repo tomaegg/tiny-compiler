@@ -59,7 +59,7 @@ func NewUnitCompiler(c Config) *UnitCompiler {
 	log.SetLevel(level)
 
 	stat, err := os.Stat(c.SrcPath)
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 	if stat.IsDir() {
@@ -136,16 +136,7 @@ func (uc *UnitCompiler) Parse() {
 	}
 }
 
-func (uc *UnitCompiler) Semantic() {
-	if errs := uc.checker.Check(); errs != 0 {
-		log.Fatalf("total %d semantic error occurs", errs)
-	} else {
-		log.Info("semantic check passed")
-	}
-	if !uc.dotGraph {
-		return
-	}
-
+func (uc *UnitCompiler) DotGraph() {
 	// 创建临时 dot 文件
 	tmpFile, err := os.CreateTemp("", "graphviz-*.dot")
 	if err != nil {
@@ -175,8 +166,23 @@ func (uc *UnitCompiler) Semantic() {
 		}()
 	}
 
-	log.Info("dot graph generated")
 	wg.Wait()
+	log.Info("dot graph generated")
+}
+
+func (uc *UnitCompiler) Semantic() {
+	if errs := uc.checker.Check(); errs != 0 {
+		if uc.dotGraph {
+			uc.DotGraph()
+		}
+		log.Fatalf("total %d semantic error occurs", errs)
+	} else {
+		log.Info("semantic check passed")
+	}
+
+	if !uc.dotGraph {
+		return
+	}
 }
 
 func (uc *UnitCompiler) IR() {
@@ -204,5 +210,4 @@ func (uc *UnitCompiler) Compile() {
 	if uc.stage >= IRGen {
 		uc.IR()
 	}
-
 }
