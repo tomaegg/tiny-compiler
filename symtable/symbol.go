@@ -293,7 +293,3 @@ func (f BasicTypeSymbol) Mutable() bool {
 func (b BasicTypeSymbol) Infer(extType SymType) {
 	panic(fmt.Sprintf("cannot infer type for basic type symbol <%s>", b.name))
 }
-
-type ArraySymbol struct {
-	baseSymbolImpl
-}

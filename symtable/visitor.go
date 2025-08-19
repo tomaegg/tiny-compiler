@@ -3,6 +3,7 @@ package symtable
 import (
 	"strconv"
 	"tj-compiler/g4/parser"
+	"tj-compiler/utils"
 
 	"github.com/antlr4-go/antlr/v4"
 	log "github.com/sirupsen/logrus"
@@ -35,33 +36,25 @@ func (v Visitor) TotalError() int {
 	return v.errorCount
 }
 
-func PosLogger(token antlr.Token) *log.Entry {
-	line, col := token.GetLine(), token.GetColumn()
-	return log.WithFields(log.Fields{
-		"line": line,
-		"col":  col,
-	})
-}
-
 func (v *Visitor) LogDefine(s Symbol) {
 	token := s.Token()
-	PosLogger(token).Infof("define: %s", s.String())
+	utils.PosLogger(token).Infof("define: %s", s.String())
 }
 
 func (v *Visitor) LogResolve(res Symbol, atToken antlr.Token) {
 	if res == nil {
-		PosLogger(atToken).Fatalf("unresolved symbol at token: <%s>", atToken.GetText())
+		utils.PosLogger(atToken).Fatalf("unresolved symbol at token: <%s>", atToken.GetText())
 	}
-	PosLogger(atToken).Infof("resolve: %s", res.String())
+	utils.PosLogger(atToken).Infof("resolve: %s", res.String())
 }
 
 func (v *Visitor) LogError(err SemanticErr, atToken antlr.Token) {
 	v.errorCount++
-	PosLogger(atToken).Errorf("%s", err)
+	utils.PosLogger(atToken).Errorf("%s", err)
 }
 
 func (v *Visitor) LogInfer(s Symbol, at antlr.Token) {
-	PosLogger(at).Infof("infer: %s", s)
+	utils.PosLogger(at).Infof("infer: %s", s)
 }
 
 func (v *Visitor) checkFuncReturn(scope FuncScope) {
@@ -254,7 +247,7 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	v.LogDefine(lhsSymbol)
 	if v.currentScope.Exist(lhsSymbol) {
 		v.currentScope.Shallow(lhsSymbol)
-		PosLogger(tokenID).Infof("shallow: %s", lhsSymbol)
+		utils.PosLogger(tokenID).Infof("shallow: %s", lhsSymbol)
 	} else {
 		v.currentScope.Define(lhsSymbol)
 	}
@@ -263,7 +256,7 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	if ctx.VarInit() != nil {
 		// 访问varinit得到属性
 		rhsAttr := v.Visit(ctx.VarInit().Expr()).(ExprAttribute)
-		PosLogger(tokenID).Debugf("init with assignment: rhs type: %v", rhsAttr.Type)
+		utils.PosLogger(tokenID).Debugf("init with assignment: rhs type: %v", rhsAttr.Type)
 		// cannot be void
 		if rhsAttr.Type.SameWith(Void) {
 			err := NewSematicErr(TypeErr).Message("rhs cannot be void type")
@@ -300,7 +293,7 @@ func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
 	case FuncSymbol:
 		t = Func
 	default:
-		PosLogger(token).Fatalf("use unknown symbol: <%v>", token.GetText())
+		utils.PosLogger(token).Fatalf("use unknown symbol: <%v>", token.GetText())
 	}
 	return ExprAttribute{Type: t}
 }
@@ -470,7 +463,7 @@ func (v *Visitor) VisitExprArrayAccess(ctx *parser.ExprArrayAccessContext) any {
 			ret = arrayType.ElemType
 		}
 	default:
-		PosLogger(token).Fatalf("use invalid symbol: <%v>", token.GetText())
+		utils.PosLogger(token).Fatalf("use invalid symbol: <%v>", token.GetText())
 	}
 	return ExprAttribute{Type: ret}
 }

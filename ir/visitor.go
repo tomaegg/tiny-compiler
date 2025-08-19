@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"tj-compiler/g4/parser"
 	"tj-compiler/symtable"
+	"tj-compiler/utils"
 	"tj-compiler/utils/dsa"
 
 	"github.com/antlr4-go/antlr/v4"
@@ -74,8 +75,7 @@ func NewVisitor(module string, symTable *symtable.SymTable) (v *Visitor, cancel 
 
 func (v *Visitor) LogError(err symtable.SemanticErr, atToken antlr.Token) {
 	v.errorCount++
-	line, col := atToken.GetLine(), atToken.GetColumn()
-	log.Errorf("[%02d:%02d] %s", line, col, err)
+	utils.PosLogger(atToken).Error(err)
 }
 
 func (v *Visitor) Visit(tree antlr.ParseTree) any {
@@ -184,22 +184,22 @@ func (v *Visitor) flattenBlock(stats []parser.IStatContext) bool {
 		case *parser.StatFuncReturnContext:
 			v.Visit(stat)
 			token := stat.GetStart()
-			log.Debugf("[%d:%d] first return found in block near token <%s>, block ends",
-				token.GetLine(), token.GetColumn(), token.GetText(),
+			utils.PosLogger(token).Debugf("first return found in block near token <%s>, block ends",
+				token.GetText(),
 			)
 			return true // 代表找到了了function return
 		case *parser.StatBreakContext:
 			v.Visit(stat)
 			token := stat.GetStart()
-			log.Debugf("[%d:%d] first break found in block near token <%s>, block ends",
-				token.GetLine(), token.GetColumn(), token.GetText(),
+			utils.PosLogger(token).Debugf("first break found in block near token <%s>, block ends",
+				token.GetText(),
 			)
 			return true // 代表找到了了break
 		case *parser.StatContinueContext:
 			v.Visit(stat)
 			token := stat.GetStart()
-			log.Debugf("[%d:%d] first continue found in block near token <%s>, block ends",
-				token.GetLine(), token.GetColumn(), token.GetText(),
+			utils.PosLogger(token).Debugf("first continue found in block near token <%s>, block ends",
+				token.GetText(),
 			)
 			return true // 代表找到了了continue
 		case *parser.StatBlockContext: // block则进行flatten
@@ -213,19 +213,59 @@ func (v *Visitor) flattenBlock(stats []parser.IStatContext) bool {
 	return false
 }
 
+func (v *Visitor) initArray(entryCtx parser.IExprContext, array symtable.Symbol) {
+	arrayType := v.LLVMType(array.Type())
+	arrayVal := GetValue(array)
+
+	// 遍历右侧的Expr
+	var path []int32
+	// 2, 4, 5,
+	var dfs func(parser.IExprContext, symtable.SymType)
+	dfs = func(pctx parser.IExprContext, etype symtable.SymType) {
+		switch etype := etype.(type) {
+		case symtable.SymArray:
+			ctx := pctx.(*parser.ExprArrayContext)
+			arrayExprs := ctx.ArrayElems().AllExpr()
+			for i := range etype.Length {
+				path = append(path, i) // push
+				// 此处必然是ArrayContext
+				dfs(arrayExprs[i], etype.ElemType)
+				path = path[:len(path)-1] // pop
+			}
+		default:
+			// 数组赋值 0...length
+			llvmIndices := make([]llvm.Value, 0, len(path))
+			for _, idx := range path {
+				llvmIdx := llvm.ConstInt(v.llvmCtx.Int32Type(), uint64(idx), false)
+				llvmIndices = append(llvmIndices, llvmIdx)
+			}
+			elemPtr := v.llvmBuilder.CreateInBoundsGEP(arrayType, arrayVal, llvmIndices, "elem.ptr")
+			// create assign
+			val := pctx.Accept(v).(llvm.Value)
+			v.llvmBuilder.CreateStore(val, elemPtr)
+		}
+	}
+
+	dfs(entryCtx, array.Type())
+}
+
 func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
 
 	switch t := varSymbol.Type().(type) {
 	case symtable.SymArray:
-		arrayType := v.LLVMType(t.ElemType)
-		arrayLen := llvm.ConstInt(v.llvmCtx.Int32Type(), uint64(t.Length), false)
+		arrayType := v.LLVMType(t)
 		arrayName := fmt.Sprintf("array.%s", varSymbol.Name())
-		val := v.llvmBuilder.CreateArrayAlloca(arrayType, arrayLen, arrayName)
+		utils.PosLogger(ctx.ID().GetSymbol()).Debugf("%s: %s", varSymbol.Name(), arrayType.String())
+		val := v.llvmBuilder.CreateAlloca(arrayType, arrayName)
 		SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
 
+		if ctx.VarInit() != nil {
+			v.initArray(ctx.VarInit().Expr(), varSymbol)
+		}
+
 	default:
-		val := v.llvmBuilder.CreateAlloca(v.LLVMType(varSymbol.Type()), "var_"+varSymbol.Name())
+		val := v.llvmBuilder.CreateAlloca(v.LLVMType(varSymbol.Type()), "var."+varSymbol.Name())
 		SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
 		if ctx.VarInit() != nil {
 			rhs := v.Visit(ctx.VarInit().Expr()).(llvm.Value)
