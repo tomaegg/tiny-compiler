@@ -5,6 +5,7 @@ import (
 
 	"github.com/antlr4-go/antlr/v4"
 	log "github.com/sirupsen/logrus"
+	"tinygo.org/x/go-llvm"
 )
 
 type IRGenerator struct {
@@ -32,4 +33,9 @@ func (ig *IRGenerator) IR() []byte {
 
 	// Print the module to human-readable IR (stdout)
 	return []byte(ig.llvmMod.String())
+}
+
+func (ig *IRGenerator) Module() llvm.Module {
+	ig.generate()
+	return ig.llvmMod
 }

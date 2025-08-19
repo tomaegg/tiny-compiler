@@ -12,9 +12,12 @@ import (
 	"tj-compiler/g4/parser"
 	"tj-compiler/ir"
 	"tj-compiler/symtable"
+	"tj-compiler/target"
+	"tj-compiler/utils"
 
 	"github.com/antlr4-go/antlr/v4"
 	log "github.com/sirupsen/logrus"
+	"tinygo.org/x/go-llvm"
 )
 
 type CompileStage int
@@ -24,6 +27,7 @@ const (
 	Parse
 	Semantic
 	IRGen
+	ASM
 	Bin
 )
 
@@ -44,9 +48,11 @@ type UnitCompiler struct {
 	parseTree antlr.ParseTree
 
 	lexerErrCallback, parserErrCallback func() []string
+	releaseCallback                     []func()
 
-	checker  *symtable.SemanticChecker
 	dotGraph bool
+	checker  *symtable.SemanticChecker
+	irGen    *ir.IRGenerator
 
 	fout io.WriteCloser
 	fin  string
@@ -72,11 +78,23 @@ func NewUnitCompiler(c Config) *UnitCompiler {
 		log.Fatal(err)
 	}
 
+	// default out put to a.out
+	var perm os.FileMode = 0644
+	if c.Stage == Bin {
+		perm = 0755
+	}
+	flag := os.O_WRONLY | os.O_CREATE | os.O_TRUNC
+	if c.Stage == Bin && len(c.OutPath) == 0 {
+		c.OutPath = "a.out"
+	}
 	var fout io.WriteCloser
-	if len(c.OutPath) == 0 {
+	if len(c.OutPath) == 0 && c.Stage < Bin {
 		fout = os.Stdout
 	} else {
-		fout, err = os.Create(c.OutPath)
+		if err := utils.RemoveIfExists(c.OutPath); err != nil {
+			log.Fatal(err)
+		}
+		fout, err = os.OpenFile(c.OutPath, flag, perm)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -187,14 +205,30 @@ func (uc *UnitCompiler) Semantic() {
 }
 
 func (uc *UnitCompiler) IR() {
-	irGen, irCancel := ir.NewIRGenerator(uc.fin, uc.checker.SymbolTable(), uc.parseTree)
-	defer irCancel()
+	irGen, llvmRelease := ir.NewIRGenerator(uc.fin, uc.checker.SymbolTable(), uc.parseTree)
+	uc.irGen = irGen
+	uc.releaseCallback = append(uc.releaseCallback, llvmRelease)
 	result := irGen.IR()
-	uc.fout.Write(result)
-	if err := uc.fout.Close(); err != nil {
-		log.Fatal(err)
+	if uc.stage == IRGen {
+		uc.fout.Write(result)
+		if err := uc.fout.Close(); err != nil {
+			log.Fatal(err)
+		}
 	}
 	log.Info("ir generated done")
+}
+
+func (uc *UnitCompiler) Target() {
+	bin := target.NewBinGenerator(uc.irGen.Module())
+	codeGen := llvm.AssemblyFile
+	switch uc.stage {
+	case Bin:
+		codeGen = llvm.ObjectFile
+	case ASM:
+		codeGen = llvm.AssemblyFile
+	}
+	bin.Generate(uc.fout, codeGen)
+	log.Info("target generated done")
 }
 
 func (uc *UnitCompiler) Compile() {
@@ -212,5 +246,13 @@ func (uc *UnitCompiler) Compile() {
 	if uc.stage >= IRGen {
 		uc.IR()
 		runtime.GC()
+	}
+
+	if uc.stage >= ASM {
+		uc.Target()
+	}
+
+	for _, f := range uc.releaseCallback {
+		f()
 	}
 }

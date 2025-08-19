@@ -16,8 +16,10 @@ var stageMap = map[string]compiler.CompileStage{
 	"lex":      compiler.Lex,
 	"parse":    compiler.Parse,
 	"bin":      compiler.Bin,
+	"asm":      compiler.ASM,
 	"semantic": compiler.Semantic,
 }
+
 var (
 	validLoglevels = []string{
 		log.InfoLevel.String(),
@@ -36,7 +38,6 @@ func init() {
 }
 
 func ParseFlag() compiler.Config {
-
 	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	// 定义可选参数
 	out := fs.String("o", "", "output file (default STDOUT)")

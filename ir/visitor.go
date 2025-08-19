@@ -52,7 +52,7 @@ type Visitor struct {
 	loopBB dsa.Stack[[2]llvm.BasicBlock] // (exit, header)
 }
 
-func NewVisitor(module string, symTable *symtable.SymTable) (v *Visitor, cancel func()) {
+func NewVisitor(module string, symTable *symtable.SymTable) (v *Visitor, llvmRelease func()) {
 	ctx := llvm.NewContext()
 	mod := ctx.NewModule(module)
 	builder := ctx.NewBuilder()
@@ -65,7 +65,7 @@ func NewVisitor(module string, symTable *symtable.SymTable) (v *Visitor, cancel 
 		counter:     make(map[string]int),
 	}
 
-	cancel = func() {
+	llvmRelease = func() {
 		v.llvmCtx.Dispose()
 		v.llvmBuilder.Dispose()
 	}
