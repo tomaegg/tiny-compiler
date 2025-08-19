@@ -13,3 +13,8 @@ fn case1() {
     let a = 1;
     let mut a0 = [a,a,a,a];
 }
+
+fn case2() {
+    let a0;
+    a0 = [1,1,1,1];
+}

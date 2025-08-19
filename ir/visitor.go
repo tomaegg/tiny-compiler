@@ -213,7 +213,7 @@ func (v *Visitor) flattenBlock(stats []parser.IStatContext) bool {
 	return false
 }
 
-func (v *Visitor) initArray(entryCtx parser.IExprContext, array symtable.Symbol) {
+func (v *Visitor) assignArray(entryCtx parser.IExprContext, array symtable.Symbol) {
 	arrayType := v.LLVMType(array.Type())
 	arrayVal := GetValue(array)
 
@@ -261,7 +261,7 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 		SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
 
 		if ctx.VarInit() != nil {
-			v.initArray(ctx.VarInit().Expr(), varSymbol)
+			v.assignArray(ctx.VarInit().Expr(), varSymbol)
 		}
 
 	default:
@@ -338,9 +338,16 @@ func (v *Visitor) VisitStatExpr(ctx *parser.StatExprContext) any {
 }
 
 func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
-	lhsVal := GetValue(v.currentScope.Resolve(ctx.ID().GetText()))
-	rhsVal := v.Visit(ctx.Expr()).(llvm.Value)
-	v.llvmBuilder.CreateStore(rhsVal, lhsVal) // val -> value, p -> pointer
+	symbol := v.currentScope.Resolve(ctx.ID().GetText())
+	lhsVal := GetValue(symbol)
+	switch ctx.Expr().(type) {
+	case *parser.ExprArrayContext:
+		v.assignArray(ctx.Expr(), symbol)
+
+	default:
+		rhsVal := v.Visit(ctx.Expr()).(llvm.Value)
+		v.llvmBuilder.CreateStore(rhsVal, lhsVal) // val -> value, p -> pointer
+	}
 	return nil
 }
 
