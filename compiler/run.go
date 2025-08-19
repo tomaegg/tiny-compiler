@@ -55,9 +55,43 @@ type UnitCompiler struct {
 	checker  *symtable.SemanticChecker
 	irGen    *ir.IRGenerator
 
-	fout  io.WriteCloser
-	fPath string
-	fin   string
+	fin string
+
+	fconfig *OutputConfig
+}
+
+type OutputConfig struct {
+	FPath string
+	Stage CompileStage
+}
+
+func (oc *OutputConfig) Open() io.WriteCloser {
+	stage := oc.Stage
+	if stage <= ASM && len(oc.FPath) == 0 {
+		return os.Stdout
+	}
+
+	if stage > ASM && len(oc.FPath) == 0 {
+		oc.FPath = "a.out"
+	}
+
+	if err := utils.RemoveIfExists(oc.FPath); err != nil {
+		log.Fatal(err)
+	}
+
+	// default out put to a.out
+	perm := os.FileMode(0644)
+	if stage == Exec {
+		perm = 0755
+	}
+	flag := os.O_WRONLY | os.O_CREATE | os.O_TRUNC
+
+	fout, err := os.OpenFile(oc.FPath, flag, perm)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return fout
 }
 
 func NewUnitCompiler(c Config) *UnitCompiler {
@@ -80,34 +114,14 @@ func NewUnitCompiler(c Config) *UnitCompiler {
 		log.Fatal(err)
 	}
 
-	// default out put to a.out
-	var perm os.FileMode = 0644
-	if c.Stage >= Bin {
-		perm = 0755
-	}
-	flag := os.O_WRONLY | os.O_CREATE | os.O_TRUNC
-	if c.Stage >= Bin && len(c.OutPath) == 0 {
-		c.OutPath = "a.out"
-	}
-	var fout io.WriteCloser
-	if len(c.OutPath) == 0 && c.Stage < Bin {
-		fout = os.Stdout
-	} else {
-		if err := utils.RemoveIfExists(c.OutPath); err != nil {
-			log.Fatal(err)
-		}
-		fout, err = os.OpenFile(c.OutPath, flag, perm)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
 	ret := &UnitCompiler{
 		stage:    c.Stage,
-		fout:     fout,
-		fPath:    c.OutPath,
 		fin:      c.SrcPath,
 		dotGraph: c.Visualize,
+		fconfig: &OutputConfig{
+			FPath: c.OutPath,
+			Stage: c.Stage,
+		},
 	}
 
 	if c.Stage >= Lex {
@@ -218,8 +232,9 @@ func (uc *UnitCompiler) IR() {
 	uc.releaseCallback = append(uc.releaseCallback, llvmRelease)
 	result := irGen.IR()
 	if uc.stage == IRGen {
-		uc.fout.Write(result)
-		if err := uc.fout.Close(); err != nil {
+		fout := uc.fconfig.Open()
+		fout.Write(result)
+		if err := fout.Close(); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -228,21 +243,33 @@ func (uc *UnitCompiler) IR() {
 
 func (uc *UnitCompiler) Target() {
 	bin := target.NewBinGenerator(uc.irGen.Module())
-	codeGen := llvm.AssemblyFile
+	codeGen := llvm.ObjectFile
 	switch uc.stage {
-	case Bin, Exec:
+	case Exec:
+		tmpBinary, err := os.CreateTemp("/var/tmp/", "tiny-compiler-*")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer tmpBinary.Close()
+		bin.Generate(tmpBinary, llvm.ObjectFile)
+		uc.Exec(tmpBinary.Name())
+		return
+
+	case Bin:
 		codeGen = llvm.ObjectFile
 	case ASM:
 		codeGen = llvm.AssemblyFile
 	}
-	bin.Generate(uc.fout, codeGen)
+
+	fout := uc.fconfig.Open()
+	defer fout.Close()
+	bin.Generate(fout, codeGen)
 	log.Info("target generated done")
-	uc.fout.Close()
 }
 
-func (uc *UnitCompiler) Exec() {
-	out := uc.fPath + ".exec"
-	cmd := exec.Command("clang", uc.fPath, "-o", out)
+func (uc *UnitCompiler) Exec(binaryIn string) {
+	out := uc.fconfig.FPath
+	cmd := exec.Command("clang", binaryIn, "-o", out)
 	log.Debug(cmd.String())
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -271,10 +298,6 @@ func (uc *UnitCompiler) Compile() {
 
 	if uc.stage >= ASM {
 		uc.Target()
-	}
-
-	if uc.stage >= Exec {
-		uc.Exec()
 	}
 
 	for _, f := range uc.releaseCallback {
