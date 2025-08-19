@@ -70,7 +70,9 @@ fn main() ->i32 {
         }
         loop {
             a = 1;
+            break;
         }
+        break;
     }
 
     return 0;
