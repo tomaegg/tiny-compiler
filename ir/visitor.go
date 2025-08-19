@@ -14,11 +14,14 @@ import (
 
 func (v *Visitor) LLVMType(t symtable.SymType) llvm.Type {
 	ctx := v.llvmCtx
-	switch t.(type) {
+	switch t := t.(type) {
 	case symtable.SymInt32:
 		return ctx.Int32Type()
 	case symtable.SymVoid:
 		return ctx.VoidType()
+	case symtable.SymArray:
+		// create array type
+		return llvm.ArrayType(v.LLVMType(t.ElemType), int(t.Length))
 	default:
 		log.Panicf("unsupported type: %s", t)
 	}
@@ -212,11 +215,22 @@ func (v *Visitor) flattenBlock(stats []parser.IStatContext) bool {
 
 func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
-	val := v.llvmBuilder.CreateAlloca(v.LLVMType(varSymbol.Type()), "var_"+varSymbol.Name())
-	SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
-	if ctx.VarInit() != nil {
-		rhs := v.Visit(ctx.VarInit().Expr()).(llvm.Value)
-		v.llvmBuilder.CreateStore(rhs, val)
+
+	switch t := varSymbol.Type().(type) {
+	case symtable.SymArray:
+		arrayType := v.LLVMType(t.ElemType)
+		arrayLen := llvm.ConstInt(v.llvmCtx.Int32Type(), uint64(t.Length), false)
+		arrayName := fmt.Sprintf("array.%s", varSymbol.Name())
+		val := v.llvmBuilder.CreateArrayAlloca(arrayType, arrayLen, arrayName)
+		SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
+
+	default:
+		val := v.llvmBuilder.CreateAlloca(v.LLVMType(varSymbol.Type()), "var_"+varSymbol.Name())
+		SetValue(varSymbol, val) // 在declare时分配空间, 加入到符号表中
+		if ctx.VarInit() != nil {
+			rhs := v.Visit(ctx.VarInit().Expr()).(llvm.Value)
+			v.llvmBuilder.CreateStore(rhs, val)
+		}
 	}
 	return nil
 }
@@ -387,6 +401,14 @@ func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
 		panic("should not get token other than +,-")
 	}
 	return ret
+}
+
+func (v *Visitor) VisitExprArray(ctx *parser.ExprArrayContext) any {
+	return nil
+}
+
+func (v *Visitor) VisitExprArrayAccess(ctx *parser.ExprArrayAccessContext) any {
+	return nil
 }
 
 func (v *Visitor) VisitExprCmp(ctx *parser.ExprCmpContext) any {
