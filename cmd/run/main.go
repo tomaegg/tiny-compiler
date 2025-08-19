@@ -17,6 +17,7 @@ var stageMap = map[string]compiler.CompileStage{
 	"parse":    compiler.Parse,
 	"bin":      compiler.Bin,
 	"asm":      compiler.ASM,
+	"exec":     compiler.Exec,
 	"semantic": compiler.Semantic,
 }
 
@@ -41,7 +42,7 @@ func ParseFlag() compiler.Config {
 	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	// 定义可选参数
 	out := fs.String("o", "", "output file (default STDOUT)")
-	stage := fs.String("stage", "bin", fmt.Sprintf("stage: %s", strings.Join(validStage, ", ")))
+	stage := fs.String("stage", "exec", fmt.Sprintf("stage: %s", strings.Join(validStage, ", ")))
 	loglevel := fs.String("loglevel", "info", fmt.Sprintf("loglevel: %s", strings.Join(validLoglevels, ", ")))
 	visualize := fs.Bool("visualize", false, "enable visualization mode")
 

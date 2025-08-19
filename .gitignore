@@ -11,3 +11,8 @@ submit/
 build/
 .vscode/
 build_tools/
+.gdb_history
+*.out
+*.bin
+*.elf
+*.exec

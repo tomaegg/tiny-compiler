@@ -29,6 +29,7 @@ const (
 	IRGen
 	ASM
 	Bin
+	Exec
 )
 
 type Config struct {
@@ -54,8 +55,9 @@ type UnitCompiler struct {
 	checker  *symtable.SemanticChecker
 	irGen    *ir.IRGenerator
 
-	fout io.WriteCloser
-	fin  string
+	fout  io.WriteCloser
+	fPath string
+	fin   string
 }
 
 func NewUnitCompiler(c Config) *UnitCompiler {
@@ -80,11 +82,11 @@ func NewUnitCompiler(c Config) *UnitCompiler {
 
 	// default out put to a.out
 	var perm os.FileMode = 0644
-	if c.Stage == Bin {
+	if c.Stage >= Bin {
 		perm = 0755
 	}
 	flag := os.O_WRONLY | os.O_CREATE | os.O_TRUNC
-	if c.Stage == Bin && len(c.OutPath) == 0 {
+	if c.Stage >= Bin && len(c.OutPath) == 0 {
 		c.OutPath = "a.out"
 	}
 	var fout io.WriteCloser
@@ -100,7 +102,13 @@ func NewUnitCompiler(c Config) *UnitCompiler {
 		}
 	}
 
-	ret := &UnitCompiler{stage: c.Stage, fout: fout, fin: c.SrcPath, dotGraph: c.Visualize}
+	ret := &UnitCompiler{
+		stage:    c.Stage,
+		fout:     fout,
+		fPath:    c.OutPath,
+		fin:      c.SrcPath,
+		dotGraph: c.Visualize,
+	}
 
 	if c.Stage >= Lex {
 		ret.lexer, ret.lexerErrCallback = cmd.NewLexer(input)
@@ -222,13 +230,26 @@ func (uc *UnitCompiler) Target() {
 	bin := target.NewBinGenerator(uc.irGen.Module())
 	codeGen := llvm.AssemblyFile
 	switch uc.stage {
-	case Bin:
+	case Bin, Exec:
 		codeGen = llvm.ObjectFile
 	case ASM:
 		codeGen = llvm.AssemblyFile
 	}
 	bin.Generate(uc.fout, codeGen)
 	log.Info("target generated done")
+	uc.fout.Close()
+}
+
+func (uc *UnitCompiler) Exec() {
+	out := uc.fPath + ".exec"
+	cmd := exec.Command("clang", uc.fPath, "-o", out)
+	log.Debug(cmd.String())
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.WithError(err).Fatalf("link: %s", output)
+	}
+	log.Info("link stage done")
+	log.Infof("target executable: %s", out)
 }
 
 func (uc *UnitCompiler) Compile() {
@@ -250,6 +271,10 @@ func (uc *UnitCompiler) Compile() {
 
 	if uc.stage >= ASM {
 		uc.Target()
+	}
+
+	if uc.stage >= Exec {
+		uc.Exec()
 	}
 
 	for _, f := range uc.releaseCallback {

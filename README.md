@@ -31,3 +31,21 @@
 ```shell
 ./run.sh compile example/func.rs --stage=ir # func.rs位于example目录中(挂载)
 ```
+
+- Generate ASM
+
+```shell
+./run.sh compile example/func.rs --stage=asm # func.rs位于example目录中(挂载)
+```
+
+- Generate Binary
+
+```shell
+./run.sh compile example/func.rs --stage=bin # func.rs位于example目录中(挂载)
+```
+
+- Generate Executable
+
+```shell
+./run.sh compile example/func.rs --stage=exec # func.rs位于example目录中(挂载)
+```
