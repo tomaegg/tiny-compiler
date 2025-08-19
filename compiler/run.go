@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"runtime"
 	"sync"
 	"tj-compiler/cmd"
 	"tj-compiler/g4/parser"
@@ -205,9 +206,11 @@ func (uc *UnitCompiler) Compile() {
 
 	if uc.stage >= Semantic {
 		uc.Semantic()
+		runtime.GC()
 	}
 
 	if uc.stage >= IRGen {
 		uc.IR()
+		runtime.GC()
 	}
 }
