@@ -284,21 +284,6 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 
 // different expression
 
-func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
-	token := ctx.ID().GetSymbol()
-	s := v.currentScope.Resolve(token.GetText())
-	var t SymType
-	switch s := s.(type) {
-	case BaseSymbol:
-		t = s.Type()
-	case FuncSymbol:
-		t = Func
-	default:
-		utils.PosLogger(token).Fatalf("use unknown symbol: <%v>", token.GetText())
-	}
-	return ExprAttribute{Type: t}
-}
-
 func (v *Visitor) VisitExprFuncCall(ctx *parser.ExprFuncCallContext) any {
 	funcName := ctx.ID().GetSymbol().GetText()
 	funcSymbol := v.currentScope.Resolve(funcName).(FuncSymbol)
@@ -439,6 +424,25 @@ func (v *Visitor) VisitExprArray(ctx *parser.ExprArrayContext) any {
 	return ExprAttribute{Type: arrayType, Value: nil} // semantic阶段ignore value
 }
 
+func (v *Visitor) VisitExprLValue(ctx *parser.ExprLValueContext) any {
+	return v.Visit(ctx.LValue())
+}
+
+func (v *Visitor) VisitLValueID(ctx *parser.LValueIDContext) any {
+	token := ctx.ID().GetSymbol()
+	s := v.currentScope.Resolve(token.GetText())
+	var t SymType
+	switch s := s.(type) {
+	case BaseSymbol:
+		t = s.Type()
+	case FuncSymbol:
+		t = Func
+	default:
+		utils.PosLogger(token).Fatalf("use unknown symbol: <%v>", token.GetText())
+	}
+	return ExprAttribute{Type: t}
+}
+
 func (v *Visitor) checkArrayIdx(ctx parser.IExprContext) {
 	ret := v.Visit(ctx).(ExprAttribute)
 	switch ret.Type.(type) {
@@ -451,9 +455,27 @@ func (v *Visitor) checkArrayIdx(ctx parser.IExprContext) {
 	}
 }
 
-func (v *Visitor) unwrapArrayVisit(ctx parser.IExprContext) SymType {
+func (v *Visitor) VisitLValueArrayAccess(ctx *parser.LValueArrayAccessContext) any {
+	exprIdx := ctx.Expr()
+	v.checkArrayIdx(exprIdx)
+
+	switch unwrapped := v.unwrapArrayVisit(ctx.LValue()).(type) {
+	case SymError:
+		return ExprAttribute{Type: Error}
+	case SymArray:
+		log.Debugf("unwrap array: elems: %v", unwrapped.ElemType)
+		return ExprAttribute{Type: unwrapped.ElemType}
+
+	default: // error
+		err := NewSematicErr(TypeErr).Message("operator [] should only use for array type, actual type: %v", unwrapped)
+		v.LogError(err, exprIdx.GetStart())
+		return ExprAttribute{Type: Error, Value: nil}
+	}
+}
+
+func (v *Visitor) unwrapArrayVisit(ctx parser.ILValueContext) SymType {
 	switch ctx := ctx.(type) {
-	case *parser.ExprIDContext:
+	case *parser.LValueIDContext:
 		// 叶子节点，访问达到ID
 		token := ctx.ID().GetSymbol()
 		symbol := v.currentScope.Resolve(token.GetText())
@@ -467,10 +489,11 @@ func (v *Visitor) unwrapArrayVisit(ctx parser.IExprContext) SymType {
 		}
 		return symbol.Type()
 
-	case *parser.ExprArrayAccessContext:
-		v.checkArrayIdx(ctx.GetRhs())
+	case *parser.LValueArrayAccessContext:
+		idxExpr := ctx.Expr()
+		v.checkArrayIdx(idxExpr)
 		// 递归访问
-		ret := v.unwrapArrayVisit(ctx.GetLhs())
+		ret := v.unwrapArrayVisit(ctx.LValue())
 		if s, ok := ret.(SymArray); ok {
 			log.Debugf("unwrap array: elems: %v", s.ElemType)
 			return s.ElemType
@@ -482,27 +505,6 @@ func (v *Visitor) unwrapArrayVisit(ctx parser.IExprContext) SymType {
 		err := NewSematicErr(TypeErr).Message("operator [] should only use for array type, actual type: %v", reflect.TypeOf(ctx))
 		v.LogError(err, ctx.GetStart())
 		return Error
-	}
-}
-
-func (v *Visitor) VisitExprArrayAccess(ctx *parser.ExprArrayAccessContext) any {
-	// lhs = expr LBRAC rhs = expr RBRAC
-	lhs := ctx.GetLhs() // lhs expression
-	rhs := ctx.GetRhs() // rhs expression
-
-	v.checkArrayIdx(ctx.GetRhs())
-
-	switch unwrapped := v.unwrapArrayVisit(lhs).(type) {
-	case SymError:
-		return ExprAttribute{Type: Error}
-	case SymArray:
-		log.Debugf("unwrap array: elems: %v", unwrapped.ElemType)
-		return ExprAttribute{Type: unwrapped}
-
-	default: // error
-		err := NewSematicErr(TypeErr).Message("operator [] should only use for array type, actual type: %v", unwrapped)
-		v.LogError(err, rhs.GetStart())
-		return ExprAttribute{Type: Error, Value: nil}
 	}
 }
 
@@ -561,23 +563,30 @@ func (v *Visitor) VisitStatIfElse(ctx *parser.StatIfElseContext) any {
 }
 
 func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
-	tokenID := ctx.ID().GetSymbol()
-	res := v.currentScope.Resolve(tokenID.GetText())
-	v.LogResolve(res, ctx.ID().GetSymbol())
+	lv := ctx.LValue()
+	switch lv := lv.(type) {
+	case *parser.LValueIDContext:
+		tokenID := lv.ID().GetSymbol()
+		res := v.currentScope.Resolve(tokenID.GetText())
+		v.LogResolve(res, tokenID)
 
-	attr := v.Visit(ctx.Expr()).(ExprAttribute)
-	if res.Type().SameWith(ToInfer) {
-		res.Infer(attr.Type)
-		v.LogInfer(res, tokenID)
-	} else if !res.Type().SameWith(attr.Type) {
-		// 如果已经推断类型且不匹配，则报错
-		err := NewSematicErr(TypeErr).
-			Message("mismatch type assignment: <%s> != <%s>", res.Type(), attr.Type)
-		v.LogError(err, tokenID)
-	} else if !res.(BaseSymbol).Mutable() {
-		// 如果lhs是常量
-		err := NewSematicErr(AttrErr).Message("modify const var: %s", res)
-		v.LogError(err, tokenID)
+		attr := v.Visit(ctx.Expr()).(ExprAttribute)
+		if res.Type().SameWith(ToInfer) {
+			res.Infer(attr.Type)
+			v.LogInfer(res, tokenID)
+		} else if !res.Type().SameWith(attr.Type) {
+			// 如果已经推断类型且不匹配，则报错
+			err := NewSematicErr(TypeErr).
+				Message("mismatch type assignment: <%s> != <%s>", res.Type(), attr.Type)
+			v.LogError(err, tokenID)
+		} else if !res.(BaseSymbol).Mutable() {
+			// 如果lhs是常量
+			err := NewSematicErr(AttrErr).Message("modify const var: %s", res)
+			v.LogError(err, tokenID)
+		}
+
+	case *parser.LValueArrayAccessContext:
+		panic("todo")
 	}
 	return nil
 }

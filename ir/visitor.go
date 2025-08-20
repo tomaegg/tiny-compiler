@@ -338,15 +338,23 @@ func (v *Visitor) VisitStatExpr(ctx *parser.StatExprContext) any {
 }
 
 func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
-	symbol := v.currentScope.Resolve(ctx.ID().GetText())
-	lhsVal := GetValue(symbol)
-	switch ctx.Expr().(type) {
-	case *parser.ExprArrayContext:
-		v.assignArray(ctx.Expr(), symbol)
+	switch lvalue := ctx.LValue().(type) {
+	case *parser.LValueArrayAccessContext:
+		// TODO:
+		panic("todo")
 
+	case *parser.LValueIDContext:
+		symbol := v.currentScope.Resolve(lvalue.ID().GetText())
+		lhsVal := GetValue(symbol)
+		switch symbol.Type().(type) {
+		case symtable.SymArray:
+			v.assignArray(ctx.Expr(), symbol)
+		default:
+			rhsVal := v.Visit(ctx.Expr()).(llvm.Value)
+			v.llvmBuilder.CreateStore(rhsVal, lhsVal) // val -> value, p -> pointer
+		}
 	default:
-		rhsVal := v.Visit(ctx.Expr()).(llvm.Value)
-		v.llvmBuilder.CreateStore(rhsVal, lhsVal) // val -> value, p -> pointer
+		panic("should not reach here")
 	}
 	return nil
 }
@@ -450,10 +458,6 @@ func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
 	return ret
 }
 
-func (v *Visitor) VisitExprArrayAccess(ctx *parser.ExprArrayAccessContext) any {
-	return nil
-}
-
 func (v *Visitor) VisitExprCmp(ctx *parser.ExprCmpContext) any {
 	lhs := v.Visit(ctx.GetLhs()).(llvm.Value)
 	rhs := v.Visit(ctx.GetRhs()).(llvm.Value)
@@ -531,10 +535,18 @@ func (v *Visitor) VisitExprParen(ctx *parser.ExprParenContext) any {
 	return v.Visit(ctx.Expr())
 }
 
-func (v *Visitor) VisitExprID(ctx *parser.ExprIDContext) any {
-	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
-	llvmType := v.LLVMType(varSymbol.Type())
-	llvmVal := GetValue(varSymbol)
-	ret := v.llvmBuilder.CreateLoad(llvmType, llvmVal, "tload")
-	return ret
+func (v *Visitor) VisitExprLValue(ctx *parser.ExprLValueContext) any {
+	switch lhs := ctx.LValue().(type) {
+	case *parser.LValueIDContext:
+		varSymbol := v.currentScope.Resolve(lhs.ID().GetText())
+		llvmType := v.LLVMType(varSymbol.Type())
+		llvmVal := GetValue(varSymbol)
+		ret := v.llvmBuilder.CreateLoad(llvmType, llvmVal, "tload")
+		return ret
+	case *parser.LValueArrayAccessContext:
+		panic("todo")
+
+	default:
+		panic("should not reach here")
+	}
 }

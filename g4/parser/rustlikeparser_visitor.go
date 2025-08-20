@@ -17,9 +17,6 @@ type RustLikeParserVisitor interface {
 	// Visit a parse tree produced by RustLikeParser#ExprAddSub.
 	VisitExprAddSub(ctx *ExprAddSubContext) interface{}
 
-	// Visit a parse tree produced by RustLikeParser#ExprArrayAccess.
-	VisitExprArrayAccess(ctx *ExprArrayAccessContext) interface{}
-
 	// Visit a parse tree produced by RustLikeParser#ExprParen.
 	VisitExprParen(ctx *ExprParenContext) interface{}
 
@@ -35,11 +32,17 @@ type RustLikeParserVisitor interface {
 	// Visit a parse tree produced by RustLikeParser#ExprFuncCall.
 	VisitExprFuncCall(ctx *ExprFuncCallContext) interface{}
 
+	// Visit a parse tree produced by RustLikeParser#ExprLValue.
+	VisitExprLValue(ctx *ExprLValueContext) interface{}
+
 	// Visit a parse tree produced by RustLikeParser#ExprArray.
 	VisitExprArray(ctx *ExprArrayContext) interface{}
 
-	// Visit a parse tree produced by RustLikeParser#ExprID.
-	VisitExprID(ctx *ExprIDContext) interface{}
+	// Visit a parse tree produced by RustLikeParser#LValueArrayAccess.
+	VisitLValueArrayAccess(ctx *LValueArrayAccessContext) interface{}
+
+	// Visit a parse tree produced by RustLikeParser#LValueID.
+	VisitLValueID(ctx *LValueIDContext) interface{}
 
 	// Visit a parse tree produced by RustLikeParser#exprNumber.
 	VisitExprNumber(ctx *ExprNumberContext) interface{}

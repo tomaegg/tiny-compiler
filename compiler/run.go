@@ -65,6 +65,14 @@ type OutputConfig struct {
 	Stage CompileStage
 }
 
+func (oc *OutputConfig) Path() string {
+	stage := oc.Stage
+	if stage > ASM && len(oc.FPath) == 0 {
+		return "a.out"
+	}
+	return oc.FPath
+}
+
 func (oc *OutputConfig) Open() io.WriteCloser {
 	stage := oc.Stage
 	if stage <= ASM && len(oc.FPath) == 0 {
@@ -268,7 +276,7 @@ func (uc *UnitCompiler) Target() {
 }
 
 func (uc *UnitCompiler) Exec(binaryIn string) {
-	out := uc.fconfig.FPath
+	out := uc.fconfig.Path()
 	cmd := exec.Command("clang", binaryIn, "-o", out)
 	log.Debug(cmd.String())
 	output, err := cmd.CombinedOutput()
