@@ -15,6 +15,7 @@ fn case1() {
 }
 
 fn case2() {
-    let a0;
+    let mut a0;
     a0 = [1,1,1,1];
+    a0[1] = a0[2];
 }

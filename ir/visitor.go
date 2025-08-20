@@ -353,6 +353,7 @@ func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 			rhsVal := v.Visit(ctx.Expr()).(llvm.Value)
 			v.llvmBuilder.CreateStore(rhsVal, lhsVal) // val -> value, p -> pointer
 		}
+
 	default:
 		panic("should not reach here")
 	}
@@ -536,17 +537,17 @@ func (v *Visitor) VisitExprParen(ctx *parser.ExprParenContext) any {
 }
 
 func (v *Visitor) VisitExprLValue(ctx *parser.ExprLValueContext) any {
-	switch lhs := ctx.LValue().(type) {
-	case *parser.LValueIDContext:
-		varSymbol := v.currentScope.Resolve(lhs.ID().GetText())
-		llvmType := v.LLVMType(varSymbol.Type())
-		llvmVal := GetValue(varSymbol)
-		ret := v.llvmBuilder.CreateLoad(llvmType, llvmVal, "tload")
-		return ret
-	case *parser.LValueArrayAccessContext:
-		panic("todo")
+	return v.Visit(ctx.LValue())
+}
 
-	default:
-		panic("should not reach here")
-	}
+func (v *Visitor) VisitLValueID(ctx *parser.LValueIDContext) any {
+	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
+	llvmType := v.LLVMType(varSymbol.Type())
+	llvmVal := GetValue(varSymbol)
+	ret := v.llvmBuilder.CreateLoad(llvmType, llvmVal, "tload")
+	return ret
+}
+
+func (v *Visitor) VisitLValueArrayAccess(ctx *parser.LValueArrayAccessContext) any {
+	panic("todo")
 }

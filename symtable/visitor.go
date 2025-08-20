@@ -7,12 +7,12 @@ import (
 	"tj-compiler/utils"
 
 	"github.com/antlr4-go/antlr/v4"
-	log "github.com/sirupsen/logrus"
 )
 
 type ExprAttribute struct {
-	Type  SymType
-	Value any
+	Type   SymType
+	Value  any
+	Symbol Symbol
 }
 
 var _ parser.RustLikeParserVisitor = (*Visitor)(nil)
@@ -149,9 +149,9 @@ func (v *Visitor) VisitRtype(ctx *parser.RtypeContext) any {
 		number := v.Visit(ctx.ArrayType().ExprNumber()).(ExprAttribute)
 		l := int32(number.Value.(int64))
 		return NewSymArray(etype, l)
+	default:
+		panic("rtype cannot be nil type")
 	}
-	log.Panic("rtype cannot be nil type")
-	return nil
 }
 
 func (v *Visitor) VisitFuncSignature(ctx *parser.FuncSignatureContext) any {
@@ -440,7 +440,9 @@ func (v *Visitor) VisitLValueID(ctx *parser.LValueIDContext) any {
 	default:
 		utils.PosLogger(token).Fatalf("use unknown symbol: <%v>", token.GetText())
 	}
-	return ExprAttribute{Type: t}
+	v.LogResolve(s, token)
+
+	return ExprAttribute{Type: t, Symbol: s}
 }
 
 func (v *Visitor) checkArrayIdx(ctx parser.IExprContext) {
@@ -457,14 +459,21 @@ func (v *Visitor) checkArrayIdx(ctx parser.IExprContext) {
 
 func (v *Visitor) VisitLValueArrayAccess(ctx *parser.LValueArrayAccessContext) any {
 	exprIdx := ctx.Expr()
-	v.checkArrayIdx(exprIdx)
+	lvalue := ctx.LValue()
+	token := lvalue.GetStart()
+	arraySymbol := v.currentScope.Resolve(token.GetText())
 
-	switch unwrapped := v.unwrapArrayVisit(ctx.LValue()).(type) {
+	v.LogResolve(arraySymbol, token)
+
+	v.checkArrayIdx(exprIdx)
+	array := v.unwrapArrayVisit(lvalue)
+	switch unwrapped := array.(type) {
 	case SymError:
 		return ExprAttribute{Type: Error}
+
 	case SymArray:
-		log.Debugf("unwrap array: elems: %v", unwrapped.ElemType)
-		return ExprAttribute{Type: unwrapped.ElemType}
+		utils.PosLogger(lvalue.GetStart()).Debugf("unwrap array access: elems: %v", unwrapped.ElemType)
+		return ExprAttribute{Type: unwrapped.ElemType, Symbol: arraySymbol}
 
 	default: // error
 		err := NewSematicErr(TypeErr).Message("operator [] should only use for array type, actual type: %v", unwrapped)
@@ -485,7 +494,7 @@ func (v *Visitor) unwrapArrayVisit(ctx parser.ILValueContext) SymType {
 			v.LogError(err, token)
 			return Error
 		} else {
-			log.Debugf("unwrap array: elems: %v", s)
+			utils.PosLogger(token).Debugf("unwrap array access: elems: %v", s)
 		}
 		return symbol.Type()
 
@@ -493,16 +502,17 @@ func (v *Visitor) unwrapArrayVisit(ctx parser.ILValueContext) SymType {
 		idxExpr := ctx.Expr()
 		v.checkArrayIdx(idxExpr)
 		// 递归访问
+		lvalue := ctx.LValue()
 		ret := v.unwrapArrayVisit(ctx.LValue())
 		if s, ok := ret.(SymArray); ok {
-			log.Debugf("unwrap array: elems: %v", s.ElemType)
+			utils.PosLogger(lvalue.GetStart()).Debugf("unwrap array access: elems: %v", s.ElemType)
 			return s.ElemType
 		}
 		return ret
 
 	default:
 		// 出现错误
-		err := NewSematicErr(TypeErr).Message("operator [] should only use for array type, actual type: %v", reflect.TypeOf(ctx))
+		err := NewSematicErr(TypeErr).Message("operator [] should only use for array type, actual node type: %v", reflect.TypeOf(ctx))
 		v.LogError(err, ctx.GetStart())
 		return Error
 	}
@@ -564,30 +574,42 @@ func (v *Visitor) VisitStatIfElse(ctx *parser.StatIfElseContext) any {
 
 func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 	lv := ctx.LValue()
+	var atToken antlr.Token
+
 	switch lv := lv.(type) {
 	case *parser.LValueIDContext:
-		tokenID := lv.ID().GetSymbol()
-		res := v.currentScope.Resolve(tokenID.GetText())
-		v.LogResolve(res, tokenID)
-
-		attr := v.Visit(ctx.Expr()).(ExprAttribute)
-		if res.Type().SameWith(ToInfer) {
-			res.Infer(attr.Type)
-			v.LogInfer(res, tokenID)
-		} else if !res.Type().SameWith(attr.Type) {
-			// 如果已经推断类型且不匹配，则报错
-			err := NewSematicErr(TypeErr).
-				Message("mismatch type assignment: <%s> != <%s>", res.Type(), attr.Type)
-			v.LogError(err, tokenID)
-		} else if !res.(BaseSymbol).Mutable() {
-			// 如果lhs是常量
-			err := NewSematicErr(AttrErr).Message("modify const var: %s", res)
-			v.LogError(err, tokenID)
-		}
+		atToken = lv.ID().GetSymbol()
 
 	case *parser.LValueArrayAccessContext:
-		panic("todo")
+		// check lvalue for array access
+		lhs := v.Visit(lv).(ExprAttribute)
+		if lhs.Type.SameWith(Error) {
+			return nil
+		}
+		atToken = lv.GetStart()
+
+	default:
+		panic("should not reach here")
 	}
+
+	lhs := v.Visit(lv).(ExprAttribute)
+	rhs := v.Visit(ctx.Expr()).(ExprAttribute)
+
+	// check type match
+	if lhs.Type.SameWith(ToInfer) {
+		lhs.Symbol.Infer(rhs.Type)
+		v.LogInfer(lhs.Symbol, atToken)
+	} else if !lhs.Type.SameWith(rhs.Type) {
+		// 如果已经推断类型且不匹配，则报错
+		err := NewSematicErr(TypeErr).
+			Message("mismatch type assignment: <%s> != <%s>", lhs.Type, rhs.Type)
+		v.LogError(err, atToken)
+	} else if !lhs.Symbol.(BaseSymbol).Mutable() {
+		// 如果lhs是常量
+		err := NewSematicErr(AttrErr).Message("modify const var: %s", lhs.Symbol)
+		v.LogError(err, atToken)
+	}
+
 	return nil
 }
 
