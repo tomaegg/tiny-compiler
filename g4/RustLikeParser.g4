@@ -13,14 +13,13 @@ expr:
 	| lhs = expr op = (EQ | NE | LT | GT | LE | GE) rhs = expr	# ExprCmp
 	| LBRAC arrayElems RBRAC									# ExprArray
 	| LPAREN expr RPAREN										# ExprParen
-	| lValue					  # ExprLValue
+	| lValue													# ExprLValue
 	| ID funcCallList											# ExprFuncCall
-	| exprNumber													# ExprNum;
+	| exprNumber												# ExprNum;
 
 lValue:
-    ID                                 # LValueID
-    | lValue LBRAC expr RBRAC          # LValueArrayAccess
-    ;
+	ID							# LValueID
+	| lValue LBRAC expr RBRAC	# LValueArrayAccess;
 
 exprNumber: NUMBER;
 
@@ -56,7 +55,7 @@ stat:
 	| BREAK SEMI							# StatBreak
 	| CONTINUE SEMI							# StatContinue
 	| LET MUT? ID varType? varInit? SEMI	# StatVarDeclare
-	| lValue ASSIGN expr SEMI					# StatVarAssign
+	| lValue ASSIGN expr SEMI				# StatVarAssign
 	| expr SEMI								# StatExpr
 	| ifBranch elifBranch* elseBranch?		# StatIfElse
 	| WHILE expr block						# StatWhile

@@ -342,8 +342,9 @@ func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 	switch lvalue := ctx.LValue().(type) {
 	case *parser.LValueArrayAccessContext:
 		// 服务于数组写入内容
-		// TODO:
-		panic("todo")
+		rhsVal := v.Visit(ctx.Expr()).(llvm.Value)
+		_, elemPtr := v.llvmArrayElem(lvalue)
+		v.llvmBuilder.CreateStore(rhsVal, elemPtr)
 
 	case *parser.LValueIDContext:
 		symbol := v.currentScope.Resolve(lvalue.ID().GetText())
@@ -551,11 +552,10 @@ func (v *Visitor) VisitLValueID(ctx *parser.LValueIDContext) any {
 	return ret
 }
 
-// 服务于读取数组内容
-func (v *Visitor) VisitLValueArrayAccess(ctx *parser.LValueArrayAccessContext) any {
+func (v *Visitor) llvmArrayElem(ctx *parser.LValueArrayAccessContext) (etype llvm.Type, ptr llvm.Value) {
 	var indices []llvm.Value
-	var dfs func(parser.ILValueContext) llvm.Value
-	dfs = func(lctx parser.ILValueContext) llvm.Value {
+	var dfs func(parser.ILValueContext) (llvm.Type, llvm.Value)
+	dfs = func(lctx parser.ILValueContext) (llvm.Type, llvm.Value) {
 		switch lctx := lctx.(type) {
 		case *parser.LValueIDContext:
 			arraySymbol := v.currentScope.Resolve(lctx.ID().GetText())
@@ -568,7 +568,7 @@ func (v *Visitor) VisitLValueArrayAccess(ctx *parser.LValueArrayAccessContext) a
 
 			elemPtr := v.llvmBuilder.CreateInBoundsGEP(arrayLLVMType, arrayVal, indices, "r.elem.ptr")
 			elemType := v.LLVMType(arrayType.InnerElem())
-			return v.llvmBuilder.CreateLoad(elemType, elemPtr, "tmp.r.elem")
+			return elemType, elemPtr
 
 		case *parser.LValueArrayAccessContext:
 			idx := v.Visit(lctx.Expr()).(llvm.Value)
@@ -581,4 +581,10 @@ func (v *Visitor) VisitLValueArrayAccess(ctx *parser.LValueArrayAccessContext) a
 	}
 
 	return dfs(ctx)
+}
+
+// 服务于读取数组内容
+func (v *Visitor) VisitLValueArrayAccess(ctx *parser.LValueArrayAccessContext) any {
+	elemType, elemPtr := v.llvmArrayElem(ctx)
+	return v.llvmBuilder.CreateLoad(elemType, elemPtr, "tmp.r.elem")
 }
