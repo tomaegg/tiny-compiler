@@ -109,6 +109,18 @@ func (t SymArray) SameWith(o SymType) bool {
 	}
 }
 
+func (t SymArray) InnerElem() SymType {
+	cur := t
+	for {
+		switch s := cur.ElemType.(type) {
+		case SymArray:
+			cur = s
+		default:
+			return s
+		}
+	}
+}
+
 func NewSymArray(etype SymType, length int32) SymArray {
 	return SymArray{ElemType: etype, Length: length}
 }

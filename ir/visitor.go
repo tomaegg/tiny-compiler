@@ -2,6 +2,7 @@ package ir
 
 import (
 	"fmt"
+	"slices"
 	"tj-compiler/g4/parser"
 	"tj-compiler/symtable"
 	"tj-compiler/utils"
@@ -340,6 +341,7 @@ func (v *Visitor) VisitStatExpr(ctx *parser.StatExprContext) any {
 func (v *Visitor) VisitStatVarAssign(ctx *parser.StatVarAssignContext) any {
 	switch lvalue := ctx.LValue().(type) {
 	case *parser.LValueArrayAccessContext:
+		// 服务于数组写入内容
 		// TODO:
 		panic("todo")
 
@@ -540,6 +542,7 @@ func (v *Visitor) VisitExprLValue(ctx *parser.ExprLValueContext) any {
 	return v.Visit(ctx.LValue())
 }
 
+// 服务于读取ID
 func (v *Visitor) VisitLValueID(ctx *parser.LValueIDContext) any {
 	varSymbol := v.currentScope.Resolve(ctx.ID().GetText())
 	llvmType := v.LLVMType(varSymbol.Type())
@@ -548,6 +551,34 @@ func (v *Visitor) VisitLValueID(ctx *parser.LValueIDContext) any {
 	return ret
 }
 
+// 服务于读取数组内容
 func (v *Visitor) VisitLValueArrayAccess(ctx *parser.LValueArrayAccessContext) any {
-	panic("todo")
+	var indices []llvm.Value
+	var dfs func(parser.ILValueContext) llvm.Value
+	dfs = func(lctx parser.ILValueContext) llvm.Value {
+		switch lctx := lctx.(type) {
+		case *parser.LValueIDContext:
+			arraySymbol := v.currentScope.Resolve(lctx.ID().GetText())
+			arrayVal := GetValue(arraySymbol)
+			arrayType := arraySymbol.Type().(symtable.SymArray)
+			arrayLLVMType := v.LLVMType(arrayType)
+
+			// NOTE: 对于a[1][2][3], 递归时候按照3,2,1的顺序放入数组，因此需要reverse
+			slices.Reverse(indices)
+
+			elemPtr := v.llvmBuilder.CreateInBoundsGEP(arrayLLVMType, arrayVal, indices, "r.elem.ptr")
+			elemType := v.LLVMType(arrayType.InnerElem())
+			return v.llvmBuilder.CreateLoad(elemType, elemPtr, "tmp.r.elem")
+
+		case *parser.LValueArrayAccessContext:
+			idx := v.Visit(lctx.Expr()).(llvm.Value)
+			indices = append(indices, idx)
+			return dfs(lctx.LValue())
+
+		default:
+			panic("should not reach here")
+		}
+	}
+
+	return dfs(ctx)
 }

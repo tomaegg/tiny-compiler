@@ -308,6 +308,10 @@ func (uc *UnitCompiler) Compile() {
 		uc.Target()
 	}
 
+	uc.release()
+}
+
+func (uc *UnitCompiler) release() {
 	for _, f := range uc.releaseCallback {
 		f()
 	}
