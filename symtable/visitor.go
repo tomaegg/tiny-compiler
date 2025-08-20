@@ -1,6 +1,7 @@
 package symtable
 
 import (
+	"reflect"
 	"strconv"
 	"tj-compiler/g4/parser"
 	"tj-compiler/utils"
@@ -438,34 +439,71 @@ func (v *Visitor) VisitExprArray(ctx *parser.ExprArrayContext) any {
 	return ExprAttribute{Type: arrayType, Value: nil} // semantic阶段ignore value
 }
 
-func (v *Visitor) VisitExprArrayAccess(ctx *parser.ExprArrayAccessContext) any {
-	var (
-		token = ctx.ID().GetSymbol()
-		s     = v.currentScope.Resolve(token.GetText())
-		ret   = Error
-	)
-	switch s := s.(type) {
-	case BaseSymbol:
-		// check array
-		arrayType, ok := s.Type().(SymArray)
-		if !ok {
-			err := NewSematicErr(TypeErr).Message("array index for non array: %v", s)
-			v.LogError(err, token)
-		}
-		// check idx
-		numberAttr := v.Visit(ctx.Expr()).(ExprAttribute)
-		if !IsNumberType(numberAttr.Type) {
-			err := NewSematicErr(TypeErr).Message("array index is not a number: %v", numberAttr.Type)
-			v.LogError(err, token)
-		}
+func (v *Visitor) checkArrayIdx(ctx parser.IExprContext) {
+	ret := v.Visit(ctx).(ExprAttribute)
+	switch ret.Type.(type) {
+	case SymInt32:
+		return
 
-		if ret != nil {
-			ret = arrayType.ElemType
-		}
 	default:
-		utils.PosLogger(token).Fatalf("use invalid symbol: <%v>", token.GetText())
+		err := NewSematicErr(TypeErr).Message("index must be integer, but %v", ret.Type)
+		v.LogError(err, ctx.GetStart())
 	}
-	return ExprAttribute{Type: ret}
+}
+
+func (v *Visitor) unwrapArrayVisit(ctx parser.IExprContext) SymType {
+	switch ctx := ctx.(type) {
+	case *parser.ExprIDContext:
+		// 叶子节点，访问达到ID
+		token := ctx.ID().GetSymbol()
+		symbol := v.currentScope.Resolve(token.GetText())
+		// 必须是array type
+		if s, ok := symbol.Type().(SymArray); !ok {
+			err := NewSematicErr(TypeErr).Message("operator [] should only use for array type, actual type: %v", symbol.Type())
+			v.LogError(err, token)
+			return Error
+		} else {
+			log.Debugf("unwrap array: elems: %v", s)
+		}
+		return symbol.Type()
+
+	case *parser.ExprArrayAccessContext:
+		v.checkArrayIdx(ctx.GetRhs())
+		// 递归访问
+		ret := v.unwrapArrayVisit(ctx.GetLhs())
+		if s, ok := ret.(SymArray); ok {
+			log.Debugf("unwrap array: elems: %v", s.ElemType)
+			return s.ElemType
+		}
+		return ret
+
+	default:
+		// 出现错误
+		err := NewSematicErr(TypeErr).Message("operator [] should only use for array type, actual type: %v", reflect.TypeOf(ctx))
+		v.LogError(err, ctx.GetStart())
+		return Error
+	}
+}
+
+func (v *Visitor) VisitExprArrayAccess(ctx *parser.ExprArrayAccessContext) any {
+	// lhs = expr LBRAC rhs = expr RBRAC
+	lhs := ctx.GetLhs() // lhs expression
+	rhs := ctx.GetRhs() // rhs expression
+
+	v.checkArrayIdx(ctx.GetRhs())
+
+	switch unwrapped := v.unwrapArrayVisit(lhs).(type) {
+	case SymError:
+		return ExprAttribute{Type: Error}
+	case SymArray:
+		log.Debugf("unwrap array: elems: %v", unwrapped.ElemType)
+		return ExprAttribute{Type: unwrapped}
+
+	default: // error
+		err := NewSematicErr(TypeErr).Message("operator [] should only use for array type, actual type: %v", unwrapped)
+		v.LogError(err, rhs.GetStart())
+		return ExprAttribute{Type: Error, Value: nil}
+	}
 }
 
 func (v *Visitor) VisitStatExpr(ctx *parser.StatExprContext) any {

@@ -16,11 +16,11 @@ func (v *BaseRustLikeParserVisitor) VisitDeclaration(ctx *DeclarationContext) in
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseRustLikeParserVisitor) VisitExprArrayAccess(ctx *ExprArrayAccessContext) interface{} {
+func (v *BaseRustLikeParserVisitor) VisitExprAddSub(ctx *ExprAddSubContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseRustLikeParserVisitor) VisitExprAddSub(ctx *ExprAddSubContext) interface{} {
+func (v *BaseRustLikeParserVisitor) VisitExprArrayAccess(ctx *ExprArrayAccessContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

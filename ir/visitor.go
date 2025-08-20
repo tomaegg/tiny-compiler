@@ -450,10 +450,6 @@ func (v *Visitor) VisitExprAddSub(ctx *parser.ExprAddSubContext) any {
 	return ret
 }
 
-func (v *Visitor) VisitExprArray(ctx *parser.ExprArrayContext) any {
-	return nil
-}
-
 func (v *Visitor) VisitExprArrayAccess(ctx *parser.ExprArrayAccessContext) any {
 	return nil
 }

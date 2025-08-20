@@ -61,7 +61,7 @@ func rustlikeparserParserInit() {
 		2, 16, 7, 16, 2, 17, 7, 17, 2, 18, 7, 18, 2, 19, 7, 19, 2, 20, 7, 20, 2,
 		21, 7, 21, 2, 22, 7, 22, 1, 0, 1, 0, 1, 1, 5, 1, 50, 8, 1, 10, 1, 12, 1,
 		53, 9, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1,
-		2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 3, 2, 73, 8, 2, 1, 2, 1, 2,
+		2, 1, 2, 1, 2, 3, 2, 68, 8, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2,
 		1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 5, 2, 84, 8, 2, 10, 2, 12, 2,
 		87, 9, 2, 1, 3, 1, 3, 1, 4, 1, 4, 1, 4, 1, 4, 1, 5, 1, 5, 1, 5, 5, 5, 98,
 		8, 5, 10, 5, 12, 5, 101, 9, 5, 1, 5, 3, 5, 104, 8, 5, 1, 6, 1, 6, 1, 6,
@@ -82,7 +82,7 @@ func rustlikeparserParserInit() {
 		20, 1, 21, 1, 21, 1, 21, 1, 22, 1, 22, 1, 22, 1, 22, 0, 1, 4, 23, 0, 2,
 		4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40,
 		42, 44, 0, 3, 1, 0, 19, 20, 1, 0, 17, 18, 1, 0, 21, 26, 258, 0, 46, 1,
-		0, 0, 0, 2, 51, 1, 0, 0, 0, 4, 72, 1, 0, 0, 0, 6, 88, 1, 0, 0, 0, 8, 90,
+		0, 0, 0, 2, 51, 1, 0, 0, 0, 4, 67, 1, 0, 0, 0, 6, 88, 1, 0, 0, 0, 8, 90,
 		1, 0, 0, 0, 10, 103, 1, 0, 0, 0, 12, 105, 1, 0, 0, 0, 14, 108, 1, 0, 0,
 		0, 16, 114, 1, 0, 0, 0, 18, 117, 1, 0, 0, 0, 20, 130, 1, 0, 0, 0, 22, 133,
 		1, 0, 0, 0, 24, 139, 1, 0, 0, 0, 26, 150, 1, 0, 0, 0, 28, 152, 1, 0, 0,
@@ -92,16 +92,16 @@ func rustlikeparserParserInit() {
 		3, 12, 6, 0, 49, 48, 1, 0, 0, 0, 50, 53, 1, 0, 0, 0, 51, 49, 1, 0, 0, 0,
 		51, 52, 1, 0, 0, 0, 52, 3, 1, 0, 0, 0, 53, 51, 1, 0, 0, 0, 54, 55, 6, 2,
 		-1, 0, 55, 56, 5, 33, 0, 0, 56, 57, 3, 30, 15, 0, 57, 58, 5, 34, 0, 0,
-		58, 73, 1, 0, 0, 0, 59, 60, 5, 31, 0, 0, 60, 61, 3, 4, 2, 0, 61, 62, 5,
-		32, 0, 0, 62, 73, 1, 0, 0, 0, 63, 64, 5, 15, 0, 0, 64, 65, 5, 33, 0, 0,
-		65, 66, 3, 4, 2, 0, 66, 67, 5, 34, 0, 0, 67, 73, 1, 0, 0, 0, 68, 69, 5,
-		15, 0, 0, 69, 73, 3, 8, 4, 0, 70, 73, 5, 15, 0, 0, 71, 73, 3, 6, 3, 0,
-		72, 54, 1, 0, 0, 0, 72, 59, 1, 0, 0, 0, 72, 63, 1, 0, 0, 0, 72, 68, 1,
-		0, 0, 0, 72, 70, 1, 0, 0, 0, 72, 71, 1, 0, 0, 0, 73, 85, 1, 0, 0, 0, 74,
-		75, 10, 9, 0, 0, 75, 76, 7, 0, 0, 0, 76, 84, 3, 4, 2, 10, 77, 78, 10, 8,
-		0, 0, 78, 79, 7, 1, 0, 0, 79, 84, 3, 4, 2, 9, 80, 81, 10, 7, 0, 0, 81,
-		82, 7, 2, 0, 0, 82, 84, 3, 4, 2, 8, 83, 74, 1, 0, 0, 0, 83, 77, 1, 0, 0,
-		0, 83, 80, 1, 0, 0, 0, 84, 87, 1, 0, 0, 0, 85, 83, 1, 0, 0, 0, 85, 86,
+		58, 68, 1, 0, 0, 0, 59, 60, 5, 31, 0, 0, 60, 61, 3, 4, 2, 0, 61, 62, 5,
+		32, 0, 0, 62, 68, 1, 0, 0, 0, 63, 64, 5, 15, 0, 0, 64, 68, 3, 8, 4, 0,
+		65, 68, 5, 15, 0, 0, 66, 68, 3, 6, 3, 0, 67, 54, 1, 0, 0, 0, 67, 59, 1,
+		0, 0, 0, 67, 63, 1, 0, 0, 0, 67, 65, 1, 0, 0, 0, 67, 66, 1, 0, 0, 0, 68,
+		85, 1, 0, 0, 0, 69, 70, 10, 9, 0, 0, 70, 71, 7, 0, 0, 0, 71, 84, 3, 4,
+		2, 10, 72, 73, 10, 8, 0, 0, 73, 74, 7, 1, 0, 0, 74, 84, 3, 4, 2, 9, 75,
+		76, 10, 7, 0, 0, 76, 77, 7, 2, 0, 0, 77, 84, 3, 4, 2, 8, 78, 79, 10, 4,
+		0, 0, 79, 80, 5, 33, 0, 0, 80, 81, 3, 4, 2, 0, 81, 82, 5, 34, 0, 0, 82,
+		84, 1, 0, 0, 0, 83, 69, 1, 0, 0, 0, 83, 72, 1, 0, 0, 0, 83, 75, 1, 0, 0,
+		0, 83, 78, 1, 0, 0, 0, 84, 87, 1, 0, 0, 0, 85, 83, 1, 0, 0, 0, 85, 86,
 		1, 0, 0, 0, 86, 5, 1, 0, 0, 0, 87, 85, 1, 0, 0, 0, 88, 89, 5, 16, 0, 0,
 		89, 7, 1, 0, 0, 0, 90, 91, 5, 31, 0, 0, 91, 92, 3, 10, 5, 0, 92, 93, 5,
 		32, 0, 0, 93, 9, 1, 0, 0, 0, 94, 99, 3, 4, 2, 0, 95, 96, 5, 30, 0, 0, 96,
@@ -159,7 +159,7 @@ func rustlikeparserParserInit() {
 		3, 32, 16, 0, 235, 39, 1, 0, 0, 0, 236, 237, 5, 7, 0, 0, 237, 238, 3, 32,
 		16, 0, 238, 41, 1, 0, 0, 0, 239, 240, 5, 29, 0, 0, 240, 241, 3, 26, 13,
 		0, 241, 43, 1, 0, 0, 0, 242, 243, 5, 27, 0, 0, 243, 244, 3, 4, 2, 0, 244,
-		45, 1, 0, 0, 0, 22, 51, 72, 83, 85, 99, 103, 112, 126, 130, 133, 143, 150,
+		45, 1, 0, 0, 0, 22, 51, 67, 83, 85, 99, 103, 112, 126, 130, 133, 143, 150,
 		163, 167, 173, 181, 190, 194, 197, 212, 216, 225,
 	}
 	deserializer := antlr.NewATNDeserializer(nil)
@@ -569,62 +569,6 @@ func (s *ExprContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) s
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-type ExprArrayAccessContext struct {
-	ExprContext
-}
-
-func NewExprArrayAccessContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ExprArrayAccessContext {
-	var p = new(ExprArrayAccessContext)
-
-	InitEmptyExprContext(&p.ExprContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*ExprContext))
-
-	return p
-}
-
-func (s *ExprArrayAccessContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *ExprArrayAccessContext) ID() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserID, 0)
-}
-
-func (s *ExprArrayAccessContext) LBRAC() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserLBRAC, 0)
-}
-
-func (s *ExprArrayAccessContext) Expr() IExprContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IExprContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IExprContext)
-}
-
-func (s *ExprArrayAccessContext) RBRAC() antlr.TerminalNode {
-	return s.GetToken(RustLikeParserRBRAC, 0)
-}
-
-func (s *ExprArrayAccessContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case RustLikeParserVisitor:
-		return t.VisitExprArrayAccess(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
 type ExprAddSubContext struct {
 	ExprContext
 	lhs IExprContext
@@ -711,6 +655,93 @@ func (s *ExprAddSubContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case RustLikeParserVisitor:
 		return t.VisitExprAddSub(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+type ExprArrayAccessContext struct {
+	ExprContext
+	lhs IExprContext
+	rhs IExprContext
+}
+
+func NewExprArrayAccessContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ExprArrayAccessContext {
+	var p = new(ExprArrayAccessContext)
+
+	InitEmptyExprContext(&p.ExprContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExprContext))
+
+	return p
+}
+
+func (s *ExprArrayAccessContext) GetLhs() IExprContext { return s.lhs }
+
+func (s *ExprArrayAccessContext) GetRhs() IExprContext { return s.rhs }
+
+func (s *ExprArrayAccessContext) SetLhs(v IExprContext) { s.lhs = v }
+
+func (s *ExprArrayAccessContext) SetRhs(v IExprContext) { s.rhs = v }
+
+func (s *ExprArrayAccessContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ExprArrayAccessContext) LBRAC() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserLBRAC, 0)
+}
+
+func (s *ExprArrayAccessContext) RBRAC() antlr.TerminalNode {
+	return s.GetToken(RustLikeParserRBRAC, 0)
+}
+
+func (s *ExprArrayAccessContext) AllExpr() []IExprContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExprContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExprContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExprContext); ok {
+			tst[i] = t.(IExprContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *ExprArrayAccessContext) Expr(i int) IExprContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExprContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExprContext)
+}
+
+func (s *ExprArrayAccessContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RustLikeParserVisitor:
+		return t.VisitExprArrayAccess(s)
 
 	default:
 		return t.VisitChildren(s)
@@ -1163,7 +1194,7 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(72)
+	p.SetState(67)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -1222,7 +1253,7 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 		}
 
 	case 3:
-		localctx = NewExprArrayAccessContext(p, localctx)
+		localctx = NewExprFuncCallContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
@@ -1235,48 +1266,15 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 		}
 		{
 			p.SetState(64)
-			p.Match(RustLikeParserLBRAC)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-		{
-			p.SetState(65)
-			p.expr(0)
-		}
-		{
-			p.SetState(66)
-			p.Match(RustLikeParserRBRAC)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-
-	case 4:
-		localctx = NewExprFuncCallContext(p, localctx)
-		p.SetParserRuleContext(localctx)
-		_prevctx = localctx
-		{
-			p.SetState(68)
-			p.Match(RustLikeParserID)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-		{
-			p.SetState(69)
 			p.FuncCallList()
 		}
 
-	case 5:
+	case 4:
 		localctx = NewExprIDContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(70)
+			p.SetState(65)
 			p.Match(RustLikeParserID)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -1284,12 +1282,12 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 			}
 		}
 
-	case 6:
+	case 5:
 		localctx = NewExprNumContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(71)
+			p.SetState(66)
 			p.ExprNumber()
 		}
 
@@ -1324,14 +1322,14 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*ExprMulDivContext).lhs = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, RustLikeParserRULE_expr)
-				p.SetState(74)
+				p.SetState(69)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 9)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 9)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(75)
+					p.SetState(70)
 
 					var _lt = p.GetTokenStream().LT(1)
 
@@ -1349,7 +1347,7 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 					}
 				}
 				{
-					p.SetState(76)
+					p.SetState(71)
 
 					var _x = p.expr(10)
 
@@ -1361,14 +1359,14 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*ExprAddSubContext).lhs = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, RustLikeParserRULE_expr)
-				p.SetState(77)
+				p.SetState(72)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 8)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 8)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(78)
+					p.SetState(73)
 
 					var _lt = p.GetTokenStream().LT(1)
 
@@ -1386,7 +1384,7 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 					}
 				}
 				{
-					p.SetState(79)
+					p.SetState(74)
 
 					var _x = p.expr(9)
 
@@ -1398,14 +1396,14 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*ExprCmpContext).lhs = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, RustLikeParserRULE_expr)
-				p.SetState(80)
+				p.SetState(75)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 7)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 7)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(81)
+					p.SetState(76)
 
 					var _lt = p.GetTokenStream().LT(1)
 
@@ -1423,11 +1421,46 @@ func (p *RustLikeParser) expr(_p int) (localctx IExprContext) {
 					}
 				}
 				{
-					p.SetState(82)
+					p.SetState(77)
 
 					var _x = p.expr(8)
 
 					localctx.(*ExprCmpContext).rhs = _x
+				}
+
+			case 4:
+				localctx = NewExprArrayAccessContext(p, NewExprContext(p, _parentctx, _parentState))
+				localctx.(*ExprArrayAccessContext).lhs = _prevctx
+
+				p.PushNewRecursionContext(localctx, _startState, RustLikeParserRULE_expr)
+				p.SetState(78)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 4)) {
+					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 4)", ""))
+					goto errorExit
+				}
+				{
+					p.SetState(79)
+					p.Match(RustLikeParserLBRAC)
+					if p.HasError() {
+						// Recognition error - abort rule
+						goto errorExit
+					}
+				}
+				{
+					p.SetState(80)
+
+					var _x = p.expr(0)
+
+					localctx.(*ExprArrayAccessContext).rhs = _x
+				}
+				{
+					p.SetState(81)
+					p.Match(RustLikeParserRBRAC)
+					if p.HasError() {
+						// Recognition error - abort rule
+						goto errorExit
+					}
 				}
 
 			case antlr.ATNInvalidAltNumber:
@@ -5183,6 +5216,9 @@ func (p *RustLikeParser) Expr_Sempred(localctx antlr.RuleContext, predIndex int)
 
 	case 2:
 		return p.Precpred(p.GetParserRuleContext(), 7)
+
+	case 3:
+		return p.Precpred(p.GetParserRuleContext(), 4)
 
 	default:
 		panic("No predicate with index: " + fmt.Sprint(predIndex))

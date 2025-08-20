@@ -14,11 +14,11 @@ type RustLikeParserVisitor interface {
 	// Visit a parse tree produced by RustLikeParser#declaration.
 	VisitDeclaration(ctx *DeclarationContext) interface{}
 
-	// Visit a parse tree produced by RustLikeParser#ExprArrayAccess.
-	VisitExprArrayAccess(ctx *ExprArrayAccessContext) interface{}
-
 	// Visit a parse tree produced by RustLikeParser#ExprAddSub.
 	VisitExprAddSub(ctx *ExprAddSubContext) interface{}
+
+	// Visit a parse tree produced by RustLikeParser#ExprArrayAccess.
+	VisitExprArrayAccess(ctx *ExprArrayAccessContext) interface{}
 
 	// Visit a parse tree produced by RustLikeParser#ExprParen.
 	VisitExprParen(ctx *ExprParenContext) interface{}

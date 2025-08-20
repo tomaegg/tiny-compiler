@@ -13,7 +13,7 @@ expr:
 	| lhs = expr op = (EQ | NE | LT | GT | LE | GE) rhs = expr	# ExprCmp
 	| LBRAC arrayElems RBRAC									# ExprArray
 	| LPAREN expr RPAREN										# ExprParen
-	| ID LBRAC expr RBRAC										# ExprArrayAccess
+	| lhs = expr LBRAC rhs = expr RBRAC					# ExprArrayAccess
 	| ID funcCallList											# ExprFuncCall
 	| ID														# ExprID
 	| exprNumber													# ExprNum;
