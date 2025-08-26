@@ -229,8 +229,8 @@ func (uc *UnitCompiler) Semantic() {
 		log.Info("semantic check passed")
 	}
 
-	if !uc.dotGraph {
-		return
+	if uc.dotGraph {
+		uc.DotGraph()
 	}
 }
 
