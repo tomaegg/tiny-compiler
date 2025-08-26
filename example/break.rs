@@ -75,5 +75,12 @@ fn main() ->i32 {
         break;
     }
 
-    return 0;
+    loop {
+        if a == 99 {
+            break;
+        }
+        a = a + 1;
+    }
+
+    return a;
 }
