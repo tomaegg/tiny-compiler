@@ -234,8 +234,12 @@ func (v *Visitor) assignArray(entryCtx parser.IExprContext, array symtable.Symbo
 				path = path[:len(path)-1] // pop
 			}
 		default:
+
+			zeroVal := llvm.ConstInt(v.llvmCtx.Int32Type(), 0, false)
 			// 数组赋值 0...length
-			llvmIndices := make([]llvm.Value, 0, len(path))
+			llvmIndices := make([]llvm.Value, 0, len(path)+1)
+			llvmIndices = append(llvmIndices, zeroVal)
+
 			for _, idx := range path {
 				llvmIdx := llvm.ConstInt(v.llvmCtx.Int32Type(), uint64(idx), false)
 				llvmIndices = append(llvmIndices, llvmIdx)
@@ -532,7 +536,18 @@ func (v *Visitor) VisitExprFuncCall(ctx *parser.ExprFuncCallContext) any {
 	}
 	log.Debugf("LLVM call function: %s", fnType.String())
 	args := v.Visit(ctx.FuncCallList()).([]llvm.Value)
-	return v.llvmBuilder.CreateCall(fnType, fn, args, "callret_"+funcSymbol.Name())
+
+	name := "callret." + funcSymbol.Name()
+	call := v.llvmBuilder.CreateCall(fnType, fn, args, "")
+
+	switch call.Type().TypeKind() {
+	case llvm.VoidTypeKind:
+		return call
+
+	default:
+		call.SetName(name)
+		return call
+	}
 }
 
 func (v *Visitor) VisitExprParen(ctx *parser.ExprParenContext) any {
@@ -553,6 +568,7 @@ func (v *Visitor) VisitLValueID(ctx *parser.LValueIDContext) any {
 }
 
 func (v *Visitor) llvmArrayElem(ctx *parser.LValueArrayAccessContext) (etype llvm.Type, ptr llvm.Value) {
+	zeroVal := llvm.ConstInt(v.llvmCtx.Int32Type(), 0, false)
 	var indices []llvm.Value
 	var dfs func(parser.ILValueContext) (llvm.Type, llvm.Value)
 	dfs = func(lctx parser.ILValueContext) (llvm.Type, llvm.Value) {
@@ -564,6 +580,7 @@ func (v *Visitor) llvmArrayElem(ctx *parser.LValueArrayAccessContext) (etype llv
 			arrayLLVMType := v.LLVMType(arrayType)
 
 			// NOTE: 对于a[1][2][3], 递归时候按照3,2,1的顺序放入数组，因此需要reverse
+			indices = append(indices, zeroVal)
 			slices.Reverse(indices)
 
 			elemPtr := v.llvmBuilder.CreateInBoundsGEP(arrayLLVMType, arrayVal, indices, "r.elem.ptr")

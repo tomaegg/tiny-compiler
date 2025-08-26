@@ -285,8 +285,12 @@ func (v *Visitor) VisitStatVarDeclare(ctx *parser.StatVarDeclareContext) any {
 // different expression
 
 func (v *Visitor) VisitExprFuncCall(ctx *parser.ExprFuncCallContext) any {
-	funcName := ctx.ID().GetSymbol().GetText()
-	funcSymbol := v.currentScope.Resolve(funcName).(FuncSymbol)
+	token := ctx.ID().GetSymbol()
+	funcName := token.GetText()
+	funcSymbol, ok := v.currentScope.Resolve(funcName).(FuncSymbol)
+	if !ok {
+		utils.PosLogger(token).Fatalf("use unknown function symbol: <%v>", token.GetText())
+	}
 	paramsRequired := funcSymbol.Params()
 
 	// 检查参数数量
