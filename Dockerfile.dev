@@ -3,6 +3,8 @@ FROM debian:bookworm-slim
 ARG GO_VERSION=1.24.5
 ENV GO_VERSION=${GO_VERSION}
 
+RUN rm -f /etc/apt/sources.list && rm -rf /etc/apt/sources.d
+COPY sources.list /etc/apt/sources.list
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \

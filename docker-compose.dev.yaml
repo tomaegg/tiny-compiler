@@ -1,6 +1,7 @@
 services:
   go-llvm-dev:
     tty: true
+    image: tiny-compiler:dev
     build:
       context: .
       dockerfile: Dockerfile.dev
